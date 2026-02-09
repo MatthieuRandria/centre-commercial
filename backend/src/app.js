@@ -1,30 +1,12 @@
 const express = require("express");
-const session = require('express-session');
-const flash = require('connect-flash');
-const path = require('path');
+const cors = require("cors");
+const bodyParser = require("body-parser");
+
 const app = express();
+app.use(cors());
+app.use(bodyParser.json());
 
-
-app.use(express.static(path.join(__dirname, "public")));
-app.use(express.urlencoded({ extended: true })); // ✅ POUR FORMULAIRES
-app.use(express.json()); // Middleware pour lire le JSON
-
-// Session
-app.use(session({
-    name:'sid',
-    secret: 'super-secret-key',
-    resave: false,
-    saveUninitialized: false,
-    cookie:{
-        httpOnly: true,
-        sameSite: 'lax',
-        secure: false
-    }
-}));
-
-// flash
-app.use(flash());
-
-// Routers
+const authRoutes = require("./routes/auth.routes");
+app.use("/api/auth", authRoutes);
 
 module.exports = app;

@@ -1,0 +1,15 @@
+<h2>Connexion</h2>
+
+<div>
+  <input type="email" placeholder="Email" [(ngModel)]="email">
+  <p style="color:red">{{ emailError }}</p>
+</div>
+
+<div>
+  <input type="password" placeholder="Mot de passe" [(ngModel)]="password">
+  <p style="color:red">{{ passwordError }}</p>
+</div>
+
+<button (click)="login()">Se connecter</button>
+
+<p style="color:red">{{ error }}</p>

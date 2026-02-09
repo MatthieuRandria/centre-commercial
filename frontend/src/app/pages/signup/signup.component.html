@@ -1,0 +1,10 @@
+<h2>Inscription</h2>
+
+<input type="text" placeholder="Nom" [(ngModel)]="nom">
+<input type="email" placeholder="Email" [(ngModel)]="email">
+<input type="text" placeholder="Phone" [(ngModel)]="phone">
+<input type="password" placeholder="Mot de passe" [(ngModel)]="password">
+
+<button (click)="signup()">S’inscrire</button>
+
+<p style="color:red">{{ error }}</p>

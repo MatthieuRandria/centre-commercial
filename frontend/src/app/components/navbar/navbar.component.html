@@ -1,0 +1,15 @@
+<nav>
+  <a routerLink="/">Accueil</a>
+
+  <ng-container *ngIf="user; else guest">
+    <span>👋 Bonjour {{ user.nom || user.email }}</span>
+    <a routerLink="/dashboard">Dashboard</a>
+    <button (click)="logout()">Logout</button>
+  </ng-container>
+
+  <ng-template #guest>
+    <a routerLink="/login">Login</a>
+    <a routerLink="/signup">Signup</a>
+  </ng-template>
+</nav>
+<hr>
