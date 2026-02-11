@@ -1,0 +1,1948 @@
+ity lesy baina ah
+
+CONTRAINTES TECHNIQUES:
+• Base de données: MongoDB
+• Backend: Express.js + JavaScript (PAS de TypeScript)
+• Frontend: Angular (JavaScript ou TypeScript au choix)
+
+======================================================
+                  MONGODB 
+======================================================
+
+USERS Collection:
+{
+   _id: ObjectId,
+   email: String (unique),
+   telephone: String,
+   motDePasse: String (hashé),
+   role: Number (0=client, 1=admin, 2=manager),
+   nom: String,
+   prenom: String,
+   image: String,
+   createdAt: Date,
+   updatedAt: Date
+}
+
+CENTRE_COMMERCIAL Collection:
+{
+   _id: ObjectId,
+   nom: String,
+   description: String,
+   image: String,
+   heureOuverture: String,
+   heureFermeture: String,
+   createdAt: Date
+}
+
+BOUTIQUE_CATEGORIES Collection:
+{
+   _id: ObjectId,
+   nom: String (unique)
+}
+
+BOUTIQUES Collection:
+{
+   _id: ObjectId,
+   nom: String,
+   statut: Number (0=fermée, 1=ouverte, 2=congé),
+   centreId: ObjectId (ref: centre_commercial),
+   categorieId: ObjectId (ref: boutique_categories),
+   localisation: {
+      numeroEmplacement: String,
+      etage: String,
+      zone: String,
+      latitude: Number,
+      longitude: Number,
+      planReference: String
+   },
+   infos: {
+      description: String,
+      logo: String,
+      banniere: String,
+      couleur: String,
+      telephone: String,
+      email: String
+   },
+   horaires: [{
+      jour: String,
+      ouverture: String,
+      fermeture: String
+   }],
+   createdAt: Date
+}
+
+CONTRACTS_BOUTIQUE Collection:
+{
+   _id: ObjectId,
+   boutiqueId: ObjectId (ref: boutiques),
+   dateDebut: Date,
+   dateFin: Date,
+   statut: Number (0=inactif, 1=actif)
+}
+
+USER_BOUTIQUE Collection (relation):
+{
+   _id: ObjectId,
+   userId: ObjectId (ref: users),
+   boutiqueId: ObjectId (ref: boutiques),
+   role: Number (0=employé, 1=manager)
+}
+
+PRODUITS Collection:
+{
+   _id: ObjectId,
+   boutiqueId: ObjectId (ref: boutiques),
+   nom: String,
+   categorie: String,
+   sousCategorie: String,
+   prix: Number,
+   stock: Number,
+   actif: Boolean,
+   vues: Number,
+   description: String,
+   enPromotion: Boolean,
+   prixPromo: Number,
+   images: [String],
+   variantes: [{
+      type: String (taille/couleur),
+      valeur: String,
+      stock: Number
+   }],
+   createdAt: Date,
+   updatedAt: Date
+}
+
+PANIERS Collection:
+{
+   _id: ObjectId,
+   acheteurId: ObjectId (ref: users),
+   articles: [{
+      produitId: ObjectId (ref: produits),
+      quantite: Number
+   }],
+   createdAt: Date,
+   updatedAt: Date
+}
+
+COMMANDES Collection:
+{
+   _id: ObjectId,
+   numeroCommande: String (auto-généré),
+   acheteurId: ObjectId (ref: users),
+   statut: String (en_attente, payee, preparee, prete, retiree, livree, annulee),
+   total: Number,
+   modeRetrait: String (click_collect, livraison),
+   articles: [{
+      produitId: ObjectId (ref: produits),
+      boutiqueId: ObjectId (ref: boutiques),
+      quantite: Number,
+      prixUnitaire: Number
+   }],
+   createdAt: Date,
+   updatedAt: Date
+}
+
+PAIEMENTS Collection:
+{
+   _id: ObjectId,
+   commandeId: ObjectId (ref: commandes),
+   methode: String (carte, mobile_money, retrait),
+   statut: String,
+   montant: Number,
+   datePaiement: Date
+}
+
+AVIS Collection:
+{
+   _id: ObjectId,
+   userId: ObjectId (ref: users),
+   type: String (produit, boutique),
+   cibleId: ObjectId (ref dynamique),
+   note: Number (1-5),
+   commentaire: String,
+   createdAt: Date
+}
+
+FAVORIS Collection:
+{
+   _id: ObjectId,
+   userId: ObjectId (ref: users),
+   produitId: ObjectId (ref: produits),
+   createdAt: Date
+}
+
+PROMOTIONS Collection:
+{
+   _id: ObjectId,
+   boutiqueId: ObjectId (ref: boutiques),
+   code: String,
+   type: String (pourcentage, montant, flash),
+   valeur: Number,
+   dateDebut: Date,
+   dateFin: Date
+}
+
+FIDELITE Collection:
+{
+   _id: ObjectId,
+   userId: ObjectId (ref: users),
+   points: Number,
+   description: String,
+   dateAction: Date
+}
+
+ACTUALITES Collection:
+{
+   _id: ObjectId,
+   centreId: ObjectId (ref: centre_commercial),
+   titre: String,
+   contenu: String,
+   datePublication: Date
+}
+
+EVENEMENTS Collection:
+{
+   _id: ObjectId,
+   centreId: ObjectId (ref: centre_commercial),
+   titre: String,
+   description: String,
+   dateEvent: Date
+}
+
+================================================================================
+                    PHASE 1 - AUTHENTIFICATION
+================================================================================
+
+[ ] TASK 1.1 - Modèle User (Backend)
+   Fichier: backend/models/User.js
+   
+   Description:
+   - Créer schéma Mongoose pour users
+   - Champs: email, telephone, motDePasse, role, nom, prenom, image
+   - Méthodes statiques:
+   * findByEmail(email)
+   * createUser(userData)
+   - Middleware pre-save pour hasher password (bcryptjs)
+   
+   Collections: users
+
+[ ] TASK 1.2 - Controller Auth - Inscription
+   Fichier: backend/controllers/auth.controller.js
+   
+   Description:
+   - Fonction register(req, res):
+   * Recevoir: { email, telephone, motDePasse, role, nom, prenom }
+   * Valider email unique
+   * Hasher mot de passe (bcrypt, 10 rounds)
+   * Créer user dans MongoDB
+   * Générer token JWT
+   * Retourner: { token, user }
+   
+   Validation:
+   - Email format valide
+   - Password min 8 caractères
+   - Téléphone format international
+   
+   Collections: users
+
+[ ] TASK 1.3 - Controller Auth - Connexion
+   Fichier: backend/controllers/auth.controller.js
+   
+   Description:
+   - Fonction login(req, res):
+   * Recevoir: { email, motDePasse }
+   * Chercher user par email
+   * Comparer password avec bcrypt
+   * Générer token JWT (payload: userId, role)
+   * Retourner: { token, user }
+   
+   Collections: users
+
+[ ] TASK 1.4 - Middleware Auth
+   Fichier: backend/middlewares/auth.middleware.js
+   
+   Description:
+   - Fonction auth(req, res, next):
+   * Extraire token du header Authorization
+   * Vérifier et décoder JWT
+   * Attacher user à req.user
+   * Appeler next() ou retourner 401
+   
+   - Fonction checkRole(roles):
+   * Vérifier req.user.role dans roles autorisés
+   * Retourner 403 si non autorisé
+
+[ ] TASK 1.5 - Routes Auth
+   Fichier: backend/routes/auth.routes.js
+   
+   Routes:
+   - POST /api/auth/register - Inscription
+   - POST /api/auth/login - Connexion
+   - GET /api/auth/me - Profil actuel (auth middleware)
+   
+   Collections: users
+
+[ ] TASK 1.6 - Service Auth (Frontend)
+   Fichier: frontend/src/app/core/services/auth.service.ts
+   
+   Description:
+   - Méthodes:
+   * register(userData): Observable
+   * login(email, password): Observable
+   * logout(): void
+   * getCurrentUser(): Observable<User>
+   * isAuthenticated(): boolean
+   * hasRole(role): boolean
+   - Stocker token dans localStorage
+   - BehaviorSubject pour currentUser
+
+[ ] TASK 1.7 - Guards Angular
+   Fichiers: 
+   - frontend/src/app/core/guards/auth.guard.ts
+   - frontend/src/app/core/guards/role.guard.ts
+   
+   Description:
+   - AuthGuard: vérifier authentification
+   - RoleGuard: vérifier rôle (admin=1, manager=2)
+
+[ ] TASK 1.8 - PAGE: Connexion (Frontend)
+   Fichier: frontend/src/app/modules/auth/pages/login/
+   Route: /login
+   
+   Données affichées:
+   - Aucune (formulaire uniquement)
+   
+   Formulaire:
+   - Input email (required, email format)
+   - Input password (required, min 8 chars)
+   - Checkbox "Se souvenir"
+   - Bouton "Se connecter"
+   - Lien "Mot de passe oublié"
+   - Lien "Créer un compte"
+   
+   Actions:
+   - Submit → authService.login()
+   - Succès → redirection selon role:
+   * role=1 (admin) → /admin/dashboard
+   * role=2 (manager) → /boutique/dashboard
+   * role=0 (client) → /accueil
+   - Erreur → afficher message
+
+[ ] TASK 1.9 - PAGE: Inscription (Frontend)
+   Fichier: frontend/src/app/modules/auth/pages/register/
+   Route: /register
+   
+   Données affichées:
+   - Aucune (formulaire uniquement)
+   
+   Formulaire:
+   - Input nom (required)
+   - Input prénom (required)
+   - Input email (required, unique)
+   - Input téléphone (required)
+   - Input password (required, min 8)
+   - Input confirmation password (match)
+   - Select rôle (client par défaut, option boutique)
+   - Checkbox CGU (required)
+   - Bouton "S'inscrire"
+   
+   Actions:
+   - Submit → authService.register()
+   - Succès → redirection /login avec message
+   - Erreur → afficher erreurs
+
+================================================================================
+                  PHASE 2 - GESTION BOUTIQUES
+================================================================================
+
+[ ] TASK 2.1 - Modèle Boutique (Backend)
+   Fichier: backend/models/Boutique.js
+   
+   Description:
+   - Schéma Mongoose avec sous-documents:
+   * localisation (embedded)
+   * infos (embedded)
+   * horaires (array embedded)
+   - Méthodes:
+   * findWithDetails() - populate centre et categorie
+   * findByUser(userId) - via user_boutique
+   
+   Collections: boutiques, centre_commercial, boutique_categories
+
+[ ] TASK 2.2 - Controller Boutique
+   Fichier: backend/controllers/boutique.controller.js
+   
+   Description:
+   - getAllBoutiques(req, res):
+   * Filtres: centreId, categorieId, statut
+   * Populate centre et categorie
+   * Pagination (page, limit)
+   * Retourner: { boutiques, total, page }
+   
+   - getBoutiqueById(req, res):
+   * Populate toutes références
+   * Retourner boutique complète
+   
+   - createBoutique(req, res): (admin)
+   * Créer boutique avec sous-documents
+   * Créer horaires par défaut (7 jours)
+   
+   - updateBoutique(req, res): (admin/manager)
+   * Modifier infos, localisation, horaires
+   
+   Collections: boutiques, centre_commercial, boutique_categories
+
+[ ] TASK 2.3 - Routes Boutiques
+   Fichier: backend/routes/boutique.routes.js
+   
+   Routes:
+   - GET /api/boutiques - Liste (public)
+   - GET /api/boutiques/:id - Détail (public)
+   - POST /api/boutiques - Créer (admin)
+   - PUT /api/boutiques/:id - Modifier (admin/manager)
+   - DELETE /api/boutiques/:id - Supprimer (admin)
+
+[ ] TASK 2.4 - Service Boutique (Frontend)
+   Fichier: frontend/src/app/core/services/boutique.service.ts
+   
+   Méthodes:
+   - getBoutiques(filters): Observable<{boutiques, total}>
+   - getBoutiqueById(id): Observable<Boutique>
+   - createBoutique(data): Observable<Boutique>
+   - updateBoutique(id, data): Observable<Boutique>
+
+[ ] TASK 2.5 - PAGE: Liste Boutiques Admin (Frontend)
+   Fichier: frontend/src/app/modules/admin/pages/boutiques-list/
+   Route: /admin/boutiques
+   Accès: Admin uniquement (role=1)
+   
+   Données affichées (depuis API):
+   - Liste boutiques depuis GET /api/boutiques
+   - Pour chaque boutique:
+   * _id
+   * nom
+   * statut (0=fermée, 1=ouverte, 2=congé)
+   * centre.nom (populated)
+   * categorie.nom (populated)
+   * createdAt
+   
+   Composants:
+   - Tableau avec colonnes: Logo, Nom, Catégorie, Centre, Statut, Date création, Actions
+   - Filtres sidebar:
+   * Select centre (depuis GET /api/centres)
+   * Select catégorie (depuis GET /api/boutique-categories)
+   * Select statut (0/1/2)
+   - Input recherche nom (local filter)
+   - Pagination (10 par page)
+   - Bouton "Ajouter boutique" → /admin/boutiques/new
+   
+   Actions par ligne:
+   - Bouton "Voir" → /admin/boutiques/:id
+   - Bouton "Modifier" → /admin/boutiques/:id/edit
+   - Bouton "Supprimer" → confirmation + DELETE /api/boutiques/:id
+
+[ ] TASK 2.6 - PAGE: Formulaire Boutique (Frontend)
+   Fichier: frontend/src/app/modules/admin/pages/boutique-form/
+   Route: /admin/boutiques/new et /admin/boutiques/:id/edit
+   Accès: Admin uniquement
+   
+   Données affichées (mode édition):
+   - Boutique depuis GET /api/boutiques/:id (si edit)
+   - Liste centres depuis GET /api/centres
+   - Liste catégories depuis GET /api/boutique-categories
+   
+   Formulaire (onglets):
+   
+   ONGLET 1: Informations générales
+   - Input nom (required)
+   - Select centre (required, liste centres)
+   - Select catégorie (required, liste catégories)
+   - Radio statut (0=fermée, 1=ouverte, 2=congé)
+   
+   ONGLET 2: Informations détaillées
+   - Textarea description
+   - Upload logo (image)
+   - Upload bannière (image)
+   - Color picker couleur
+   - Input téléphone
+   - Input email
+   
+   ONGLET 3: Localisation
+   - Input numéro emplacement
+   - Input étage
+   - Input zone
+   - Input latitude (number)
+   - Input longitude (number)
+   - Input plan référence
+   - Carte interactive (optionnel)
+   
+   ONGLET 4: Horaires
+   - 7 lignes (Lundi à Dimanche)
+   - Pour chaque jour:
+   * Input ouverture (time)
+   * Input fermeture (time)
+   
+   Actions:
+   - Bouton "Enregistrer" → POST /api/boutiques (new) ou PUT /api/boutiques/:id (edit)
+   - Bouton "Annuler" → retour liste
+
+[ ] TASK 2.7 - PAGE: Liste Boutiques Public (Frontend)
+   Fichier: frontend/src/app/modules/acheteur/pages/boutiques-list/
+   Route: /boutiques
+   Accès: Public
+   
+   Données affichées:
+   - Liste boutiques depuis GET /api/boutiques?statut=1 (ouvertes uniquement)
+   - Pour chaque boutique:
+   * _id
+   * nom
+   * infos.logo
+   * infos.description (tronquée 100 chars)
+   * categorie.nom
+   * statut (badge: Ouvert/Fermé selon horaires actuels)
+   
+   Composants:
+   - Grille de cartes boutiques (3 colonnes)
+   - Chaque carte:
+   * Image logo (ou placeholder)
+   * Nom boutique
+   * Catégorie
+   * Badge statut (vert=ouvert, rouge=fermé)
+   * Bouton "Voir la boutique"
+   - Filtres sidebar:
+   * Liste catégories (checkbox)
+   * Recherche par nom
+   - Pagination
+   
+   Actions:
+   - Click carte → /boutiques/:id
+
+[ ] TASK 2.8 - PAGE: Détail Boutique Public (Frontend)
+   Fichier: frontend/src/app/modules/acheteur/pages/boutique-detail/
+   Route: /boutiques/:id
+   Accès: Public
+   
+   Données affichées:
+   - Boutique depuis GET /api/boutiques/:id
+   * nom
+   * infos.banniere (header image)
+   * infos.logo
+   * infos.description
+   * infos.telephone
+   * infos.email
+   * horaires (tableau 7 jours)
+   * localisation (étage, zone)
+   
+   - Produits depuis GET /api/produits?boutiqueId=:id
+   * Liste produits de cette boutique
+   
+   - Avis depuis GET /api/avis/boutique/:id
+   * Note moyenne
+   * Liste avis
+   
+   Sections:
+   1. Header avec bannière
+   2. Infos principales:
+      - Logo à gauche
+      - Nom, description
+      - Contact (téléphone, email)
+      - Horaires aujourd'hui
+   3. Onglets:
+      - PRODUITS: Grille produits boutique
+      - HORAIRES: Tableau complet 7 jours
+      - LOCALISATION: Plan + infos emplacement
+      - AVIS: Liste avis boutique
+   
+   Actions:
+   - Click produit → /produits/:id
+
+================================================================================
+                  PHASE 3 - GESTION PRODUITS
+================================================================================
+
+[ ] TASK 3.1 - Modèle Produit (Backend)
+   Fichier: backend/models/Produit.js
+   
+   Description:
+   - Schéma avec:
+   * images (array)
+   * variantes (array embedded)
+   - Index texte sur nom et description
+   - Méthodes:
+   * search(query) - recherche texte
+   * findByBoutique(boutiqueId)
+   
+   Collections: produits, boutiques
+
+[ ] TASK 3.2 - Controller Produit
+   Fichier: backend/controllers/produit.controller.js
+   
+   Description:
+   - getAllProduits(req, res):
+   * Filtres: boutiqueId, categorie, prixMin, prixMax, enPromotion
+   * Tri: prix, date, vues
+   * Pagination
+   * Populate boutique
+   
+   - getProduitById(req, res):
+   * Populate boutique
+   * Incrémenter vues
+   
+   - createProduit(req, res): (manager/admin)
+   * Upload images avec multer
+   * Créer produit avec variantes
+   
+   - updateProduit(req, res)
+   - deleteProduit(req, res)
+   
+   Collections: produits, boutiques
+
+[ ] TASK 3.3 - Routes Produits
+   Fichier: backend/routes/produit.routes.js
+   
+   Routes:
+   - GET /api/produits - Liste (public)
+   - GET /api/produits/search - Recherche (public)
+   - GET /api/produits/:id - Détail (public)
+   - POST /api/produits - Créer (manager/admin)
+   - PUT /api/produits/:id - Modifier (manager/admin)
+   - DELETE /api/produits/:id - Supprimer (manager/admin)
+
+[ ] TASK 3.4 - Service Produit (Frontend)
+   Fichier: frontend/src/app/core/services/produit.service.ts
+   
+   Méthodes:
+   - getProduits(filters): Observable<{produits, total}>
+   - searchProduits(query): Observable<Produit[]>
+   - getProduitById(id): Observable<Produit>
+   - createProduit(formData): Observable<Produit>
+   - updateProduit(id, formData): Observable<Produit>
+
+[ ] TASK 3.5 - PAGE: Liste Produits Manager (Frontend)
+   Fichier: frontend/src/app/modules/boutique/pages/produits-list/
+   Route: /boutique/produits
+   Accès: Manager uniquement (role=2)
+   
+   Données affichées:
+   - Produits depuis GET /api/produits?boutiqueId=:maBoutiqueId
+   - Pour chaque produit:
+   * _id
+   * images[0] (première image)
+   * nom
+   * prix
+   * prixPromo (si enPromotion)
+   * stock
+   * actif
+   * vues
+   * createdAt
+   
+   Composants:
+   - Tableau avec colonnes: Image, Nom, Prix, Stock, Promo, Actif, Vues, Actions
+   - Filtres:
+   * Select catégorie
+   * Checkbox "En promotion"
+   * Checkbox "En stock uniquement"
+   - Recherche nom
+   - Bouton "Ajouter produit" → /boutique/produits/new
+   
+   Actions par ligne:
+   - Bouton "Modifier" → /boutique/produits/:id/edit
+   - Toggle "Actif/Inactif" → PUT /api/produits/:id {actif}
+   - Bouton "Supprimer" → DELETE /api/produits/:id
+
+[ ] TASK 3.6 - PAGE: Formulaire Produit Manager (Frontend)
+   Fichier: frontend/src/app/modules/boutique/pages/produit-form/
+   Route: /boutique/produits/new et /boutique/produits/:id/edit
+   Accès: Manager uniquement
+   
+   Données affichées (mode édition):
+   - Produit depuis GET /api/produits/:id
+   
+   Formulaire:
+   - Input nom (required)
+   - Input catégorie (required)
+   - Input sous-catégorie
+   - Input prix (required, number)
+   - Checkbox "En promotion"
+   - Input prix promo (if enPromotion)
+   - Input stock (required, number)
+   - Textarea description
+   - Upload images (max 5, preview)
+   - Section variantes:
+   * Bouton "Ajouter variante"
+   * Liste variantes dynamique:
+      - Select type (Taille/Couleur)
+      - Input valeur
+      - Input stock
+      - Bouton supprimer
+   - Checkbox "Actif"
+   
+   Actions:
+   - Bouton "Enregistrer" → POST /PUT /api/produits
+   - Bouton "Annuler" → retour liste
+
+[ ] TASK 3.7 - PAGE: Catalogue Produits Public (Frontend)
+   Fichier: frontend/src/app/modules/acheteur/pages/catalogue/
+   Route: /catalogue ou /produits
+   Accès: Public
+   
+   Données affichées:
+   - Produits depuis GET /api/produits?actif=true
+   - Pour chaque produit:
+   * _id
+   * images[0]
+   * nom
+   * prix
+   * prixPromo
+   * enPromotion
+   * boutique.nom (populated)
+   * stock (pour afficher "En stock")
+   
+   Composants:
+   - Grille de cartes produits (4 colonnes)
+   - Chaque carte:
+   * Image produit
+   * Badge "PROMO -X%" si enPromotion
+   * Nom produit
+   * Prix (barré si promo) + Prix promo
+   * Nom boutique
+   * Badge "En stock" ou "Rupture"
+   * Icône cœur (favoris)
+   * Bouton "Voir détails"
+   
+   - Sidebar filtres:
+   * Catégories (checkbox)
+   * Prix (slider range min-max)
+   * Boutiques (search + checkbox)
+   * Checkbox "En promotion"
+   * Checkbox "En stock uniquement"
+   
+   - Barre du haut:
+   * Recherche (input avec icon)
+   * Select tri (Prix ↑, Prix ↓, Nouveautés, Populaires)
+   * Nombre résultats
+   
+   - Pagination
+   
+   Actions:
+   - Click carte → /produits/:id
+   - Click cœur → ajouter/retirer favoris
+
+[ ] TASK 3.8 - PAGE: Détail Produit Public (Frontend)
+   Fichier: frontend/src/app/modules/acheteur/pages/produit-detail/
+   Route: /produits/:id
+   Accès: Public
+   
+   Données affichées:
+   - Produit depuis GET /api/produits/:id
+   * images (toutes)
+   * nom
+   * prix, prixPromo, enPromotion
+   * description
+   * categorie, sousCategorie
+   * stock
+   * variantes
+   * boutique.nom, boutique.logo (populated)
+   
+   - Avis depuis GET /api/avis/produit/:id
+   * Note moyenne
+   * Liste avis avec users
+   
+   - Produits similaires depuis GET /api/produits?categorie=X&limit=4
+   
+   Layout:
+   GAUCHE (60%):
+   - Galerie images (carousel + thumbnails)
+   - Zoom au hover
+   
+   DROITE (40%):
+   - Nom produit (h1)
+   - Note moyenne étoiles + (X avis)
+   - Prix (gros, barré si promo)
+   - Prix promo (si applicable)
+   - Badge "EN PROMOTION -X%"
+   - Stock disponible (couleur: vert si >5, orange si <5, rouge si 0)
+   
+   - Variantes:
+   * Si tailles: boutons radio
+   * Si couleurs: pastilles couleur
+   
+   - Sélecteur quantité:
+   * Bouton - 
+   * Input number (min=1, max=stock)
+   * Bouton +
+   
+   - Boutons:
+   * "Ajouter au panier" (principal, large)
+   * Icône cœur "Ajouter aux favoris"
+   
+   - Infos boutique:
+   * Logo + Nom boutique (link)
+   * Note boutique
+   
+   BAS:
+   - Onglets:
+   * DESCRIPTION: Texte complet
+   * AVIS (X): Liste avis + formulaire si acheté
+   * PRODUITS SIMILAIRES: Grille 4 produits
+   
+   Actions:
+   - Click "Ajouter panier" → POST /api/panier/add
+   - Click "Favoris" → POST /api/favoris
+   - Click boutique → /boutiques/:boutiqueId
+
+[ ] TASK 3.9 - COMPOSANT: Barre Recherche Header (Frontend)
+   Fichier: frontend/src/app/shared/components/search-bar/
+   Position: Header (toutes pages)
+   
+   Données:
+   - Suggestions depuis GET /api/produits/search?q=query (debounce 300ms)
+   
+   Composant:
+   - Input texte avec icône loupe
+   - Dropdown suggestions (si input non vide):
+   * Max 5 résultats
+   * Pour chaque: image mini + nom + prix
+   - Click suggestion → /produits/:id
+   - Enter → /catalogue?search=query
+
+================================================================================
+                  PHASE 4 - PANIER ET COMMANDES
+================================================================================
+
+[ ] TASK 4.1 - Modèle Panier (Backend)
+   Fichier: backend/models/Panier.js
+   
+   Description:
+   - Schéma avec articles (array embedded)
+   - Méthodes:
+   * findOrCreateByUser(userId)
+   * addArticle(panierId, produitId, quantite)
+   * updateQuantite(panierId, produitId, quantite)
+   * removeArticle(panierId, produitId)
+   * clearPanier(panierId)
+   
+   Collections: paniers, produits
+
+[ ] TASK 4.2 - Controller Panier
+   Fichier: backend/controllers/panier.controller.js
+   
+   Description:
+   - getPanier(req, res): (auth)
+   * Trouver panier de req.user._id
+   * Populate produits
+   * Calculer total
+   
+   - addToPanier(req, res):
+   * Vérifier stock
+   * Ajouter ou update quantite
+   
+   - updateQuantite(req, res)
+   - removeFromPanier(req, res)
+   - clearPanier(req, res)
+   
+   Collections: paniers, produits
+
+[ ] TASK 4.3 - Routes Panier
+   Fichier: backend/routes/panier.routes.js
+   
+   Routes:
+   - GET /api/panier - Mon panier (auth)
+   - POST /api/panier/add - Ajouter article (auth)
+   - PUT /api/panier/update - Modifier quantité (auth)
+   - DELETE /api/panier/remove/:produitId - Retirer (auth)
+   - DELETE /api/panier/clear - Vider (auth)
+
+[ ] TASK 4.4 - Service Panier (Frontend)
+   Fichier: frontend/src/app/core/services/panier.service.ts
+   
+   Description:
+   - BehaviorSubject<Panier>
+   - Méthodes:
+   * getPanier(): Observable<Panier>
+   * addToPanier(produitId, quantite): Observable
+   * updateQuantite(produitId, quantite): Observable
+   * removeFromPanier(produitId): Observable
+   * clearPanier(): Observable
+   * getCartCount(): Observable<number>
+   * getCartTotal(): Observable<number>
+
+[ ] TASK 4.5 - PAGE: Panier (Frontend)
+   Fichier: frontend/src/app/modules/acheteur/pages/panier/
+   Route: /panier
+   Accès: Client authentifié
+   
+   Données affichées:
+   - Panier depuis GET /api/panier
+   * articles (array)
+      - produitId._id
+      - produitId.nom
+      - produitId.images[0]
+      - produitId.prix
+      - produitId.prixPromo
+      - produitId.stock
+      - produitId.boutiqueId.nom
+      - quantite
+   - Total calculé côté client
+   
+   Layout:
+   - Si panier vide:
+   * Icône panier vide
+   * Message "Votre panier est vide"
+   * Bouton "Découvrir nos produits" → /catalogue
+   
+   - Si articles:
+   * Titre "Mon panier (X articles)"
+   * Tableau/Liste articles groupés par boutique:
+      
+      BOUTIQUE A:
+      - Article 1:
+         * Image (petite)
+         * Nom produit (link)
+         * Prix unitaire
+         * Sélecteur quantité (- input +)
+         * Sous-total (prix × quantité)
+         * Bouton supprimer (icône)
+      - Article 2...
+      - Sous-total Boutique A: XXX Ar
+      
+      BOUTIQUE B:
+      - Article 3...
+      - Sous-total Boutique B: XXX Ar
+   
+   * Sidebar droite:
+      - Récapitulatif:
+         * Sous-total: XXX Ar
+         * Frais livraison: (à calculer)
+         * Total: XXX Ar (gros)
+      - Bouton "Passer commande" (primary, large)
+      - Bouton "Vider le panier" (secondary, small)
+      - Lien "Continuer mes achats"
+   
+   Actions:
+   - Click + → PUT /api/panier/update {quantite+1}
+   - Click - → PUT /api/panier/update {quantite-1}
+   - Input quantité change → PUT /api/panier/update
+   - Click supprimer → DELETE /api/panier/remove/:id
+   - Click "Vider" → DELETE /api/panier/clear
+   - Click "Passer commande" → /checkout
+
+[ ] TASK 4.6 - COMPOSANT: Badge Panier Header (Frontend)
+   Fichier: frontend/src/app/shared/components/panier-badge/
+   Position: Header (icône panier)
+   
+   Données:
+   - Nombre articles depuis panierService.getCartCount()
+   
+   Composant:
+   - Icône panier (shopping cart)
+   - Badge avec nombre (si > 0)
+   - Click → /panier ou dropdown mini-panier
+
+[ ] TASK 4.7 - Modèle Commande (Backend)
+   Fichier: backend/models/Commande.js
+   
+   Description:
+   - Schéma avec:
+   * numeroCommande (auto-généré: CMD-timestamp)
+   * articles (array embedded)
+   - Méthodes:
+   * create(acheteurId, panier, modeRetrait)
+   * findByUser(userId)
+   * updateStatut(id, statut)
+   
+   Collections: commandes, produits, boutiques
+
+[ ] TASK 4.8 - Controller Commande
+   Fichier: backend/controllers/commande.controller.js
+   
+   Description:
+   - createCommande(req, res): (auth)
+   * Transaction MongoDB:
+      1. Vérifier stock tous produits
+      2. Créer commande depuis panier
+      3. Décrémenter stocks
+      4. Vider panier
+   * Générer numéro commande
+   * Retourner commande créée
+   
+   - getMyCommandes(req, res): (auth)
+   * Trouver commandes de req.user._id
+   * Populate produits et boutiques
+   * Tri date DESC
+   
+   - getCommandeById(req, res): (auth)
+   * Populate complet
+   
+   - updateStatut(req, res): (manager/admin)
+   * Vérifier autorisation (boutique concernée)
+   * Update statut
+   
+   Collections: commandes, paniers, produits
+
+[ ] TASK 4.9 - Routes Commandes
+   Fichier: backend/routes/commande.routes.js
+   
+   Routes:
+   - POST /api/commandes - Créer commande (auth)
+   - GET /api/commandes/me - Mes commandes (auth)
+   - GET /api/commandes/:id - Détail commande (auth)
+   - PUT /api/commandes/:id/statut - Changer statut (manager/admin)
+
+[ ] TASK 4.10 - Service Commande (Frontend)
+   Fichier: frontend/src/app/core/services/commande.service.ts
+   
+   Méthodes:
+   - createCommande(commandeData): Observable<Commande>
+   - getMyCommandes(): Observable<Commande[]>
+   - getCommandeById(id): Observable<Commande>
+   - updateStatut(id, statut): Observable<Commande>
+
+[ ] TASK 4.11 - PAGE: Checkout (Frontend)
+   Fichier: frontend/src/app/modules/acheteur/pages/checkout/
+   Route: /checkout
+   Accès: Client authentifié avec panier non vide
+   
+   Données affichées:
+   - Panier depuis panierService (récap)
+   - User actuel depuis authService
+   
+   Layout (Stepper 3 étapes):
+   
+   ÉTAPE 1: Récapitulatif panier
+   - Liste articles (similaire page panier, lecture seule)
+   - Possibilité retour modifier quantités
+   - Bouton "Suivant"
+   
+   ÉTAPE 2: Mode de retrait
+   - Radio buttons:
+   * Click & Collect (retrait en boutique)
+      - Afficher liste boutiques concernées
+      - Sélection boutique préférée pour retrait
+   * Livraison à domicile
+      - Formulaire adresse:
+         * Rue
+         * Ville
+         * Code postal
+         * Téléphone
+      - OU sélection adresse enregistrée (depuis profil)
+   - Bouton "Suivant"
+   
+   ÉTAPE 3: Paiement et confirmation
+   - Récapitulatif final:
+   * Liste articles
+   * Mode retrait choisi
+   * Adresse (si livraison)
+   * Montant total
+   - Radio paiement:
+   * Carte bancaire (formulaire ou redirect)
+   * Mobile Money
+   * Paiement au retrait/livraison
+   - Checkbox "J'accepte les CGV"
+   - Bouton "Valider la commande"
+   
+   Actions:
+   - Click "Valider" → POST /api/commandes
+   - Succès → /commandes/confirmation/:id
+   - Erreur → message (stock insuffisant, etc.)
+
+[ ] TASK 4.12 - PAGE: Confirmation Commande (Frontend)
+   Fichier: frontend/src/app/modules/acheteur/pages/commande-confirmation/
+   Route: /commandes/confirmation/:id
+   Accès: Client authentifié
+   
+   Données affichées:
+   - Commande depuis GET /api/commandes/:id
+   * numeroCommande
+   * total
+   * modeRetrait
+   * statut
+   * articles (liste)
+   
+   Layout:
+   - Icône succès (check vert)
+   - Titre "Commande confirmée !"
+   - Numéro de commande (gros)
+   - Message selon mode:
+   * Click & collect: "Vous recevrez un SMS quand votre commande sera prête"
+   * Livraison: "Votre commande sera livrée sous X jours"
+   - Récapitulatif commande
+   - Boutons:
+   * "Suivre ma commande" → /commandes/:id
+   * "Retour à l'accueil" → /accueil
+
+[ ] TASK 4.13 - PAGE: Mes Commandes (Frontend)
+   Fichier: frontend/src/app/modules/acheteur/pages/mes-commandes/
+   Route: /mon-compte/commandes
+   Accès: Client authentifié
+   
+   Données affichées:
+   - Commandes depuis GET /api/commandes/me
+   - Pour chaque commande:
+   * _id
+   * numeroCommande
+   * createdAt (date)
+   * total
+   * statut
+   * articles.length (nombre articles)
+   
+   Layout:
+   - Titre "Mes commandes"
+   - Filtres:
+   * Tous / En cours / Livrées / Annulées
+   
+   - Liste/Tableau commandes:
+   * Colonnes: N°, Date, Montant, Articles, Statut, Actions
+   * Badge statut avec couleur:
+      - en_attente: orange
+      - payee: bleu
+      - preparee: violet
+      - prete: cyan
+      - retiree/livree: vert
+      - annulee: rouge
+   
+   - Pagination
+   
+   Actions par ligne:
+   - Click "Voir détails" → /commandes/:id
+   - Bouton "Annuler" (si statut le permet)
+
+[ ] TASK 4.14 - PAGE: Détail Commande (Frontend)
+   Fichier: frontend/src/app/modules/acheteur/pages/commande-detail/
+   Route: /commandes/:id
+   Accès: Client authentifié (propriétaire)
+   
+   Données affichées:
+   - Commande depuis GET /api/commandes/:id
+   * numeroCommande
+   * createdAt
+   * statut
+   * modeRetrait
+   * total
+   * articles (array avec produits populated)
+   
+   Layout:
+   - En-tête:
+   * Numéro commande
+   * Date commande
+   * Badge statut
+   
+   - Timeline statut (stepper horizontal):
+   * En attente → Payée → Préparée → Prête → Retirée/Livrée
+   * Highlight étape actuelle
+   
+   - Détails commande:
+   * Liste articles (tableau):
+      - Image
+      - Nom produit
+      - Boutique
+      - Quantité
+      - Prix unitaire
+      - Sous-total
+   * Total commande
+   
+   - Informations:
+   * Mode de retrait (Click & collect ou Livraison)
+   * Adresse (si livraison)
+   * Paiement (méthode, statut)
+   
+   - Actions:
+   * Bouton "Annuler commande" (si statut en_attente ou payee)
+   * Bouton "Contacter le vendeur"
+   * Bouton "Télécharger facture" (si livrée)
+
+[ ] TASK 4.15 - PAGE: Commandes Boutique Manager (Frontend)
+   Fichier: frontend/src/app/modules/boutique/pages/commandes-list/
+   Route: /boutique/commandes
+   Accès: Manager (role=2)
+   
+   Données affichées:
+   - Commandes depuis GET /api/commandes?boutiqueId=:maBoutiqueId
+   - Pour chaque commande:
+   * numeroCommande
+   * acheteurId.nom + prenom (populated)
+   * createdAt
+   * total (de ma boutique uniquement)
+   * statut
+   * articles (mes produits uniquement)
+   
+   Layout:
+   - Titre "Commandes reçues"
+   - Filtres rapides (tabs):
+   * Toutes
+   * En attente
+   * À préparer
+   * Prêtes
+   * Terminées
+   
+   - Tableau:
+   * Colonnes: N° commande, Client, Date, Articles, Montant, Statut, Actions
+   * Code couleur statuts
+   
+   - Recherche par n° commande ou nom client
+   - Pagination
+   
+   Actions par ligne:
+   - Click "Voir" → /boutique/commandes/:id
+   - Boutons changement statut rapide:
+   * "Marquer payée"
+   * "Marquer préparée"
+   * "Marquer prête"
+
+[ ] TASK 4.16 - PAGE: Détail Commande Manager (Frontend)
+   Fichier: frontend/src/app/modules/boutique/pages/commande-detail/
+   Route: /boutique/commandes/:id
+   Accès: Manager
+   
+   Données affichées:
+   - Commande depuis GET /api/commandes/:id
+   * Filtrée pour n'afficher que les articles de sa boutique
+   
+   Layout:
+   - En-tête:
+   * N° commande
+   * Date
+   * Statut actuel
+   
+   - Informations client:
+   * Nom complet
+   * Téléphone
+   * Email
+   
+   - Articles commandés (de ma boutique):
+   * Tableau: Produit, Quantité, Prix unitaire, Total
+   
+   - Total de cette boutique
+   
+   - Mode retrait
+   - Adresse livraison (si applicable)
+   
+   - Section changement statut:
+   * Statut actuel (badge)
+   * Select nouveau statut
+   * Bouton "Mettre à jour"
+   
+   - Historique des changements (si implémenté)
+   
+   Actions:
+   - Select statut + "Mettre à jour" → PUT /api/commandes/:id/statut
+   - Bouton "Annuler commande" (confirmation)
+
+================================================================================
+                  PHASE 5 - AVIS ET FAVORIS
+================================================================================
+
+[ ] TASK 5.1 - Modèle Avis (Backend)
+   Fichier: backend/models/Avis.js
+   
+   Description:
+   - Schéma avec type (produit/boutique) et cibleId (ref dynamique)
+   - Méthodes:
+   * findByProduit(produitId)
+   * findByBoutique(boutiqueId)
+   * getAverageNote(type, cibleId)
+   * canUserReview(userId, type, cibleId)
+   
+   Collections: avis, users, produits, boutiques, commandes
+
+[ ] TASK 5.2 - Controller Avis
+   Fichier: backend/controllers/avis.controller.js
+   
+   Description:
+   - createAvis(req, res): (auth)
+   * Vérifier que user a acheté ce produit/boutique
+   * Vérifier pas déjà noté
+   * Créer avis
+   * Recalculer note moyenne
+   
+   - getAvisProduit(req, res)
+   - getAvisBoutique(req, res)
+   - deleteAvis(req, res)
+   
+   Collections: avis, commandes
+
+[ ] TASK 5.3 - Routes Avis
+   Fichier: backend/routes/avis.routes.js
+   
+   Routes:
+   - POST /api/avis/produit - Créer avis produit (auth)
+   - POST /api/avis/boutique - Créer avis boutique (auth)
+   - GET /api/avis/produit/:id - Liste avis produit (public)
+   - GET /api/avis/boutique/:id - Liste avis boutique (public)
+   - DELETE /api/avis/:id - Supprimer (auth, proprio)
+
+[ ] TASK 5.4 - COMPOSANT: Section Avis Produit (Frontend)
+   Fichier: frontend/src/app/shared/components/avis-produit/
+   Position: Onglet dans page produit-detail
+   
+   Données affichées:
+   - Avis depuis GET /api/avis/produit/:id
+   - Pour chaque avis:
+   * userId.nom + prenom (populated)
+   * userId.image
+   * note (1-5)
+   * commentaire
+   * createdAt
+   - Note moyenne calculée
+   
+   Layout:
+   - En-tête:
+   * Note moyenne (ex: 4.5/5) avec étoiles
+   * Nombre total d'avis
+   * Distribution notes (barres):
+      - 5★ ███████ 65%
+      - 4★ ████ 20%
+      - 3★ ██ 10%
+      - 2★ █ 3%
+      - 1★ 2%
+   
+   - Liste avis:
+   * Avatar utilisateur
+   * Nom + note étoiles
+   * Date avis
+   * Commentaire
+   * Bouton "Utile" (compteur)
+   
+   - Si user connecté ET a acheté produit ET pas encore noté:
+   * Formulaire notation:
+      - Sélection étoiles (1-5)
+      - Textarea commentaire
+      - Bouton "Publier mon avis"
+   
+   Actions:
+   - Click étoiles + "Publier" → POST /api/avis/produit
+
+[ ] TASK 5.5 - Modèle Favoris (Backend)
+   Fichier: backend/models/Favoris.js
+   
+   Description:
+   - Schéma simple: userId, produitId
+   - Index unique sur (userId, produitId)
+   - Méthodes:
+   * addFavori(userId, produitId)
+   * removeFavori(userId, produitId)
+   * getUserFavoris(userId)
+   * isFavorite(userId, produitId)
+   
+   Collections: favoris, produits
+
+[ ] TASK 5.6 - Controller Favoris
+   Fichier: backend/controllers/favoris.controller.js
+   
+   Description:
+   - addFavori(req, res): (auth)
+   - removeFavori(req, res): (auth)
+   - getUserFavoris(req, res): (auth)
+   * Populate produits
+   - checkFavori(req, res): (auth)
+   
+   Collections: favoris, produits
+
+[ ] TASK 5.7 - Routes Favoris
+   Fichier: backend/routes/favoris.routes.js
+   
+   Routes:
+   - POST /api/favoris - Ajouter (auth)
+   - DELETE /api/favoris/:produitId - Retirer (auth)
+   - GET /api/favoris/me - Mes favoris (auth)
+   - GET /api/favoris/check/:produitId - Vérifier (auth)
+
+[ ] TASK 5.8 - Service Favoris (Frontend)
+   Fichier: frontend/src/app/core/services/favoris.service.ts
+   
+   Méthodes:
+   - addFavori(produitId): Observable
+   - removeFavori(produitId): Observable
+   - getFavoris(): Observable<Produit[]>
+   - isFavorite(produitId): Observable<boolean>
+   - toggleFavori(produitId): Observable
+
+[ ] TASK 5.9 - PAGE: Mes Favoris (Frontend)
+   Fichier: frontend/src/app/modules/acheteur/pages/favoris/
+   Route: /mon-compte/favoris
+   Accès: Client authentifié
+   
+   Données affichées:
+   - Favoris depuis GET /api/favoris/me
+   - Pour chaque favori (produit populated):
+   * _id
+   * images[0]
+   * nom
+   * prix, prixPromo
+   * stock
+   * boutiqueId.nom
+   
+   Layout:
+   - Titre "Mes favoris (X produits)"
+   
+   - Si vide:
+   * Message "Aucun favori"
+   * Bouton "Découvrir des produits"
+   
+   - Si articles:
+   * Grille de cartes (4 colonnes)
+   * Chaque carte:
+      - Image produit
+      - Nom
+      - Prix
+      - Badge stock
+      - Icône cœur plein (pour retirer)
+      - Bouton "Ajouter au panier"
+   
+   Actions:
+   - Click cœur → DELETE /api/favoris/:id + retirer de la liste
+   - Click "Ajouter panier" → POST /api/panier/add
+
+================================================================================
+                  PHASE 6 - DASHBOARD ET STATISTIQUES
+================================================================================
+
+[ ] TASK 6.1 - Controller Statistiques
+   Fichier: backend/controllers/statistiques.controller.js
+   
+   Description:
+   - getAdminStats(req, res): (admin)
+   * Nombre boutiques (count)
+   * Nombre produits (count)
+   * Nombre commandes (count)
+   * CA total (sum commandes.total)
+   * CA du mois
+   * Nouveaux users du mois
+   
+   - getBoutiqueStats(req, res): (manager)
+   * CA total boutique
+   * CA du mois
+   * Nombre commandes
+   * Nombre produits
+   * Stock total
+   * Produits en rupture (stock <= 0)
+   
+   Collections: Toutes (agrégations MongoDB)
+
+[ ] TASK 6.2 - Routes Statistiques
+   Fichier: backend/routes/statistiques.routes.js
+   
+   Routes:
+   - GET /api/stats/admin - Stats admin (admin)
+   - GET /api/stats/boutique/:id - Stats boutique (manager/admin)
+
+[ ] TASK 6.3 - PAGE: Dashboard Admin (Frontend)
+   Fichier: frontend/src/app/modules/admin/pages/dashboard/
+   Route: /admin/dashboard
+   Accès: Admin (role=1)
+   
+   Données affichées:
+   - Stats depuis GET /api/stats/admin
+   * nombreBoutiques
+   * nombreProduits
+   * nombreCommandes
+   * caTotal
+   * caMois
+   * nouveauxUsersMois
+   
+   - Top boutiques depuis GET /api/stats/top-boutiques
+   - Top produits depuis GET /api/stats/top-produits
+   
+   Layout:
+   - Titre "Tableau de bord"
+   
+   - 4 cartes KPI (grille 4 colonnes):
+   * Boutiques: nombre + icône
+   * Produits: nombre + icône
+   * Commandes: nombre + icône
+   * CA total: montant + icône
+   
+   - Graphique ligne: Évolution CA (12 derniers mois)
+   * Axe X: Mois
+   * Axe Y: Montant
+   * Utiliser Chart.js ou ng2-charts
+   
+   - 2 colonnes:
+   GAUCHE:
+   - Tableau "Top 5 Boutiques":
+      * Nom boutique
+      * CA
+      * Nombre commandes
+   
+   DROITE:
+   - Tableau "Top 5 Produits":
+      * Image
+      * Nom produit
+      * Boutique
+      * Ventes
+   
+   - Section "Dernières commandes" (5 dernières)
+   * N°, Date, Client, Montant, Statut
+
+[ ] TASK 6.4 - PAGE: Dashboard Manager Boutique (Frontend)
+   Fichier: frontend/src/app/modules/boutique/pages/dashboard/
+   Route: /boutique/dashboard
+   Accès: Manager (role=2)
+   
+   Données affichées:
+   - Stats depuis GET /api/stats/boutique/:maBoutiqueId
+   * caTotal
+   * caJour
+   * caSemaine
+   * caMois
+   * nombreCommandes
+   * nombreProduits
+   * stockTotal
+   * produitsRupture
+   
+   - Dernières commandes depuis GET /api/commandes?boutiqueId=X&limit=10
+   
+   Layout:
+   - Titre "Tableau de bord - [Nom Boutique]"
+   
+   - 6 cartes KPI (grille 3x2):
+   * CA du jour
+   * CA de la semaine
+   * CA du mois
+   * Commandes en cours
+   * Produits en rupture (badge rouge si > 0)
+   * Stock total
+   
+   - Graphique ligne: Ventes 30 derniers jours
+   
+   - Tableau "Dernières commandes" (10 dernières):
+   * N°, Date, Client, Articles, Montant, Statut, Actions
+   * Bouton "Voir toutes" → /boutique/commandes
+   
+   - Section "Produits en rupture" (si > 0):
+   * Liste produits stock <= 0
+   * Lien "Réapprovisionner"
+   
+   - Tableau "Produits les plus vendus" (top 5):
+   * Image, Nom, Ventes, Stock actuel
+
+================================================================================
+                  PHASE 7 - PAGES PUBLIQUES ET NAVIGATION
+================================================================================
+
+[ ] TASK 7.1 - PAGE: Accueil Public (Frontend)
+   Fichier: frontend/src/app/modules/acheteur/pages/accueil/
+   Route: / ou /accueil
+   Accès: Public
+   
+   Données affichées:
+   - Centre depuis GET /api/centres/:id (si unique)
+   * nom, description, image
+   - Produits vedette depuis GET /api/produits?enVedette=true&limit=8
+   - Promotions depuis GET /api/promotions/actives?limit=5
+   - Nouveautés depuis GET /api/produits?sort=createdAt&limit=8
+   - Boutiques depuis GET /api/boutiques?limit=6
+   - Événements depuis GET /api/evenements?limit=3
+   
+   Layout:
+   
+   1. HERO SECTION (carrousel):
+      - 3-5 slides avec images du centre ou promotions
+      - Titre accrocheur
+      - Bouton CTA "Découvrir"
+   
+   2. BARRE RECHERCHE centrale:
+      - Input large "Que recherchez-vous ?"
+      - Bouton "Rechercher"
+   
+   3. CATÉGORIES populaires:
+      - 6-8 icônes catégories (Vêtements, Électronique, etc.)
+      - Click → /catalogue?categorie=X
+   
+   4. PRODUITS EN VEDETTE:
+      - Titre "Produits en vedette"
+      - Grille 4 colonnes (8 produits)
+      - Bouton "Voir plus" → /catalogue
+   
+   5. PROMOTIONS DU MOMENT:
+      - Bannières promotions (carousel)
+      - Badge "PROMO -X%"
+   
+   6. NOUVEAUTÉS:
+      - Titre "Nouveautés"
+      - Grille 4 produits
+   
+   7. NOS BOUTIQUES:
+      - Titre "Nos boutiques partenaires"
+      - Grille 6 boutiques (logo + nom)
+      - Bouton "Voir toutes" → /boutiques
+   
+   8. ÉVÉNEMENTS:
+      - Titre "Événements à venir"
+      - 3 cartes événements
+      - Date, titre, description courte
+   
+   9. FOOTER:
+      - Liens rapides
+      - Contact
+      - Réseaux sociaux
+
+[ ] TASK 7.2 - COMPOSANT: Header Navigation (Frontend)
+   Fichier: frontend/src/app/shared/components/header/
+   Position: Toutes pages
+   
+   Données affichées:
+   - User actuel depuis authService
+   - Nombre panier depuis panierService.getCartCount()
+   - Catégories depuis GET /api/boutique-categories
+   
+   Layout:
+   - TOP BAR (fond coloré):
+   * Gauche: Logo + Nom centre
+   * Centre: Barre recherche
+   * Droite:
+      - Si non connecté: "Connexion" | "Inscription"
+      - Si connecté:
+         * Icône favoris (avec badge si > 0)
+         * Icône panier (avec badge nombre)
+         * Avatar + dropdown:
+         - "Mon compte" (si client)
+         - "Tableau de bord" (si manager/admin)
+         - "Mes commandes"
+         - "Mes favoris"
+         - "Déconnexion"
+   
+   - MENU PRINCIPAL (dessous):
+   * Navigation:
+      - Accueil
+      - Boutiques
+      - Promotions
+      - Nouveautés
+      - Contact
+   * Dropdown catégories (hover/click)
+   
+   - MOBILE:
+   * Burger menu
+   * Version condensée
+
+[ ] TASK 7.3 - COMPOSANT: Footer (Frontend)
+   Fichier: frontend/src/app/shared/components/footer/
+   Position: Toutes pages
+   
+   Layout (3 colonnes):
+   
+   COLONNE 1: À propos
+   - Nom centre
+   - Description courte
+   - Adresse
+   - Téléphone
+   - Email
+   
+   COLONNE 2: Liens rapides
+   - Accueil
+   - Boutiques
+   - Catalogue produits
+   - Mon compte
+   - CGU
+   - Politique de confidentialité
+   
+   COLONNE 3: Suivez-nous
+   - Icônes réseaux sociaux (Facebook, Instagram, Twitter)
+   - Newsletter:
+   * Input email
+   * Bouton "S'abonner"
+   
+   BAS:
+   - Copyright © 2024 [Nom Centre]. Tous droits réservés.
+
+[ ] TASK 7.4 - PAGE: Mon Compte (Frontend)
+   Fichier: frontend/src/app/modules/acheteur/pages/mon-compte/
+   Route: /mon-compte
+   Accès: Client authentifié
+   
+   Données affichées:
+   - User depuis GET /api/auth/me
+   * nom, prenom, email, telephone, image
+   
+   - Points fidélité depuis GET /api/fidelite/me
+   
+   Layout (2 colonnes):
+   
+   SIDEBAR GAUCHE (menu):
+   - "Mon profil" (actif)
+   - "Mes commandes" → /mon-compte/commandes
+   - "Mes favoris" → /mon-compte/favoris
+   - "Mes points fidélité" → /mon-compte/fidelite
+   - "Paramètres"
+   - "Déconnexion"
+   
+   DROITE (contenu selon section):
+   
+   SECTION "Mon profil":
+   - Photo profil (avec upload)
+   - Formulaire:
+   * Input nom
+   * Input prénom
+   * Input email
+   * Input téléphone
+   * Bouton "Enregistrer"
+   
+   - Section "Changer mot de passe":
+   * Input ancien mot de passe
+   * Input nouveau mot de passe
+   * Input confirmation
+   * Bouton "Modifier"
+
+[ ] TASK 7.5 - PAGE: À propos / Contact (Frontend)
+   Fichier: frontend/src/app/modules/acheteur/pages/contact/
+   Route: /contact
+   Accès: Public
+   
+   Données affichées:
+   - Centre depuis GET /api/centres/:id
+   * nom, description, image
+   * heureOuverture, heureFermeture
+   * Adresse (si ajoutée au modèle)
+   
+   Layout:
+   - Titre "Contactez-nous"
+   
+   - 2 colonnes:
+   GAUCHE:
+   - Formulaire contact:
+      * Input nom
+      * Input email
+      * Input sujet
+      * Textarea message
+      * Bouton "Envoyer"
+   
+   DROITE:
+   - Informations centre:
+      * Adresse
+      * Téléphone
+      * Email
+      * Horaires d'ouverture
+   
+   - Carte Google Maps (optionnel)
+   
+   - Section FAQ (accordéon):
+   * Questions fréquentes
+   * Réponses
+
+================================================================================
+                  PHASE 8 - PROMOTIONS ET FIDÉLITÉ (OPTIONNEL)
+================================================================================
+
+[ ] TASK 8.1 - Modèle Promotions (Backend)
+   Fichier: backend/models/Promotion.js
+   
+   Description:
+   - Schéma avec dates début/fin
+   - Méthodes:
+   * findActive() - promotions en cours
+   * validateCode(code)
+   * applyPromotion(code, montant)
+   
+   Collections: promotions
+
+[ ] TASK 8.2 - Controller Promotions
+   Fichier: backend/controllers/promotion.controller.js
+   
+   Description:
+   - createPromotion(req, res): (manager)
+   - getActivePromotions(req, res)
+   - validatePromoCode(req, res)
+   - deletePromotion(req, res)
+   
+   Collections: promotions
+
+[ ] TASK 8.3 - Routes Promotions
+   Fichier: backend/routes/promotion.routes.js
+   
+   Routes:
+   - POST /api/promotions - Créer (manager)
+   - GET /api/promotions/active - Actives (public)
+   - POST /api/promotions/validate - Valider code (auth)
+   - DELETE /api/promotions/:id - Supprimer (manager)
+
+[ ] TASK 8.4 - PAGE: Gestion Promotions Manager (Frontend)
+   Fichier: frontend/src/app/modules/boutique/pages/promotions/
+   Route: /boutique/promotions
+   Accès: Manager
+   
+   Données affichées:
+   - Promotions depuis GET /api/promotions?boutiqueId=X
+   
+   Layout:
+   - Tableau promotions:
+   * Code, Type, Valeur, Date début, Date fin, Statut, Actions
+   - Bouton "Créer promotion"
+   - Formulaire modal:
+   * Input code (auto-généré ou custom)
+   * Select type (pourcentage/montant/flash)
+   * Input valeur
+   * Date picker début
+   * Date picker fin
+   * Bouton "Créer"
+
+[ ] TASK 8.5 - PAGE: Promotions Public (Frontend)
+   Fichier: frontend/src/app/modules/acheteur/pages/promotions/
+   Route: /promotions
+   Accès: Public
+   
+   Données affichées:
+   - Promotions depuis GET /api/promotions/active
+   - Produits en promotion depuis GET /api/produits?enPromotion=true
+   
+   Layout:
+   - Bannière "Promotions du moment"
+   - Cartes promotions:
+   * Code promo
+   * Description
+   * Réduction
+   * Date fin (compte à rebours)
+   * Bouton "Copier le code"
+   - Grille produits en promotion
+
+[ ] TASK 8.6 - Modèle Fidélité (Backend)
+   Fichier: backend/models/Fidelite.js
+   
+   Description:
+   - Schéma avec userId, points, description, date
+   - Méthodes:
+   * addPoints(userId, points, description)
+   * deductPoints(userId, points)
+   * getUserBalance(userId)
+   
+   Collections: fidelite
+
+[ ] TASK 8.7 - Controller Fidélité
+   Fichier: backend/controllers/fidelite.controller.js
+   
+   Description:
+   - getUserPoints(req, res): (auth)
+   - getHistory(req, res): (auth)
+   - Auto après commande livrée:
+   * Calculer points (1 point / 100 Ar)
+   * Ajouter points
+   
+   Collections: fidelite
+
+[ ] TASK 8.8 - PAGE: Mes Points Fidélité (Frontend)
+   Fichier: frontend/src/app/modules/acheteur/pages/fidelite/
+   Route: /mon-compte/fidelite
+   Accès: Client authentifié
+   
+   Données affichées:
+   - Solde depuis GET /api/fidelite/me
+   - Historique depuis GET /api/fidelite/history
+   
+   Layout:
+   - Carte solde (gros):
+   * Nombre de points
+   * Équivalent en argent (100 pts = 1000 Ar)
+   
+   - Règles du programme:
+   * 1 point = 100 Ar dépensés
+   * 100 points = 1000 Ar de réduction
+   
+   - Tableau historique:
+   * Date, Description, Points (+/-), Solde
+
+================================================================================
+                  PHASE 9 - ACTUALITÉS ET ÉVÉNEMENTS (OPTIONNEL)
+================================================================================
+
+[ ] TASK 9.1 - Modèle Actualités et Événements (Backend)
+   Fichiers: 
+   - backend/models/Actualite.js
+   - backend/models/Evenement.js
+   
+   Collections: actualites, evenements
+
+[ ] TASK 9.2 - Controllers (Backend)
+   Fichiers:
+   - backend/controllers/actualite.controller.js
+   - backend/controllers/evenement.controller.js
+   
+   CRUD complet pour chaque
+
+[ ] TASK 9.3 - Routes (Backend)
+   Fichiers:
+   - backend/routes/actualite.routes.js
+   - backend/routes/evenement.routes.js
+
+[ ] TASK 9.4 - PAGE: Gestion Actualités Admin (Frontend)
+   Fichier: frontend/src/app/modules/admin/pages/actualites/
+   Route: /admin/actualites
+   Accès: Admin
+   
+   Liste + Formulaire CRUD
+
+[ ] TASK 9.5 - PAGE: Gestion Événements Admin (Frontend)
+   Fichier: frontend/src/app/modules/admin/pages/evenements/
+   Route: /admin/evenements
+   Accès: Admin
+   
+   Liste + Formulaire CRUD
+
+[ ] TASK 9.6 - PAGE: Actualités Public (Frontend)
+   Fichier: frontend/src/app/modules/acheteur/pages/actualites/
+   Route: /actualites
+   Accès: Public
+   
+   Données affichées:
+   - Actualités depuis GET /api/actualites
+   
+   Layout:
+   - Liste cartes actualités
+   - Pour chaque: Titre, date, extrait, image
+   - Click → page détail
+
+[ ] TASK 9.7 - PAGE: Événements Public (Frontend)
+   Fichier: frontend/src/app/modules/acheteur/pages/evenements/
+   Route: /evenements
+   Accès: Public
+   
+   Données affichées:
+   - Événements depuis GET /api/evenements
+   
+   Layout:
+   - Onglets: À venir / Passés
+   - Cartes événements
+   - Date, titre, description, lieu
+
+================================================================================
+                    RÉCAPITULATIF DES PAGES
+================================================================================
+
+PAGES PUBLIQUES (Non authentifié):
+✓ /login - Connexion
+✓ /register - Inscription
+✓ /accueil - Page d'accueil
+✓ /boutiques - Liste boutiques
+✓ /boutiques/:id - Détail boutique
+✓ /catalogue ou /produits - Catalogue produits
+✓ /produits/:id - Détail produit
+✓ /promotions - Promotions actives
+✓ /actualites - Actualités
+✓ /evenements - Événements
+✓ /contact - Contact
+
+PAGES CLIENT (role=0, authentifié):
+✓ /panier - Mon panier
+✓ /checkout - Processus commande
+✓ /commandes/confirmation/:id - Confirmation commande
+✓ /mon-compte - Mon compte (profil)
+✓ /mon-compte/commandes - Mes commandes
+✓ /commandes/:id - Détail commande
+✓ /mon-compte/favoris - Mes favoris
+✓ /mon-compte/fidelite - Mes points fidélité
+
+PAGES MANAGER BOUTIQUE (role=2):
+✓ /boutique/dashboard - Dashboard boutique
+✓ /boutique/produits - Liste mes produits
+✓ /boutique/produits/new - Ajouter produit
+✓ /boutique/produits/:id/edit - Modifier produit
+✓ /boutique/commandes - Commandes reçues
+✓ /boutique/commandes/:id - Détail commande
+✓ /boutique/promotions - Mes promotions
+
+PAGES ADMIN (role=1):
+✓ /admin/dashboard - Dashboard admin
+✓ /admin/boutiques - Liste boutiques
+✓ /admin/boutiques/new - Ajouter boutique
+✓ /admin/boutiques/:id - Détail boutique
+✓ /admin/boutiques/:id/edit - Modifier boutique
+✓ /admin/actualites - Gestion actualités
+✓ /admin/evenements - Gestion événements
