@@ -2,6 +2,14 @@ Mety am'zay zany ?
 
 Manandrama Manoratra hoe elah
 
+<<<<<<< Updated upstream
+<<<<<<< Updated upstream
 Ao fa anandrana hi-merge zah zao !
 
 TAYYYYYYYY !!!!!
+=======
+Ao fa anandrana hi-merge zah zao !!!!
+>>>>>>> Stashed changes
+=======
+Ao fa anandrana hi-merge zah zao !!!!
+>>>>>>> Stashed changes

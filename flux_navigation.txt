@@ -1,0 +1,1366 @@
+================================================================================
+        FLUX DE NAVIGATION - APPLICATION E-COMMERCE CENTRE COMMERCIAL
+        Architecture et déroulement des pages
+================================================================================
+
+LÉGENDE:
+→ Navigation directe (click, lien)
+⇒ Redirection automatique
+[AUTH] Nécessite authentification
+[ROLE:X] Nécessite rôle spécifique (0=client, 1=admin, 2=manager)
+
+================================================================================
+                    PARTIE PUBLIQUE (NON AUTHENTIFIÉ)
+================================================================================
+
+┌─────────────────────────────────────────────────────────────────────────┐
+│ PAGE D'ACCUEIL (/)                                                       │
+│ - Header avec logo, menu, recherche, panier (vide), bouton Login        │
+│ - Carrousel d'images/promotions                                         │
+│ - Catégories de boutiques (badges)                                      │
+│ - Produits en vedette                                                   │
+│ - Promotions du moment                                                  │
+│ - Événements à venir (3 prochains)                                      │
+│ - Footer avec liens utiles                                              │
+└─────────────────────────────────────────────────────────────────────────┘
+    │
+    ├─→ Click "Se connecter" ────────────→ PAGE LOGIN
+    ├─→ Click "S'inscrire" ──────────────→ PAGE INSCRIPTION
+    ├─→ Click catégorie ─────────────────→ LISTE BOUTIQUES (filtrée)
+    ├─→ Click produit ───────────────────→ DÉTAIL PRODUIT
+    ├─→ Click promotion ─────────────────→ PAGE PROMOTIONS
+    ├─→ Click événement ─────────────────→ DÉTAIL ÉVÉNEMENT
+    ├─→ Click "Toutes les boutiques" ────→ LISTE BOUTIQUES
+    ├─→ Click "Catalogue produits" ──────→ CATALOGUE PRODUITS
+    ├─→ Recherche dans barre ────────────→ RÉSULTATS RECHERCHE
+    └─→ Click logo ──────────────────────→ Retour PAGE D'ACCUEIL
+
+================================================================================
+
+┌─────────────────────────────────────────────────────────────────────────┐
+│ PAGE LOGIN (/login)                                                      │
+│ - Formulaire: Email/Téléphone, Mot de passe                             │
+│ - Checkbox "Se souvenir de moi"                                         │
+│ - Bouton "Se connecter"                                                 │
+│ - Lien "Mot de passe oublié?"                                           │
+│ - Lien "Pas de compte? S'inscrire"                                      │
+└─────────────────────────────────────────────────────────────────────────┘
+    │
+    ├─→ Click "S'inscrire" ──────────────→ PAGE INSCRIPTION
+    ├─→ Click "Mot de passe oublié" ─────→ PAGE MOT DE PASSE OUBLIÉ
+    └─→ Connexion réussie:
+        ├─⇒ Si role = 0 (client) ────────→ PAGE D'ACCUEIL (authentifié)
+        ├─⇒ Si role = 1 (admin) ─────────→ DASHBOARD ADMIN
+        └─⇒ Si role = 2 (manager) ───────→ DASHBOARD BOUTIQUE
+
+================================================================================
+
+┌─────────────────────────────────────────────────────────────────────────┐
+│ PAGE INSCRIPTION (/register)                                             │
+│ - Formulaire:                                                            │
+│   * Nom, Prénom                                                          │
+│   * Email                                                                │
+│   * Téléphone                                                            │
+│   * Mot de passe, Confirmation                                           │
+│   * Rôle (radio): Client / Manager boutique                             │
+│   * Upload photo (optionnel)                                             │
+│ - Checkbox CGU                                                           │
+│ - Bouton "S'inscrire"                                                    │
+│ - Lien "Déjà un compte? Se connecter"                                   │
+└─────────────────────────────────────────────────────────────────────────┘
+    │
+    ├─→ Click "Se connecter" ────────────→ PAGE LOGIN
+    └─→ Inscription réussie:
+        ├─⇒ Si client ───────────────────→ PAGE D'ACCUEIL (authentifié)
+        └─⇒ Si manager ──────────────────→ PAGE ATTENTE VALIDATION
+                                              (message: "Votre compte est en 
+                                              attente de validation par 
+                                              l'administration")
+
+================================================================================
+
+┌─────────────────────────────────────────────────────────────────────────┐
+│ PAGE MOT DE PASSE OUBLIÉ (/forgot-password)                             │
+│ - Formulaire: Email                                                      │
+│ - Bouton "Envoyer le lien de réinitialisation"                          │
+│ - Message confirmation envoi email                                       │
+│ - Lien "Retour à la connexion"                                           │
+└─────────────────────────────────────────────────────────────────────────┘
+    │
+    ├─→ Click "Retour" ──────────────────→ PAGE LOGIN
+    └─→ Click lien dans email ───────────→ PAGE RÉINITIALISATION
+
+┌─────────────────────────────────────────────────────────────────────────┐
+│ PAGE RÉINITIALISATION (/reset-password/:token)                          │
+│ - Formulaire: Nouveau mot de passe, Confirmation                        │
+│ - Bouton "Réinitialiser"                                                │
+└─────────────────────────────────────────────────────────────────────────┘
+    │
+    └─→ Réinitialisation réussie ────────→ PAGE LOGIN (avec message succès)
+
+================================================================================
+
+┌─────────────────────────────────────────────────────────────────────────┐
+│ LISTE BOUTIQUES (/boutiques)                                            │
+│ - Filtres sidebar: Catégorie, Centre commercial                         │
+│ - Recherche par nom                                                      │
+│ - Grille de cartes boutiques:                                            │
+│   * Logo                                                                 │
+│   * Nom boutique                                                         │
+│   * Catégorie                                                            │
+│   * Statut (ouvert/fermé)                                                │
+│   * Note moyenne                                                         │
+│ - Pagination                                                             │
+└─────────────────────────────────────────────────────────────────────────┘
+    │
+    ├─→ Click carte boutique ────────────→ DÉTAIL BOUTIQUE
+    ├─→ Click catégorie (filtre) ────────→ Recharge liste filtrée
+    └─→ Recherche ───────────────────────→ Recharge liste filtrée
+
+================================================================================
+
+┌─────────────────────────────────────────────────────────────────────────┐
+│ DÉTAIL BOUTIQUE (/boutiques/:id)                                        │
+│ - Bannière                                                               │
+│ - Logo, Nom, Description                                                 │
+│ - Note et nombre d'avis                                                  │
+│ - Horaires d'ouverture                                                   │
+│ - Contact (téléphone, email)                                             │
+│ - Plan localisation dans centre                                          │
+│ - Onglets:                                                               │
+│   * Produits (catalogue boutique)                                        │
+│   * À propos                                                             │
+│   * Avis clients                                                         │
+└─────────────────────────────────────────────────────────────────────────┘
+    │
+    ├─→ Click produit ───────────────────→ DÉTAIL PRODUIT
+    ├─→ Click "Laisser un avis" [AUTH] ─→ Modal notation
+    └─→ Click "Retour" ──────────────────→ LISTE BOUTIQUES
+
+================================================================================
+
+┌─────────────────────────────────────────────────────────────────────────┐
+│ CATALOGUE PRODUITS (/produits)                                          │
+│ - Filtres sidebar:                                                       │
+│   * Catégories (checkboxes)                                              │
+│   * Prix (slider min-max)                                                │
+│   * Boutiques (checkboxes)                                               │
+│   * En promotion (toggle)                                                │
+│   * En stock uniquement (toggle)                                         │
+│   * Note minimale (étoiles)                                              │
+│ - Tri: Prix, Date, Popularité, Note                                     │
+│ - Grille de cartes produits:                                             │
+│   * Image                                                                │
+│   * Badge "PROMO" si applicable                                          │
+│   * Nom produit                                                          │
+│   * Prix (barré si promo)                                                │
+│   * Nom boutique                                                         │
+│   * Note moyenne                                                         │
+│   * Icône cœur (favoris)                                                 │
+│ - Pagination                                                             │
+└─────────────────────────────────────────────────────────────────────────┘
+    │
+    ├─→ Click carte produit ─────────────→ DÉTAIL PRODUIT
+    ├─→ Click nom boutique ──────────────→ DÉTAIL BOUTIQUE
+    ├─→ Click cœur [AUTH] ───────────────→ Ajoute/Retire favoris
+    ├─→ Click cœur [NON AUTH] ───────────→ Redirect PAGE LOGIN
+    ├─→ Appliquer filtres ───────────────→ Recharge liste filtrée
+    └─→ Changement tri ──────────────────→ Recharge liste triée
+
+================================================================================
+
+┌─────────────────────────────────────────────────────────────────────────┐
+│ RÉSULTATS RECHERCHE (/recherche?q=...)                                  │
+│ - Texte "Résultats pour: [requête]"                                     │
+│ - Nombre de résultats                                                    │
+│ - Mêmes filtres que catalogue                                            │
+│ - Grille de cartes produits                                              │
+│ - Si aucun résultat: message + suggestions                               │
+└─────────────────────────────────────────────────────────────────────────┘
+    │
+    ├─→ Click produit ───────────────────→ DÉTAIL PRODUIT
+    └─→ Nouvelle recherche ──────────────→ RÉSULTATS RECHERCHE (nouvelle)
+
+================================================================================
+
+┌─────────────────────────────────────────────────────────────────────────┐
+│ DÉTAIL PRODUIT (/produits/:id)                                          │
+│ - Galerie images (carousel avec zoom)                                   │
+│ - Nom produit                                                            │
+│ - Prix, prix barré si promo, badge "PROMO"                              │
+│ - Note moyenne et nombre d'avis                                          │
+│ - Stock disponible (texte + couleur)                                     │
+│ - Description                                                            │
+│ - Sélection variantes (si disponibles):                                  │
+│   * Taille (boutons radio)                                               │
+│   * Couleur (boutons radio)                                              │
+│ - Sélecteur quantité (input number)                                     │
+│ - Bouton "Ajouter au panier"                                            │
+│ - Bouton favoris (cœur)                                                 │
+│ - Informations boutique (encadré):                                       │
+│   * Logo, Nom                                                            │
+│   * Lien vers boutique                                                   │
+│   * Bouton "Contacter"                                                   │
+│ - Onglets:                                                               │
+│   * Description détaillée                                                │
+│   * Caractéristiques                                                     │
+│   * Avis clients (avec formulaire si acheté)                            │
+│ - Section "Produits similaires" (même catégorie)                        │
+└─────────────────────────────────────────────────────────────────────────┘
+    │
+    ├─→ Click "Ajouter au panier" [AUTH] ────────→ Ajout panier + Toast
+    ├─→ Click "Ajouter au panier" [NON AUTH] ────→ Redirect PAGE LOGIN
+    ├─→ Click cœur [AUTH] ───────────────────────→ Toggle favoris
+    ├─→ Click cœur [NON AUTH] ───────────────────→ Redirect PAGE LOGIN
+    ├─→ Click nom boutique ──────────────────────→ DÉTAIL BOUTIQUE
+    ├─→ Click produit similaire ─────────────────→ DÉTAIL PRODUIT (autre)
+    ├─→ Click "Laisser un avis" [AUTH + ACHETÉ] ─→ Formulaire avis
+    └─→ Click "Retour" ──────────────────────────→ Page précédente
+
+================================================================================
+
+┌─────────────────────────────────────────────────────────────────────────┐
+│ PAGE PROMOTIONS (/promotions)                                           │
+│ - Liste des promotions actives                                           │
+│ - Filtres: Boutique, Type promotion                                      │
+│ - Cartes promotions:                                                     │
+│   * Badge type (%, €, FLASH)                                             │
+│   * Titre promotion                                                      │
+│   * Description                                                          │
+│   * Valeur réduction                                                     │
+│   * Code promo si applicable                                             │
+│   * Date de fin (compte à rebours)                                       │
+│   * Boutique concernée                                                   │
+└─────────────────────────────────────────────────────────────────────────┘
+    │
+    ├─→ Click promotion ─────────────────→ DÉTAIL BOUTIQUE ou PRODUITS
+    └─→ Click "Utiliser" [AUTH] ─────────→ Copie code + Redirect CATALOGUE
+
+================================================================================
+
+┌─────────────────────────────────────────────────────────────────────────┐
+│ PAGE ÉVÉNEMENTS (/evenements)                                           │
+│ - Onglets: À venir / Passés                                              │
+│ - Grille de cartes événements:                                           │
+│   * Image                                                                │
+│   * Titre                                                                │
+│   * Date et heure                                                        │
+│   * Lieu                                                                 │
+│   * Courte description                                                   │
+└─────────────────────────────────────────────────────────────────────────┘
+    │
+    └─→ Click événement ─────────────────→ DÉTAIL ÉVÉNEMENT
+
+┌─────────────────────────────────────────────────────────────────────────┐
+│ DÉTAIL ÉVÉNEMENT (/evenements/:id)                                      │
+│ - Image principale                                                       │
+│ - Titre                                                                  │
+│ - Date, heure, lieu                                                      │
+│ - Description complète                                                   │
+│ - Bouton "Partager"                                                      │
+│ - Bouton "Ajouter au calendrier"                                         │
+└─────────────────────────────────────────────────────────────────────────┘
+    │
+    └─→ Click "Retour" ──────────────────→ PAGE ÉVÉNEMENTS
+
+================================================================================
+
+┌─────────────────────────────────────────────────────────────────────────┐
+│ PAGE ACTUALITÉS (/actualites)                                           │
+│ - Liste des actualités du centre                                         │
+│ - Cartes actualités:                                                     │
+│   * Titre                                                                │
+│   * Extrait                                                              │
+│   * Date publication                                                     │
+│ - Pagination                                                             │
+└─────────────────────────────────────────────────────────────────────────┘
+    │
+    └─→ Click actualité ─────────────────→ DÉTAIL ACTUALITÉ
+
+┌─────────────────────────────────────────────────────────────────────────┐
+│ DÉTAIL ACTUALITÉ (/actualites/:id)                                      │
+│ - Titre                                                                  │
+│ - Date publication                                                       │
+│ - Contenu complet                                                        │
+│ - Bouton "Partager"                                                      │
+└─────────────────────────────────────────────────────────────────────────┘
+    │
+    └─→ Click "Retour" ──────────────────→ PAGE ACTUALITÉS
+
+================================================================================
+                    PARTIE CLIENT AUTHENTIFIÉ (ROLE = 0)
+================================================================================
+
+┌─────────────────────────────────────────────────────────────────────────┐
+│ HEADER AUTHENTIFIÉ                                                       │
+│ - Logo                                                                   │
+│ - Menu: Accueil, Boutiques, Catalogue, Promotions                       │
+│ - Barre de recherche                                                     │
+│ - Icône panier avec badge (nombre articles)                             │
+│ - Icône cœur (Mes favoris)                                               │
+│ - Icône cloche (Notifications) avec badge (non lues)                    │
+│ - Avatar + Menu dropdown:                                                │
+│   * Mon profil                                                           │
+│   * Mes commandes                                                        │
+│   * Mes favoris                                                          │
+│   * Mes points fidélité                                                  │
+│   * Paramètres                                                           │
+│   * Se déconnecter                                                       │
+└─────────────────────────────────────────────────────────────────────────┘
+    │
+    ├─→ Click icône panier ──────────────→ PAGE PANIER ou MINI PANIER
+    ├─→ Click icône cœur ────────────────→ PAGE MES FAVORIS
+    ├─→ Click icône cloche ──────────────→ Dropdown NOTIFICATIONS
+    ├─→ Click "Mon profil" ──────────────→ PAGE PROFIL
+    ├─→ Click "Mes commandes" ───────────→ PAGE MES COMMANDES
+    ├─→ Click "Mes favoris" ─────────────→ PAGE MES FAVORIS
+    ├─→ Click "Points fidélité" ─────────→ PAGE FIDÉLITÉ
+    └─→ Click "Se déconnecter" ──────────→ Déconnexion ⇒ PAGE D'ACCUEIL
+
+================================================================================
+
+┌─────────────────────────────────────────────────────────────────────────┐
+│ MINI PANIER (Dropdown depuis header)                                    │
+│ - 3 derniers articles ajoutés:                                           │
+│   * Image miniature                                                      │
+│   * Nom                                                                  │
+│   * Quantité × Prix                                                      │
+│ - Total panier                                                           │
+│ - Bouton "Voir mon panier"                                              │
+│ - Bouton "Commander"                                                     │
+│ - Si vide: "Votre panier est vide"                                      │
+└─────────────────────────────────────────────────────────────────────────┘
+    │
+    ├─→ Click "Voir mon panier" ─────────→ PAGE PANIER
+    └─→ Click "Commander" ───────────────→ PAGE PANIER
+
+================================================================================
+
+┌─────────────────────────────────────────────────────────────────────────┐
+│ PAGE PANIER [AUTH] (/panier)                                            │
+│ - Titre "Mon Panier" avec nombre articles                               │
+│ - Si vide:                                                               │
+│   * Message "Votre panier est vide"                                      │
+│   * Bouton "Découvrir nos produits" ───→ CATALOGUE                      │
+│ - Si articles:                                                           │
+│   * Liste groupée par boutique                                           │
+│   * Pour chaque article:                                                 │
+│     - Image                                                              │
+│     - Nom + variante                                                     │
+│     - Prix unitaire                                                      │
+│     - Input quantité (+ / -)                                             │
+│     - Sous-total (prix × quantité)                                       │
+│     - Bouton supprimer (×)                                               │
+│   * Sous-total par boutique                                              │
+│   * Section "Code promo":                                                │
+│     - Input code                                                         │
+│     - Bouton "Appliquer"                                                 │
+│     - Réduction affichée si appliqué                                     │
+│   * Récapitulatif (sidebar):                                             │
+│     - Sous-total                                                         │
+│     - Réduction (si promo)                                               │
+│     - Total final (gros texte)                                           │
+│   * Bouton "Continuer mes achats" ───→ CATALOGUE                        │
+│   * Bouton "Vider le panier" (avec confirmation)                         │
+│   * Bouton "Commander" (gros, vert) ───→ PROCESSUS COMMANDE             │
+└─────────────────────────────────────────────────────────────────────────┘
+    │
+    ├─→ Click "+/-" quantité ────────────→ Update panier (AJAX)
+    ├─→ Click "×" supprimer ─────────────→ Supprime article + Recharge
+    ├─→ Click "Vider" ───────────────────→ Modal confirmation → Vide panier
+    ├─→ Click "Continuer achats" ────────→ CATALOGUE PRODUITS
+    └─→ Click "Commander" ───────────────→ CHECKOUT ÉTAPE 1
+
+================================================================================
+
+┌─────────────────────────────────────────────────────────────────────────┐
+│ PROCESSUS COMMANDE - ÉTAPE 1 [AUTH] (/checkout/step1)                  │
+│ - Stepper: [1. Résumé] → 2. Livraison → 3. Paiement                    │
+│ - Titre "Vérifiez votre panier"                                         │
+│ - Récapitulatif articles (lecture seule)                                │
+│ - Groupé par boutique                                                    │
+│ - Total affiché                                                          │
+│ - Bouton "Retour au panier" ────────────→ PAGE PANIER                   │
+│ - Bouton "Suivant" ──────────────────────→ CHECKOUT ÉTAPE 2             │
+└─────────────────────────────────────────────────────────────────────────┘
+
+================================================================================
+
+┌─────────────────────────────────────────────────────────────────────────┐
+│ PROCESSUS COMMANDE - ÉTAPE 2 [AUTH] (/checkout/step2)                  │
+│ - Stepper: 1. Résumé → [2. Livraison] → 3. Paiement                    │
+│ - Titre "Choisissez le mode de retrait"                                 │
+│ - Radio buttons:                                                         │
+│   ○ Click & Collect (Retrait en boutique)                               │
+│     → Si sélectionné:                                                    │
+│       * Affiche liste boutiques concernées                               │
+│       * Sélection boutique (radio)                                       │
+│       * Champ "Créneau souhaité" (optionnel)                             │
+│   ○ Livraison à domicile                                                 │
+│     → Si sélectionné:                                                    │
+│       * Radio "Mes adresses enregistrées" (si existantes)                │
+│       * Radio "Nouvelle adresse"                                         │
+│       * Formulaire adresse:                                              │
+│         - Rue                                                            │
+│         - Ville                                                          │
+│         - Code postal                                                    │
+│         - Téléphone                                                      │
+│         - Checkbox "Enregistrer cette adresse"                           │
+│ - Bouton "Précédent" ────────────────────→ CHECKOUT ÉTAPE 1             │
+│ - Bouton "Suivant" ───────────────────────→ CHECKOUT ÉTAPE 3            │
+└─────────────────────────────────────────────────────────────────────────┘
+
+================================================================================
+
+┌─────────────────────────────────────────────────────────────────────────┐
+│ PROCESSUS COMMANDE - ÉTAPE 3 [AUTH] (/checkout/step3)                  │
+│ - Stepper: 1. Résumé → 2. Livraison → [3. Paiement]                    │
+│ - Titre "Paiement et confirmation"                                       │
+│ - Section "Récapitulatif" (collapsible):                                 │
+│   * Liste articles                                                       │
+│   * Mode retrait choisi                                                  │
+│   * Adresse si livraison                                                 │
+│   * Total                                                                │
+│ - Section "Choisissez votre mode de paiement":                           │
+│   * Radio buttons:                                                       │
+│     ○ Carte bancaire                                                     │
+│       → Formulaire carte (ou iframe Stripe)                              │
+│     ○ Mobile Money                                                       │
+│       → Sous-options: Airtel / Orange / Telma                            │
+│       → Message: "Vous recevrez une notification sur votre téléphone"   │
+│     ○ Paiement au retrait/livraison                                      │
+│       → Message: "Payez en espèces lors du retrait/livraison"           │
+│ - Checkbox "J'accepte les CGV" (requis)                                 │
+│ - Bouton "Précédent" ────────────────────→ CHECKOUT ÉTAPE 2             │
+│ - Bouton "Valider ma commande" (désactivé si CGV non cochée)            │
+│   └─→ Click ──────────────────────────────→ Validation en cours...      │
+│       └─⇒ Si succès ───────────────────────→ PAGE CONFIRMATION          │
+│       └─⇒ Si erreur ───────────────────────→ Message erreur             │
+└─────────────────────────────────────────────────────────────────────────┘
+
+================================================================================
+
+┌─────────────────────────────────────────────────────────────────────────┐
+│ PAGE CONFIRMATION COMMANDE [AUTH] (/commande/confirmation/:id)         │
+│ - Icône succès (✓ vert)                                                 │
+│ - Titre "Commande confirmée !"                                           │
+│ - Numéro de commande (gros texte)                                       │
+│ - Message selon mode:                                                    │
+│   * Si Click & Collect: "Votre commande sera prête dans X jours.        │
+│     Vous serez notifié."                                                 │
+│   * Si Livraison: "Votre commande sera livrée sous X jours."            │
+│ - Récapitulatif commande (collapsible)                                  │
+│ - Statut actuel: "En attente de confirmation"                           │
+│ - Bouton "Suivre ma commande" ───────────→ DÉTAIL COMMANDE              │
+│ - Bouton "Retour à l'accueil" ───────────→ PAGE D'ACCUEIL               │
+│ - Bouton "Continuer mes achats" ─────────→ CATALOGUE PRODUITS           │
+└─────────────────────────────────────────────────────────────────────────┘
+
+================================================================================
+
+┌─────────────────────────────────────────────────────────────────────────┐
+│ PAGE MES COMMANDES [AUTH] (/mes-commandes)                             │
+│ - Titre "Mes commandes"                                                 │
+│ - Filtres:                                                               │
+│   * Statut (dropdown): Toutes, En attente, En cours, Livrées, Annulées │
+│   * Date (plage de dates)                                                │
+│ - Recherche par numéro commande                                          │
+│ - Liste commandes (cartes):                                              │
+│   * N° commande                                                          │
+│   * Date                                                                 │
+│   * Miniatures produits (3 max + "+X" si plus)                          │
+│   * Total                                                                │
+│   * Badge statut (couleur selon statut)                                 │
+│   * Bouton "Voir détail" ────────────────→ DÉTAIL COMMANDE              │
+│   * Bouton "Racheter" (même panier)                                     │
+│   * Bouton "Annuler" si statut le permet                                │
+│ - Pagination                                                             │
+│ - Si aucune commande: "Vous n'avez pas encore passé de commande"        │
+└─────────────────────────────────────────────────────────────────────────┘
+    │
+    ├─→ Click "Voir détail" ─────────────→ DÉTAIL COMMANDE
+    ├─→ Click "Annuler" ─────────────────→ Modal confirmation → Annule
+    └─→ Click "Racheter" ────────────────→ Ajoute au panier → PAGE PANIER
+
+================================================================================
+
+┌─────────────────────────────────────────────────────────────────────────┐
+│ DÉTAIL COMMANDE [AUTH] (/commandes/:id)                                │
+│ - Numéro commande (titre)                                               │
+│ - Date et heure                                                          │
+│ - Timeline statut (stepper horizontal):                                  │
+│   En attente → Payée → En préparation → Prête → Livrée/Retirée          │
+│   (étape actuelle en couleur)                                            │
+│ - Section "Articles commandés":                                          │
+│   * Groupés par boutique                                                 │
+│   * Pour chaque article:                                                 │
+│     - Image, Nom, Variante, Quantité, Prix unitaire, Sous-total         │
+│   * Sous-total par boutique                                              │
+│ - Section "Informations":                                                │
+│   * Mode retrait                                                         │
+│   * Adresse livraison (si applicable)                                    │
+│   * Mode paiement                                                        │
+│   * Statut paiement                                                      │
+│ - Section "Montants":                                                    │
+│   * Sous-total                                                           │
+│   * Réduction (si promo)                                                 │
+│   * Frais de livraison (si applicable)                                   │
+│   * Total (gros texte)                                                   │
+│ - Boutons d'action selon statut:                                         │
+│   * Si "En attente" ou "Payée": Bouton "Annuler la commande"            │
+│   * Si "Livrée": Bouton "Laisser un avis" par produit                   │
+│   * Bouton "Contacter la boutique"                                       │
+│   * Bouton "Télécharger la facture" (PDF)                               │
+│ - Bouton "Retour à mes commandes" ───────→ PAGE MES COMMANDES           │
+└─────────────────────────────────────────────────────────────────────────┘
+    │
+    ├─→ Click "Annuler" ─────────────────→ Modal confirmation
+    │   └─→ Confirmer ────────────────────→ Annule commande + Recharge page
+    ├─→ Click "Laisser un avis" ─────────→ Modal notation produit
+    ├─→ Click "Contacter boutique" ──────→ Modal messagerie ou email
+    └─→ Click "Télécharger facture" ─────→ Génère et télécharge PDF
+
+================================================================================
+
+┌─────────────────────────────────────────────────────────────────────────┐
+│ PAGE MES FAVORIS [AUTH] (/mes-favoris)                                 │
+│ - Titre "Mes favoris" avec nombre                                       │
+│ - Si vide:                                                               │
+│   * Message "Vous n'avez pas encore de favoris"                          │
+│   * Bouton "Découvrir nos produits" ───→ CATALOGUE                      │
+│ - Si articles:                                                           │
+│   * Grille de cartes produits (même style que catalogue)                 │
+│   * Icône cœur plein (rouge) pour retirer                               │
+│   * Bouton "Ajouter au panier" sur chaque carte                         │
+│ - Bouton "Vider mes favoris" (avec confirmation)                         │
+└─────────────────────────────────────────────────────────────────────────┘
+    │
+    ├─→ Click produit ───────────────────→ DÉTAIL PRODUIT
+    ├─→ Click cœur ──────────────────────→ Retire des favoris + Recharge
+    ├─→ Click "Ajouter au panier" ───────→ Ajoute au panier + Toast
+    └─→ Click nom boutique ──────────────→ DÉTAIL BOUTIQUE
+
+================================================================================
+
+┌─────────────────────────────────────────────────────────────────────────┐
+│ PAGE PROFIL [AUTH] (/profil)                                            │
+│ - Sidebar avec onglets:                                                  │
+│   * Informations personnelles                                            │
+│   * Sécurité                                                             │
+│   * Notifications                                                        │
+│ - Section active selon onglet:                                           │
+│                                                                          │
+│ ONGLET "Informations personnelles":                                     │
+│   - Photo de profil avec bouton "Modifier"                              │
+│   - Formulaire:                                                          │
+│     * Nom, Prénom                                                        │
+│     * Email                                                              │
+│     * Téléphone                                                          │
+│   - Bouton "Enregistrer les modifications"                              │
+│                                                                          │
+│ ONGLET "Sécurité":                                                      │
+│   - Formulaire changement mot de passe:                                 │
+│     * Mot de passe actuel                                               │
+│     * Nouveau mot de passe                                              │
+│     * Confirmation                                                       │
+│   - Bouton "Changer le mot de passe"                                    │
+│                                                                          │
+│ ONGLET "Notifications":                                                 │
+│   - Préférences de notifications:                                        │
+│     * Checkboxes: Email, SMS, Push                                      │
+│     * Types: Commandes, Promotions, Nouveautés                          │
+│   - Bouton "Enregistrer les préférences"                                │
+└─────────────────────────────────────────────────────────────────────────┘
+    │
+    └─→ Modification → Toast succès
+
+================================================================================
+
+┌─────────────────────────────────────────────────────────────────────────┐
+│ PAGE FIDÉLITÉ [AUTH] (/fidelite)                                        │
+│ - Titre "Mon programme de fidélité"                                     │
+│ - Carte de points (grande):                                              │
+│   * Nombre de points (gros chiffre)                                     │
+│   * Équivalent en argent                                                │
+│   * Barre de progression vers prochaine récompense                      │
+│ - Section "Comment ça marche":                                           │
+│   * Règles du programme                                                  │
+│   * 1 point = 100 Ar dépensés                                           │
+│   * 100 points = 1000 Ar de réduction                                   │
+│ - Section "Utiliser mes points":                                         │
+│   * Input nombre de points à convertir                                   │
+│   * Aperçu réduction                                                     │
+│   * Bouton "Générer un bon d'achat"                                     │
+│     └─→ Génère code promo personnel                                     │
+│ - Section "Historique":                                                  │
+│   * Tableau transactions:                                                │
+│     - Date, Description, Points (+/-), Solde                            │
+│   * Pagination                                                           │
+└─────────────────────────────────────────────────────────────────────────┘
+
+================================================================================
+
+┌─────────────────────────────────────────────────────────────────────────┐
+│ DROPDOWN NOTIFICATIONS (depuis header)                                  │
+│ - Titre "Notifications" avec badge (nombre non lues)                    │
+│ - Liste 5 dernières notifications:                                       │
+│   * Icône selon type                                                     │
+│   * Titre (gras si non lu)                                              │
+│   * Message court                                                        │
+│   * Date relative ("Il y a 2h")                                         │
+│   * Click notification → Marque comme lue + Redirige vers lien          │
+│ - Bouton "Tout marquer comme lu"                                        │
+│ - Lien "Voir toutes les notifications" ──→ PAGE NOTIFICATIONS           │
+└─────────────────────────────────────────────────────────────────────────┘
+
+┌─────────────────────────────────────────────────────────────────────────┐
+│ PAGE NOTIFICATIONS [AUTH] (/notifications)                              │
+│ - Titre "Toutes mes notifications"                                      │
+│ - Filtres: Toutes / Non lues                                            │
+│ - Liste complète notifications:                                          │
+│   * Icône, Titre, Message, Date                                         │
+│   * Fond gris clair si non lue                                          │
+│   * Click → Marque lue + Redirige                                       │
+│ - Pagination                                                             │
+│ - Bouton "Tout marquer comme lu"                                        │
+└─────────────────────────────────────────────────────────────────────────┘
+
+================================================================================
+                    PARTIE ADMIN (ROLE = 1)
+================================================================================
+
+┌─────────────────────────────────────────────────────────────────────────┐
+│ LAYOUT ADMIN                                                             │
+│ - Sidebar gauche (collapsible):                                          │
+│   * Dashboard                                                            │
+│   * Centres commerciaux                                                  │
+│   * Boutiques                                                            │
+│   * Catégories                                                           │
+│   * Utilisateurs                                                         │
+│   * Produits (tous)                                                      │
+│   * Commandes (toutes)                                                   │
+│   * Actualités                                                           │
+│   * Événements                                                           │
+│   * Statistiques                                                         │
+│   * Paramètres                                                           │
+│ - Header:                                                                │
+│   * Nom du centre commercial                                             │
+│   * Notifications                                                        │
+│   * Avatar admin + dropdown (Profil, Déconnexion)                       │
+│ - Contenu principal (zone de travail)                                   │
+└─────────────────────────────────────────────────────────────────────────┘
+
+================================================================================
+
+┌─────────────────────────────────────────────────────────────────────────┐
+│ DASHBOARD ADMIN [ROLE:1] (/admin/dashboard)                            │
+│ - Titre "Tableau de bord"                                               │
+│ - Cartes KPIs (4 en ligne):                                             │
+│   * Total boutiques (nombre + icône)                                    │
+│   * Total produits (nombre + icône)                                     │
+│   * Commandes du mois (nombre + icône)                                  │
+│   * CA du mois (montant + icône)                                        │
+│ - Graphique "Évolution du CA" (12 derniers mois) - Line chart           │
+│ - Graphique "Répartition commandes par statut" - Doughnut               │
+│ - Section "Dernières inscriptions boutiques":                           │
+│   * Tableau 5 dernières inscriptions                                    │
+│   * Colonnes: Nom, Catégorie, Date, Statut, Actions (Valider/Rejeter) │
+│   * Lien "Voir toutes" ───────────────────→ LISTE BOUTIQUES ADMIN       │
+│ - Section "Alertes":                                                     │
+│   * Boutiques en attente de validation (nombre)                         │
+│   * Réclamations non traitées (nombre)                                  │
+│   * Contrats expirant (nombre)                                          │
+└─────────────────────────────────────────────────────────────────────────┘
+    │
+    └─→ Click menu sidebar ──────────────→ Pages correspondantes
+
+================================================================================
+
+┌─────────────────────────────────────────────────────────────────────────┐
+│ LISTE CENTRES COMMERCIAUX [ROLE:1] (/admin/centres)                    │
+│ - Titre "Centres commerciaux"                                           │
+│ - Bouton "+ Nouveau centre" ─────────────→ FORMULAIRE CENTRE (modal)    │
+│ - Tableau:                                                               │
+│   * Colonnes: Nom, Description, Horaires, Nombre boutiques, Actions    │
+│   * Actions: Voir, Modifier, Supprimer                                  │
+│ - Pagination                                                             │
+└─────────────────────────────────────────────────────────────────────────┘
+    │
+    ├─→ Click "Nouveau" ─────────────────→ Modal formulaire
+    ├─→ Click "Modifier" ────────────────→ Modal formulaire (pré-rempli)
+    └─→ Click "Supprimer" ───────────────→ Confirmation → Supprime
+
+================================================================================
+
+┌─────────────────────────────────────────────────────────────────────────┐
+│ LISTE BOUTIQUES ADMIN [ROLE:1] (/admin/boutiques)                      │
+│ - Titre "Gestion des boutiques"                                         │
+│ - Filtres:                                                               │
+│   * Statut (En attente / Validées / Suspendues / Rejetées)              │
+│   * Catégorie                                                            │
+│   * Centre commercial                                                    │
+│   * Date inscription                                                     │
+│ - Recherche par nom                                                      │
+│ - Bouton "+ Nouvelle boutique" ───────────→ FORMULAIRE BOUTIQUE         │
+│ - Tableau:                                                               │
+│   * Colonnes: Logo, Nom, Catégorie, Centre, Statut, Date, Actions      │
+│   * Badge statut coloré                                                  │
+│   * Actions: Voir, Valider, Modifier, Suspendre, Supprimer             │
+│ - Pagination                                                             │
+└─────────────────────────────────────────────────────────────────────────┘
+    │
+    ├─→ Click "Nouvelle" ────────────────→ FORMULAIRE BOUTIQUE
+    ├─→ Click "Voir" ────────────────────→ DÉTAIL BOUTIQUE ADMIN
+    ├─→ Click "Valider" ─────────────────→ Modal validation
+    ├─→ Click "Modifier" ────────────────→ FORMULAIRE BOUTIQUE (édition)
+    ├─→ Click "Suspendre" ───────────────→ Confirmation → Change statut
+    └─→ Click "Supprimer" ───────────────→ Confirmation → Supprime
+
+================================================================================
+
+┌─────────────────────────────────────────────────────────────────────────┐
+│ FORMULAIRE BOUTIQUE [ROLE:1] (/admin/boutiques/form)                   │
+│ - Titre "Nouvelle boutique" ou "Modifier boutique"                      │
+│ - Onglets:                                                               │
+│   * Informations générales                                               │
+│   * Informations détaillées                                              │
+│   * Localisation                                                         │
+│   * Horaires                                                             │
+│   * Contrat                                                              │
+│                                                                          │
+│ ONGLET 1 - Informations générales:                                      │
+│   - Nom boutique                                                         │
+│   - Centre commercial (select)                                           │
+│   - Catégorie (select)                                                   │
+│   - Statut (select): Ouverte / Fermée / Congé                           │
+│                                                                          │
+│ ONGLET 2 - Informations détaillées:                                     │
+│   - Description (textarea)                                               │
+│   - Upload logo                                                          │
+│   - Upload bannière                                                      │
+│   - Couleur thème (color picker)                                         │
+│   - Téléphone, Email                                                     │
+│                                                                          │
+│ ONGLET 3 - Localisation:                                                │
+│   - Numéro emplacement                                                   │
+│   - Étage (select)                                                       │
+│   - Zone                                                                 │
+│   - Latitude, Longitude (ou sélection sur carte)                        │
+│   - Plan de référence                                                    │
+│                                                                          │
+│ ONGLET 4 - Horaires:                                                    │
+│   - Tableau 7 jours:                                                     │
+│     * Jour, Ouverture (time), Fermeture (time), Checkbox "Fermé"        │
+│                                                                          │
+│ ONGLET 5 - Contrat:                                                     │
+│   - Date début, Date fin                                                 │
+│   - Statut contrat (Actif/Inactif)                                      │
+│                                                                          │
+│ - Bouton "Annuler" ──────────────────────→ LISTE BOUTIQUES ADMIN        │
+│ - Bouton "Enregistrer"                                                   │
+│   └─→ Validation → Enregistre → Redirect LISTE BOUTIQUES                │
+└─────────────────────────────────────────────────────────────────────────┘
+
+================================================================================
+
+┌─────────────────────────────────────────────────────────────────────────┐
+│ MODAL VALIDATION BOUTIQUE [ROLE:1]                                     │
+│ - Titre "Valider la boutique [Nom]"                                     │
+│ - Récapitulatif infos boutique                                           │
+│ - Textarea "Commentaires" (optionnel)                                    │
+│ - Radio buttons:                                                         │
+│   ○ Valider                                                              │
+│   ○ Demander des compléments                                             │
+│   ○ Rejeter                                                              │
+│ - Si "Valider":                                                          │
+│   * Select "Attribuer un emplacement"                                    │
+│ - Bouton "Annuler"                                                       │
+│ - Bouton "Confirmer"                                                     │
+│   └─→ Change statut + Envoie notification + Email → Ferme modal         │
+└─────────────────────────────────────────────────────────────────────────┘
+
+================================================================================
+
+┌─────────────────────────────────────────────────────────────────────────┐
+│ LISTE CATÉGORIES [ROLE:1] (/admin/categories)                          │
+│ - Titre "Catégories de boutiques"                                       │
+│ - Bouton "+ Nouvelle catégorie" ──────────→ Modal formulaire            │
+│ - Tableau:                                                               │
+│   * Colonnes: Nom, Nombre de boutiques, Actions                         │
+│   * Actions: Modifier, Supprimer                                         │
+└─────────────────────────────────────────────────────────────────────────┘
+    │
+    ├─→ Click "Nouvelle" ────────────────→ Modal formulaire (vide)
+    ├─→ Click "Modifier" ────────────────→ Modal formulaire (pré-rempli)
+    └─→ Click "Supprimer" ───────────────→ Confirmation → Supprime
+
+================================================================================
+
+┌─────────────────────────────────────────────────────────────────────────┐
+│ LISTE UTILISATEURS [ROLE:1] (/admin/utilisateurs)                      │
+│ - Titre "Gestion des utilisateurs"                                      │
+│ - Filtres:                                                               │
+│   * Rôle (Client / Manager / Admin)                                     │
+│   * Statut (Actif / Inactif)                                            │
+│ - Recherche par nom, email, téléphone                                    │
+│ - Tableau:                                                               │
+│   * Colonnes: Avatar, Nom, Email, Téléphone, Rôle, Statut, Date, Actions│
+│   * Actions: Voir, Modifier, Désactiver/Activer, Supprimer              │
+│ - Pagination                                                             │
+└─────────────────────────────────────────────────────────────────────────┘
+    │
+    ├─→ Click "Voir" ────────────────────→ DÉTAIL UTILISATEUR ADMIN
+    ├─→ Click "Modifier" ────────────────→ Modal modification rôle/statut
+    ├─→ Click "Désactiver" ──────────────→ Confirmation → Change statut
+    └─→ Click "Supprimer" ───────────────→ Confirmation → Supprime
+
+================================================================================
+
+┌─────────────────────────────────────────────────────────────────────────┐
+│ LISTE PRODUITS ADMIN [ROLE:1] (/admin/produits)                        │
+│ - Titre "Tous les produits"                                             │
+│ - Filtres: Boutique, Catégorie, Prix, Stock, Actif                      │
+│ - Recherche par nom                                                      │
+│ - Tableau:                                                               │
+│   * Colonnes: Image, Nom, Boutique, Prix, Stock, Vues, Actif, Actions  │
+│   * Actions: Voir, Désactiver, Supprimer                                │
+│ - Pagination                                                             │
+└─────────────────────────────────────────────────────────────────────────┘
+    │
+    ├─→ Click "Voir" ────────────────────→ Ouvre fiche produit (public)
+    ├─→ Click "Désactiver" ──────────────→ Confirmation → Change actif
+    └─→ Click "Supprimer" ───────────────→ Confirmation → Supprime
+
+================================================================================
+
+┌─────────────────────────────────────────────────────────────────────────┐
+│ LISTE COMMANDES ADMIN [ROLE:1] (/admin/commandes)                      │
+│ - Titre "Toutes les commandes"                                          │
+│ - Filtres: Statut, Boutique, Date, Mode retrait                         │
+│ - Recherche par numéro, client                                           │
+│ - Tableau:                                                               │
+│   * Colonnes: N°, Client, Date, Boutiques, Total, Statut, Actions      │
+│   * Badge statut coloré                                                  │
+│   * Actions: Voir détail                                                 │
+│ - Export CSV/Excel                                                       │
+│ - Pagination                                                             │
+└─────────────────────────────────────────────────────────────────────────┘
+    │
+    └─→ Click "Voir" ────────────────────→ DÉTAIL COMMANDE (même que client)
+
+================================================================================
+
+┌─────────────────────────────────────────────────────────────────────────┐
+│ LISTE ACTUALITÉS [ROLE:1] (/admin/actualites)                          │
+│ - Titre "Actualités du centre"                                          │
+│ - Bouton "+ Nouvelle actualité" ──────────→ FORMULAIRE ACTUALITÉ        │
+│ - Tableau:                                                               │
+│   * Colonnes: Titre, Date publication, Actions                          │
+│   * Actions: Modifier, Supprimer                                         │
+└─────────────────────────────────────────────────────────────────────────┘
+    │
+    ├─→ Click "Nouvelle" ────────────────→ FORMULAIRE ACTUALITÉ (vide)
+    ├─→ Click "Modifier" ────────────────→ FORMULAIRE ACTUALITÉ (édition)
+    └─→ Click "Supprimer" ───────────────→ Confirmation → Supprime
+
+┌─────────────────────────────────────────────────────────────────────────┐
+│ FORMULAIRE ACTUALITÉ [ROLE:1] (/admin/actualites/form)                 │
+│ - Titre "Nouvelle actualité" ou "Modifier actualité"                    │
+│ - Formulaire:                                                            │
+│   * Titre                                                                │
+│   * Contenu (éditeur riche WYSIWYG)                                     │
+│   * Date publication (date picker)                                       │
+│ - Bouton "Annuler" ──────────────────────→ LISTE ACTUALITÉS             │
+│ - Bouton "Enregistrer"                                                   │
+└─────────────────────────────────────────────────────────────────────────┘
+
+================================================================================
+
+┌─────────────────────────────────────────────────────────────────────────┐
+│ LISTE ÉVÉNEMENTS [ROLE:1] (/admin/evenements)                          │
+│ - Titre "Événements"                                                    │
+│ - Onglets: À venir / Passés                                              │
+│ - Bouton "+ Nouvel événement" ────────────→ FORMULAIRE ÉVÉNEMENT        │
+│ - Tableau:                                                               │
+│   * Colonnes: Titre, Date, Lieu, Actions                                │
+│   * Actions: Modifier, Supprimer                                         │
+└─────────────────────────────────────────────────────────────────────────┘
+    │
+    ├─→ Click "Nouveau" ─────────────────→ FORMULAIRE ÉVÉNEMENT (vide)
+    ├─→ Click "Modifier" ────────────────→ FORMULAIRE ÉVÉNEMENT (édition)
+    └─→ Click "Supprimer" ───────────────→ Confirmation → Supprime
+
+┌─────────────────────────────────────────────────────────────────────────┐
+│ FORMULAIRE ÉVÉNEMENT [ROLE:1] (/admin/evenements/form)                 │
+│ - Titre "Nouvel événement" ou "Modifier événement"                      │
+│ - Formulaire:                                                            │
+│   * Titre                                                                │
+│   * Description (textarea)                                               │
+│   * Upload image                                                         │
+│   * Date et heure événement (datetime picker)                           │
+│   * Lieu                                                                 │
+│ - Bouton "Annuler" ──────────────────────→ LISTE ÉVÉNEMENTS             │
+│ - Bouton "Enregistrer"                                                   │
+└─────────────────────────────────────────────────────────────────────────┘
+
+================================================================================
+
+┌─────────────────────────────────────────────────────────────────────────┐
+│ PAGE STATISTIQUES [ROLE:1] (/admin/statistiques)                       │
+│ - Titre "Statistiques avancées"                                         │
+│ - Sélection période (date picker plage)                                 │
+│ - Onglets:                                                               │
+│   * Vue d'ensemble                                                       │
+│   * Par boutique                                                         │
+│   * Par produit                                                          │
+│                                                                          │
+│ ONGLET Vue d'ensemble:                                                   │
+│   - Cartes KPIs détaillés                                                │
+│   - Graphique CA (line chart)                                            │
+│   - Graphique répartition ventes par catégorie (pie chart)              │
+│   - Top 10 boutiques (bar chart)                                         │
+│                                                                          │
+│ ONGLET Par boutique:                                                     │
+│   - Select boutique                                                      │
+│   - KPIs boutique                                                        │
+│   - Graphique ventes boutique                                            │
+│   - Top produits boutique                                                │
+│                                                                          │
+│ ONGLET Par produit:                                                      │
+│   - Top 20 produits vendus (tableau)                                     │
+│   - Top 20 produits consultés (tableau)                                 │
+│   - Produits en rupture (alerte)                                        │
+│                                                                          │
+│ - Bouton "Exporter rapport PDF"                                          │
+│ - Bouton "Exporter rapport Excel"                                        │
+└─────────────────────────────────────────────────────────────────────────┘
+
+================================================================================
+                    PARTIE MANAGER BOUTIQUE (ROLE = 2)
+================================================================================
+
+┌─────────────────────────────────────────────────────────────────────────┐
+│ LAYOUT MANAGER BOUTIQUE                                                  │
+│ - Sidebar gauche:                                                        │
+│   * Dashboard                                                            │
+│   * Ma boutique                                                          │
+│   * Produits                                                             │
+│   * Commandes                                                            │
+│   * Promotions                                                           │
+│   * Statistiques                                                         │
+│   * Équipe (si applicable)                                               │
+│   * Paramètres                                                           │
+│ - Header:                                                                │
+│   * Nom boutique                                                         │
+│   * Statut (ouvert/fermé) avec toggle                                    │
+│   * Notifications                                                        │
+│   * Avatar + dropdown (Profil, Déconnexion)                             │
+│ - Contenu principal                                                      │
+└─────────────────────────────────────────────────────────────────────────┘
+
+================================================================================
+
+┌─────────────────────────────────────────────────────────────────────────┐
+│ DASHBOARD BOUTIQUE [ROLE:2] (/boutique/dashboard)                      │
+│ - Titre "Tableau de bord - [Nom Boutique]"                              │
+│ - Cartes KPIs (4 en ligne):                                             │
+│   * CA du jour (montant + variation %)                                  │
+│   * CA du mois (montant + variation %)                                  │
+│   * Commandes en cours (nombre)                                         │
+│   * Produits en rupture (nombre + alerte si > 0)                        │
+│ - Graphique "Ventes des 30 derniers jours" - Line chart                 │
+│ - Section "Commandes récentes":                                          │
+│   * Tableau 10 dernières commandes                                      │
+│   * Colonnes: N°, Client, Date, Total, Statut                           │
+│   * Click ligne → DÉTAIL COMMANDE                                       │
+│   * Lien "Voir toutes" ───────────────────→ LISTE COMMANDES BOUTIQUE    │
+│ - Section "Produits populaires":                                         │
+│   * Liste 5 produits les plus vendus                                    │
+│   * Nombre ventes, CA généré                                            │
+│ - Section "Alertes":                                                     │
+│   * Produits en rupture de stock                                        │
+│   * Commandes en attente                                                │
+│   * Avis non répondus                                                    │
+└─────────────────────────────────────────────────────────────────────────┘
+
+================================================================================
+
+┌─────────────────────────────────────────────────────────────────────────┐
+│ PAGE MA BOUTIQUE [ROLE:2] (/boutique/ma-boutique)                      │
+│ - Titre "Ma boutique"                                                   │
+│ - Onglets:                                                               │
+│   * Informations                                                         │
+│   * Horaires                                                             │
+│   * Avis clients                                                         │
+│                                                                          │
+│ ONGLET Informations:                                                     │
+│   - Aperçu tel que vu par les clients                                   │
+│   - Bouton "Modifier" → Formulaire édition:                             │
+│     * Description                                                        │
+│     * Logo, Bannière                                                     │
+│     * Contact (téléphone, email)                                         │
+│   - Bouton "Enregistrer"                                                 │
+│                                                                          │
+│ ONGLET Horaires:                                                         │
+│   - Tableau 7 jours avec horaires                                       │
+│   - Bouton "Modifier" → Formulaire édition                              │
+│   - Bouton "Enregistrer"                                                 │
+│                                                                          │
+│ ONGLET Avis clients:                                                     │
+│   - Note moyenne (grande étoiles)                                        │
+│   - Répartition notes                                                    │
+│   - Liste avis avec possibilité de répondre                             │
+└─────────────────────────────────────────────────────────────────────────┘
+
+================================================================================
+
+┌─────────────────────────────────────────────────────────────────────────┐
+│ LISTE PRODUITS BOUTIQUE [ROLE:2] (/boutique/produits)                  │
+│ - Titre "Mes produits"                                                  │
+│ - Filtres:                                                               │
+│   * Catégorie                                                            │
+│   * Stock (En stock / Rupture / Stock faible < 10)                      │
+│   * Promotion (En promo / Non)                                           │
+│   * Statut (Actif / Inactif)                                            │
+│ - Recherche par nom                                                      │
+│ - Bouton "+ Nouveau produit" ─────────────→ FORMULAIRE PRODUIT          │
+│ - Vue: Toggle Grille / Tableau                                           │
+│ - Tableau/Grille:                                                        │
+│   * Image, Nom, Prix, Stock, Promo, Vues, Actif                        │
+│   * Actions: Voir, Modifier, Dupliquer, Activer/Désactiver, Supprimer  │
+│ - Pagination                                                             │
+│ - Actions groupées:                                                      │
+│   * Checkbox sélection multiple                                          │
+│   * Bouton "Activer sélection"                                           │
+│   * Bouton "Désactiver sélection"                                        │
+│   * Bouton "Supprimer sélection"                                         │
+└─────────────────────────────────────────────────────────────────────────┘
+    │
+    ├─→ Click "Nouveau" ─────────────────→ FORMULAIRE PRODUIT (vide)
+    ├─→ Click "Voir" ────────────────────→ Ouvre fiche publique produit
+    ├─→ Click "Modifier" ────────────────→ FORMULAIRE PRODUIT (édition)
+    ├─→ Click "Dupliquer" ───────────────→ FORMULAIRE PRODUIT (copie)
+    └─→ Click "Supprimer" ───────────────→ Confirmation → Supprime
+
+================================================================================
+
+┌─────────────────────────────────────────────────────────────────────────┐
+│ FORMULAIRE PRODUIT [ROLE:2] (/boutique/produits/form)                  │
+│ - Titre "Nouveau produit" ou "Modifier produit"                         │
+│ - Layout 2 colonnes:                                                     │
+│                                                                          │
+│ COLONNE GAUCHE:                                                          │
+│   - Section "Informations générales":                                    │
+│     * Nom produit                                                        │
+│     * Catégorie (select avec recherche)                                  │
+│     * Sous-catégorie                                                     │
+│   - Section "Prix et stock":                                             │
+│     * Prix (number)                                                      │
+│     * Checkbox "En promotion"                                            │
+│       → Si coché: Input "Prix promo"                                     │
+│     * Stock (number)                                                     │
+│     * Alerte stock bas (number, default 10)                             │
+│   - Section "Description":                                               │
+│     * Textarea description (éditeur riche)                               │
+│   - Section "Variantes" (optionnel):                                     │
+│     * Bouton "+ Ajouter variante"                                        │
+│     * Liste variantes ajoutées:                                          │
+│       - Type (Taille/Couleur), Valeur, Stock                            │
+│       - Bouton supprimer                                                 │
+│                                                                          │
+│ COLONNE DROITE:                                                          │
+│   - Section "Images":                                                    │
+│     * Zone drag & drop ou bouton upload                                  │
+│     * Max 5 images                                                       │
+│     * Aperçu images avec réorganisation (drag)                           │
+│     * Bouton supprimer par image                                         │
+│   - Section "Visibilité":                                                │
+│     * Toggle "Produit actif"                                             │
+│     * Checkbox "Mettre en vedette"                                       │
+│   - Section "Aperçu":                                                    │
+│     * Preview carte produit                                              │
+│                                                                          │
+│ - Bouton "Annuler" ──────────────────────→ LISTE PRODUITS BOUTIQUE      │
+│ - Bouton "Enregistrer brouillon" (actif=false)                          │
+│ - Bouton "Publier" (actif=true)                                         │
+└─────────────────────────────────────────────────────────────────────────┘
+    │
+    └─→ Enregistrer → Validation → Retour LISTE PRODUITS
+
+================================================================================
+
+┌─────────────────────────────────────────────────────────────────────────┐
+│ LISTE COMMANDES BOUTIQUE [ROLE:2] (/boutique/commandes)                │
+│ - Titre "Commandes reçues"                                              │
+│ - Filtres:                                                               │
+│   * Statut (Toutes, En attente, Payée, En préparation, Prête, Livrée)  │
+│   * Mode retrait (Click & Collect / Livraison)                          │
+│   * Date (plage)                                                         │
+│ - Recherche par n° commande ou client                                    │
+│ - Onglets rapides (compteurs):                                           │
+│   * En attente (X)                                                       │
+│   * À préparer (X)                                                       │
+│   * Prêtes (X)                                                           │
+│   * Terminées                                                            │
+│ - Tableau:                                                               │
+│   * Colonnes: N°, Client, Date, Articles (miniatures), Total, Statut   │
+│   * Badge statut avec couleur                                            │
+│   * Actions: Voir détail, Changer statut                                │
+│ - Pagination                                                             │
+└─────────────────────────────────────────────────────────────────────────┘
+    │
+    ├─→ Click ligne ─────────────────────→ DÉTAIL COMMANDE BOUTIQUE
+    └─→ Click "Changer statut" ──────────→ Dropdown statuts → Change
+
+================================================================================
+
+┌─────────────────────────────────────────────────────────────────────────┐
+│ DÉTAIL COMMANDE BOUTIQUE [ROLE:2] (/boutique/commandes/:id)            │
+│ - Numéro commande (titre)                                               │
+│ - Timeline statut (étape actuelle en couleur)                           │
+│ - Section "Informations client":                                         │
+│   * Nom, Email, Téléphone                                               │
+│   * Mode retrait                                                         │
+│   * Adresse (si livraison)                                               │
+│ - Section "Articles commandés" (uniquement ceux de cette boutique):     │
+│   * Tableau: Image, Nom, Variante, Quantité, Prix unitaire, Total      │
+│   * Total boutique                                                       │
+│ - Section "Historique statuts":                                          │
+│   * Liste changements avec date et heure                                │
+│ - Boutons d'action (selon statut actuel):                               │
+│   * "Marquer comme payée" (si en_attente)                               │
+│   * "Marquer en préparation" (si payée)                                 │
+│   * "Marquer prête pour retrait" (si en_preparation)                    │
+│   * "Marquer livrée/retirée" (si prete)                                 │
+│   * "Annuler la commande" (avec raison)                                 │
+│ - Textarea "Notes internes" (visible seulement par boutique)            │
+│ - Bouton "Contacter le client" (email ou message)                       │
+│ - Bouton "Imprimer bon de préparation"                                  │
+│ - Bouton "Retour aux commandes" ──────────→ LISTE COMMANDES BOUTIQUE    │
+└─────────────────────────────────────────────────────────────────────────┘
+    │
+    ├─→ Click bouton statut ─────────────→ Confirmation → Change + Notif
+    └─→ Click "Annuler" ─────────────────→ Modal raison → Annule + Notif
+
+================================================================================
+
+┌─────────────────────────────────────────────────────────────────────────┐
+│ LISTE PROMOTIONS BOUTIQUE [ROLE:2] (/boutique/promotions)              │
+│ - Titre "Mes promotions"                                                │
+│ - Onglets: Actives / Expirées / Toutes                                  │
+│ - Bouton "+ Nouvelle promotion" ───────────→ FORMULAIRE PROMOTION       │
+│ - Tableau/Cartes:                                                        │
+│   * Code, Type, Valeur, Date début/fin, Utilisations, Actif            │
+│   * Actions: Modifier, Désactiver, Supprimer                            │
+└─────────────────────────────────────────────────────────────────────────┘
+    │
+    ├─→ Click "Nouvelle" ────────────────→ FORMULAIRE PROMOTION (vide)
+    ├─→ Click "Modifier" ────────────────→ FORMULAIRE PROMOTION (édition)
+    └─→ Click "Supprimer" ───────────────→ Confirmation → Supprime
+
+┌─────────────────────────────────────────────────────────────────────────┐
+│ FORMULAIRE PROMOTION [ROLE:2] (/boutique/promotions/form)              │
+│ - Titre "Nouvelle promotion" ou "Modifier promotion"                    │
+│ - Formulaire:                                                            │
+│   * Type (radio):                                                        │
+│     ○ Code promo                                                         │
+│     ○ Réduction pourcentage                                              │
+│     ○ Réduction montant                                                  │
+│     ○ Flash sale                                                         │
+│   * Code (auto-généré ou personnalisé)                                   │
+│   * Titre (ex: "Soldes d'été")                                           │
+│   * Description                                                          │
+│   * Valeur (%, Ar selon type)                                            │
+│   * Date début (date picker)                                             │
+│   * Date fin (date picker)                                               │
+│   * Montant minimum commande (optionnel)                                 │
+│   * Nombre utilisations max (optionnel)                                  │
+│   * Produits concernés (select multiple ou "Tous")                       │
+│ - Bouton "Annuler" ──────────────────────→ LISTE PROMOTIONS             │
+│ - Bouton "Créer la promotion"                                            │
+└─────────────────────────────────────────────────────────────────────────┘
+
+================================================================================
+
+┌─────────────────────────────────────────────────────────────────────────┐
+│ PAGE STATISTIQUES BOUTIQUE [ROLE:2] (/boutique/statistiques)           │
+│ - Titre "Mes statistiques"                                              │
+│ - Sélection période (dropdown): Aujourd'hui, 7j, 30j, 3 mois, Année,   │
+│   Personnalisé (date picker)                                             │
+│ - Cartes KPIs:                                                           │
+│   * CA période (montant + variation)                                    │
+│   * Nombre commandes (nombre + variation)                               │
+│   * Panier moyen (montant + variation)                                  │
+│   * Taux conversion (% + variation)                                     │
+│   * Nombre visiteurs (nombre)                                            │
+│   * Note moyenne boutique (étoiles)                                     │
+│ - Graphique "Évolution CA" (line chart)                                 │
+│ - Graphique "Ventes par catégorie" (doughnut)                           │
+│ - Section "Top 10 produits vendus":                                     │
+│   * Tableau: Produit, Quantité, CA généré                               │
+│ - Section "Top 10 produits consultés":                                  │
+│   * Tableau: Produit, Vues, Taux ajout panier                           │
+│ - Bouton "Exporter rapport PDF"                                          │
+│ - Bouton "Exporter rapport Excel"                                        │
+└─────────────────────────────────────────────────────────────────────────┘
+
+================================================================================
+
+┌─────────────────────────────────────────────────────────────────────────┐
+│ PAGE ÉQUIPE [ROLE:2] (/boutique/equipe) [Optionnel]                    │
+│ - Titre "Mon équipe"                                                    │
+│ - Bouton "+ Ajouter un membre"                                          │
+│ - Tableau:                                                               │
+│   * Colonnes: Nom, Email, Rôle (Manager/Employé), Ajouté le, Actions   │
+│   * Actions: Modifier rôle, Retirer                                      │
+└─────────────────────────────────────────────────────────────────────────┘
+
+================================================================================
+
+┌─────────────────────────────────────────────────────────────────────────┐
+│ PAGE PARAMÈTRES BOUTIQUE [ROLE:2] (/boutique/parametres)               │
+│ - Titre "Paramètres"                                                    │
+│ - Onglets:                                                               │
+│   * Notifications                                                        │
+│   * Politique de retour                                                  │
+│   * Conditions de vente                                                  │
+│                                                                          │
+│ ONGLET Notifications:                                                    │
+│   - Préférences notifications:                                           │
+│     * Checkbox "Nouvelle commande"                                       │
+│     * Checkbox "Avis client"                                             │
+│     * Checkbox "Stock faible"                                            │
+│     * Mode: Email / SMS / Push                                           │
+│                                                                          │
+│ ONGLET Politique de retour:                                             │
+│   - Textarea (éditeur riche)                                             │
+│   - Visible sur page boutique                                            │
+│                                                                          │
+│ ONGLET Conditions de vente:                                             │
+│   - Textarea (éditeur riche)                                             │
+│   - Visible sur page boutique                                            │
+│                                                                          │
+│ - Bouton "Enregistrer"                                                   │
+└─────────────────────────────────────────────────────────────────────────┘
+
+================================================================================
+                    PAGES COMMUNES / UTILITAIRES
+================================================================================
+
+┌─────────────────────────────────────────────────────────────────────────┐
+│ PAGE 404 - NON TROUVÉE                                                  │
+│ - Illustration 404                                                       │
+│ - Message "Page non trouvée"                                            │
+│ - Bouton "Retour à l'accueil" ────────────→ PAGE D'ACCUEIL              │
+└─────────────────────────────────────────────────────────────────────────┘
+
+┌─────────────────────────────────────────────────────────────────────────┐
+│ PAGE 403 - ACCÈS REFUSÉ                                                 │
+│ - Illustration cadenas                                                   │
+│ - Message "Vous n'avez pas accès à cette page"                          │
+│ - Bouton "Retour" ────────────────────────→ Page précédente             │
+└─────────────────────────────────────────────────────────────────────────┘
+
+┌─────────────────────────────────────────────────────────────────────────┐
+│ PAGE 500 - ERREUR SERVEUR                                               │
+│ - Illustration erreur                                                    │
+│ - Message "Une erreur est survenue"                                     │
+│ - Bouton "Réessayer"                                                     │
+│ - Bouton "Contacter le support"                                          │
+└─────────────────────────────────────────────────────────────────────────┘
+
+================================================================================
+                    RÉCAPITULATIF ROUTES PRINCIPALES
+================================================================================
+
+PUBLIC:
+/                           - Accueil
+/login                      - Connexion
+/register                   - Inscription
+/forgot-password            - Mot de passe oublié
+/reset-password/:token      - Réinitialisation
+/boutiques                  - Liste boutiques
+/boutiques/:id              - Détail boutique
+/produits                   - Catalogue produits
+/produits/:id               - Détail produit
+/recherche                  - Résultats recherche
+/promotions                 - Liste promotions
+/evenements                 - Liste événements
+/evenements/:id             - Détail événement
+/actualites                 - Liste actualités
+/actualites/:id             - Détail actualité
+
+CLIENT AUTHENTIFIÉ (ROLE=0):
+/panier                     - Mon panier
+/checkout/step1             - Commande étape 1
+/checkout/step2             - Commande étape 2
+/checkout/step3             - Commande étape 3
+/commande/confirmation/:id  - Confirmation
+/mes-commandes              - Mes commandes
+/commandes/:id              - Détail commande
+/mes-favoris                - Mes favoris
+/profil                     - Mon profil
+/fidelite                   - Programme fidélité
+/notifications              - Mes notifications
+
+ADMIN (ROLE=1):
+/admin/dashboard            - Dashboard
+/admin/centres              - Centres commerciaux
+/admin/boutiques            - Gestion boutiques
+/admin/boutiques/form       - Formulaire boutique
+/admin/categories           - Catégories
+/admin/utilisateurs         - Utilisateurs
+/admin/produits             - Tous produits
+/admin/commandes            - Toutes commandes
+/admin/actualites           - Actualités
+/admin/actualites/form      - Formulaire actualité
+/admin/evenements           - Événements
+/admin/evenements/form      - Formulaire événement
+/admin/statistiques         - Statistiques
+
+MANAGER BOUTIQUE (ROLE=2):
+/boutique/dashboard         - Dashboard boutique
+/boutique/ma-boutique       - Ma boutique
+/boutique/produits          - Mes produits
+/boutique/produits/form     - Formulaire produit
+/boutique/commandes         - Commandes reçues
+/boutique/commandes/:id     - Détail commande
+/boutique/promotions        - Mes promotions
+/boutique/promotions/form   - Formulaire promotion
+/boutique/statistiques      - Mes statistiques
+/boutique/equipe            - Mon équipe
+/boutique/parametres        - Paramètres
+
+================================================================================
+                    FLUX UTILISATEUR TYPIQUES
+================================================================================
+
+FLUX 1 - ACHAT SIMPLE (Client non connecté):
+Accueil → Catalogue → Détail produit → Click "Ajouter au panier"
+→ Redirect Login → Connexion → Retour détail produit → Ajout panier
+→ Panier → Commander → Checkout (3 étapes) → Confirmation
+
+FLUX 2 - ACHAT EXPRESS (Client connecté):
+Accueil → Recherche → Détail produit → Ajouter panier → Mini-panier
+→ Commander → Checkout (3 étapes) → Confirmation
+
+FLUX 3 - DÉCOUVERTE BOUTIQUE:
+Accueil → Click catégorie → Liste boutiques → Détail boutique
+→ Parcourir produits → Détail produit → Ajouter panier
+
+FLUX 4 - GESTION COMMANDE (Manager):
+Login → Dashboard boutique → Voir commandes → Détail commande
+→ Changer statut → Notification client automatique
+
+FLUX 5 - AJOUT PRODUIT (Manager):
+Dashboard boutique → Mes produits → Nouveau produit → Formulaire complet
+→ Upload images → Enregistrer → Publication
+
+FLUX 6 - VALIDATION BOUTIQUE (Admin):
+Login admin → Dashboard → Alerte inscription → Liste boutiques
+→ Click "Valider" → Modal validation → Attribuer emplacement
+→ Confirmer → Email envoyé au manager
+
+================================================================================
+FIN DU DOCUMENT - FLUX DE NAVIGATION
+================================================================================
