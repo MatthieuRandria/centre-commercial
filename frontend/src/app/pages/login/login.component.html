@@ -4,7 +4,7 @@
   <p class="login-subtitle">Accédez à votre espace sécurisé</p>
 
       <p style="color:red">{{ error }}</p>
-      <div id="success" class="alert success"></div>
+      <!-- <div id="success" class="alert success"></div> -->
 
       <div class="field">
           <label for="mail">Adresse email</label>
@@ -17,7 +17,7 @@
         
         <div class="password-wrapper">
             <input type="password" placeholder="Mot de passe" [(ngModel)]="motDePasse">
-            <button type="button" class="toggle-password" aria-label="Afficher le mot de passe"></button>
+            <!-- <button type="button" class="toggle-password" aria-label="Afficher le mot de passe"></button> -->
               <p style="color:red">{{ mdpError }}</p>
         </div>
       </div>
@@ -35,5 +35,5 @@
       </button>
 
       <p class="secure-note">Connexion sécurisée – Vos informations sont protégées.</p>      
-      <p class="auth-footer">Pas encore de compte ?<a href="/signup">Créer un compte</a></p>
+      <p class="auth-footer">Pas encore de compte ?<a routerLink="/signup">Créer un compte</a></p>
 </div>

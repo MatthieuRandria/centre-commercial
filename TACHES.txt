@@ -305,7 +305,7 @@ EVENEMENTS Collection:
    - AuthGuard: vérifier authentification
    - RoleGuard: vérifier rôle (admin=1, manager=2)
 
-[ ] TASK 1.8 - PAGE: Connexion (Frontend)
+[X] TASK 1.8 - PAGE: Connexion (Frontend)
    Fichier: frontend/src/app/modules/auth/pages/login/
    Route: /login
    

@@ -8,7 +8,8 @@ import { Router } from '@angular/router';
   selector: 'app-signup',
   standalone: true,
   imports: [CommonModule, FormsModule],
-  templateUrl: './signup.component.html'
+  templateUrl: './signup.component.html',
+  styleUrl: './signup.component.scss',
 })
 //  - Champs: email, telephone, motDePasse, role, nom, prenom, image
 export class SignupComponent {
@@ -32,7 +33,16 @@ export class SignupComponent {
       .subscribe({
         next: (res: any) => {
           localStorage.setItem('token', res.token);
-          this.router.navigate(['/dashboard']);
+          const role=res.user.role;
+          this.authService.setSession(res.token, res.user);
+          if(role==="client"){
+            this.router.navigate(['']);
+          }
+          if (role==="boutique") {
+            this.router.navigate(['/boutique']);
+          }if (role==="admin"){
+            this.router.navigate(['/admin']);
+          }
         },
         error: err => {
           this.error = err.error.message || 'Erreur inscription';
