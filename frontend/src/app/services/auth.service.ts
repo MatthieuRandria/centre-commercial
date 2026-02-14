@@ -30,7 +30,7 @@ export class AuthService {
   }
 
   signup(data: any) {
-    return this.http.post<any>(`${this.apiUrl}/signup`, data);
+    return this.http.post<any>(`${this.apiUrl}/register`, data);
   }
 
   setSession(token: string, user: any) {

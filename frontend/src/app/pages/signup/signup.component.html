@@ -1,16 +1,59 @@
-<h2>Inscription</h2>
+<div class="login-card">
+  <h2>Inscription</h2>
+  <p class="login-subtitle">Créez votre compte sécurisé</p>
 
-<input type="text" placeholder="Nom" [(ngModel)]="nom">
-<input type="text" placeholder="Prenom" [(ngModel)]="prenom">
-<input type="text" placeholder="Telephone" [(ngModel)]="telephone">
-<select [(ngModel)]="role" id="">
-    <option value="client">Client</option>
-    <option value="boutique">Boutique</option>
-    <option value="admin">Admin</option>
-</select>
-<input type="email" placeholder="Email" [(ngModel)]="email">
-<input type="password" placeholder="Mot de passe" [(ngModel)]="motDePasse">
+  <!-- Message d'erreur général -->
+  <p style="color:red">{{ error }}</p>
+  <!-- <div id="success" class="alert success"></div> -->
 
-<button (click)="signup()">S’inscrire</button>
+  <!-- Champ Nom -->
+  <div class="field">
+    <label for="nom">Nom</label>
+    <input type="text" placeholder="Nom" [(ngModel)]="nom" id="nom">
+  </div>
 
-<p style="color:red">{{ error }}</p>
+  <!-- Champ Prénom -->
+  <div class="field">
+    <label for="prenom">Prénom</label>
+    <input type="text" placeholder="Prénom" [(ngModel)]="prenom" id="prenom">
+  </div>
+
+  <!-- Champ Téléphone -->
+  <div class="field">
+    <label for="telephone">Téléphone</label>
+    <input type="text" placeholder="Téléphone" [(ngModel)]="telephone" id="telephone">
+  </div>
+
+  <!-- Sélecteur Rôle -->
+  <div class="field">
+    <label for="role">Rôle</label>
+    <select [(ngModel)]="role" id="role">
+      <option value="client" selected>Client</option>
+      <option value="boutique">Boutique</option>
+    </select>
+  </div>
+
+  <!-- Email -->
+  <div class="field">
+    <label for="email">Adresse email</label>
+    <input type="email" placeholder="Email" [(ngModel)]="email" id="email">
+  </div>
+
+  <!-- Mot de passe -->
+  <div class="field password-field">
+    <label for="motDePasse">Mot de passe</label>
+    <div class="password-wrapper">
+      <input type="password" placeholder="Mot de passe" [(ngModel)]="motDePasse" id="motDePasse">
+      <!-- <button type="button" class="toggle-password" aria-label="Afficher le mot de passe"></button> -->
+    </div>
+  </div>
+
+  <!-- Bouton inscription -->
+  <button (click)="signup()" class="btn-primary" id="signupBtn">
+    <span class="btn-text">S’inscrire</span>
+    <span class="btn-loader" aria-hidden="true"></span>
+  </button>
+
+  <p class="secure-note">Inscription sécurisée – Vos informations sont protégées.</p>      
+  <p class="auth-footer">Déjà un compte ? <a routerLink="/login">Se connecter</a></p>
+</div>
