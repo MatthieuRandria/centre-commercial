@@ -8,21 +8,23 @@ import { Router } from '@angular/router';
   selector: 'app-login',
   standalone: true,
   imports: [CommonModule, FormsModule],
-  templateUrl: './login.component.html'
+  templateUrl: './login.component.html',
+  styleUrl: './login.component.scss'
+
 })
 export class LoginComponent {
   email = '';
-  password = '';
+  motDePasse = '';
   error = '';
   emailError = '';
-  passwordError = '';
+  mdpError = '';
   loading = false;
 
   constructor(private authService: AuthService, private router: Router) {}
 
   validateForm(): boolean {
     this.emailError = '';
-    this.passwordError = '';
+    this.mdpError = '';
     let valid = true;
 
     if (!this.email) {
@@ -33,8 +35,8 @@ export class LoginComponent {
       valid = false;
     }
 
-    if (!this.password) {
-      this.passwordError = 'Mot de passe requis';
+    if (!this.motDePasse) {
+      this.mdpError = 'Mot de passe requis';
       valid = false;
     }
 
@@ -48,11 +50,19 @@ export class LoginComponent {
 
     this.authService.login({
       email: this.email,
-      password: this.password
+      motDePasse: this.motDePasse
     }).subscribe({
       next: res => {
+        const role=res.user.role;
         this.authService.setSession(res.token, res.user);
-        this.router.navigate(['/dashboard']);
+        if(role==="client"){
+          this.router.navigate(['']);
+        }
+        if (role==="boutique") {
+          this.router.navigate(['/boutique']);
+        }if (role==="admin"){
+          this.router.navigate(['/admin']);
+        }
       },
       error: err => {
         this.error = err.error.message || 'Erreur de connexion';

@@ -25,7 +25,7 @@ export class AuthService {
     }
   }
 
-  login(data: { email: string; password: string }) {
+  login(data: { email: string; motDePasse: string }) {
     return this.http.post<any>(`${this.apiUrl}/login`, data);
   }
 
@@ -49,11 +49,11 @@ export class AuthService {
     this.currentUserSubject.next(null);
   }
 
-  isLoggedIn(): boolean {
+  isAuthenticated(): boolean {
     return this.isBrowser && !!localStorage.getItem('token');
   }
 
-  getUser() {
+  getCurrentUser() {
     return this.currentUserSubject.value;
   }
 }
