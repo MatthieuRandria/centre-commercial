@@ -10,22 +10,25 @@ import { Router } from '@angular/router';
   imports: [CommonModule, FormsModule],
   templateUrl: './signup.component.html'
 })
+//  - Champs: email, telephone, motDePasse, role, nom, prenom, image
 export class SignupComponent {
   email = '';
-  password = '';
+  motDePasse = '';
   nom = '';
-  phone = '';
+  prenom = '';
+  telephone = '';
+  role = '';
   error = '';
 
   constructor(private authService: AuthService, private router: Router) {}
 
   signup() {
-    if (!this.email || !this.password) {
+    if (!this.email || !this.motDePasse) {
       this.error = 'Email et mot de passe requis';
       return;
     }
 
-    this.authService.signup({ email: this.email, password: this.password, nom: this.nom, phone: this.phone })
+    this.authService.signup({  email:this.email, telephone:this.telephone, motDePasse:this.motDePasse, role:this.role, nom:this.nom, prenom:this.prenom })
       .subscribe({
         next: (res: any) => {
           localStorage.setItem('token', res.token);

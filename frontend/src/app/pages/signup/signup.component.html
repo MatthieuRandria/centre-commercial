@@ -1,9 +1,15 @@
 <h2>Inscription</h2>
 
 <input type="text" placeholder="Nom" [(ngModel)]="nom">
+<input type="text" placeholder="Prenom" [(ngModel)]="prenom">
+<input type="text" placeholder="Telephone" [(ngModel)]="telephone">
+<select [(ngModel)]="role" id="">
+    <option value="client">Client</option>
+    <option value="boutique">Boutique</option>
+    <option value="admin">Admin</option>
+</select>
 <input type="email" placeholder="Email" [(ngModel)]="email">
-<input type="text" placeholder="Phone" [(ngModel)]="phone">
-<input type="password" placeholder="Mot de passe" [(ngModel)]="password">
+<input type="password" placeholder="Mot de passe" [(ngModel)]="motDePasse">
 
 <button (click)="signup()">S’inscrire</button>
 

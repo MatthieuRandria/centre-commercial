@@ -1,23 +1,23 @@
 const jwt = require("jsonwebtoken");
 const bcrypt = require("bcryptjs");
-const User = require("../models/User");
+const userService = require("../services/User")
 
 exports.login = async (req, res) => {
-  const { email, password } = req.body;
+  const { email, motDePasse } = req.body;
 
   try {
-    const user = await User.findOne({ email });
+    const user = await userService.findByEmail(email);
     if (!user) {
       return res.status(401).json({ message: "Email incorrect" });
     }
 
-    const isMatch = bcrypt.compareSync(password, user.password);
+    const isMatch = bcrypt.compareSync(motDePasse, user.motDePasse);
     if (!isMatch) {
       return res.status(401).json({ message: "Mot de passe incorrect" });
     }
 
     const token = jwt.sign(
-      { id: user._id, email: user.email },
+      { id: user._id, email: user.email,role: user.role },
       process.env.JWT_SECRET,
       { expiresIn: "1h" }
     );
@@ -27,36 +27,25 @@ exports.login = async (req, res) => {
       user: {
         id: user._id,
         email: user.email,
-        nom: user.nom
+        nom: user.nom,
+        role: user.role
       }
     });
 
   } catch (err) {
-    console.error("Erreur login :", err);
     res.status(500).json({ message: "Erreur serveur" });
   }
 };
 
-exports.signup = async (req, res) => {
-  const { email, password, nom, phone } = req.body;
+exports.register = async (req, res) => {
+  const { email,telephone,motDePasse,role,nom,prenom } = req.body;
 
   try {
-    // Vérifier si email existe déjà
-    const existingUser = await User.findOne({ email });
-    if (existingUser) {
-      return res.status(400).json({ message: "Email déjà utilisé" });
-    }
-
-    // Créer le nouvel utilisateur
-    const user = new User({ email, password, nom, phone });
-    await user.save();
-
+    const user = await userService.createUser(email,telephone,motDePasse,role,nom,prenom);
     // Générer token JWT
-    const token = jwt.sign({ id: user._id, email: user.email }, "SECRET_KEY", { expiresIn: "1h" });
-
-    res.json({ token });
+    const token = jwt.sign({ id: user._id, email: user.email }, process.env.JWT_SECRET, { expiresIn: "1h" });
+    res.json({ token,user });
   } catch (err) {
-    console.error(err);
-    res.status(500).json({ message: "Erreur serveur" });
+    res.status(400).json({ message: err.message });
   }
 };
