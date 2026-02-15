@@ -355,7 +355,7 @@ EVENEMENTS Collection:
                   PHASE 2 - GESTION BOUTIQUES
 ================================================================================
 
-[ ] TASK 2.1 - Modèle Boutique (Backend)
+[ OK ] TASK 2.1 - Modèle Boutique (Backend)
    Fichier: backend/models/Boutique.js
    
    Description:
@@ -369,7 +369,7 @@ EVENEMENTS Collection:
    
    Collections: boutiques, centre_commercial, boutique_categories
 
-[ ] TASK 2.2 - Controller Boutique
+[ OK ] TASK 2.2 - Controller Boutique
    Fichier: backend/controllers/boutique.controller.js
    
    Description:
@@ -392,7 +392,7 @@ EVENEMENTS Collection:
    
    Collections: boutiques, centre_commercial, boutique_categories
 
-[ ] TASK 2.3 - Routes Boutiques
+[ OK ] TASK 2.3 - Routes Boutiques
    Fichier: backend/routes/boutique.routes.js
    
    Routes:
@@ -402,7 +402,7 @@ EVENEMENTS Collection:
    - PUT /api/boutiques/:id - Modifier (admin/manager)
    - DELETE /api/boutiques/:id - Supprimer (admin)
 
-[ ] TASK 2.4 - Service Boutique (Frontend)
+[ Ok ] TASK 2.4 - Service Boutique (Frontend)
    Fichier: frontend/src/app/core/services/boutique.service.ts
    
    Méthodes:
