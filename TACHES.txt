@@ -296,7 +296,7 @@ EVENEMENTS Collection:
    - Stocker token dans localStorage
    - BehaviorSubject pour currentUser
 
-[ ] TASK 1.7 - Guards Angular
+[X] TASK 1.7 - Guards Angular
    Fichiers: 
    - frontend/src/app/core/guards/auth.guard.ts
    - frontend/src/app/core/guards/role.guard.ts
@@ -328,7 +328,7 @@ EVENEMENTS Collection:
    * role=0 (client) → /accueil
    - Erreur → afficher message
 
-[ ] TASK 1.9 - PAGE: Inscription (Frontend)
+[X] TASK 1.9 - PAGE: Inscription (Frontend)
    Fichier: frontend/src/app/modules/auth/pages/register/
    Route: /register
    

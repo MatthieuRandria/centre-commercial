@@ -1,15 +1,40 @@
-<nav>
-  <a routerLink="/">Accueil</a>
+<nav class="navbar">
+  <!-- Logo / Nom boutique -->
+  <div class="logo">
+    <a routerLink="/">🛍️ MaBoutique</a>
+  </div>
 
-  <ng-container *ngIf="user; else guest">
-    <span>👋 Bonjour {{ user.nom || user.email }}</span>
-    <a routerLink="/dashboard">Dashboard</a>
-    <button (click)="logout()">Logout</button>
-  </ng-container>
+  <!-- Menu principal -->
+  <ul class="nav-items">
+    <li *ngFor="let item of navItems" class="nav-item">
+      <ng-container *ngIf="item.dropdown; else simpleLink">
+        <div class="dropdown">
+          <span>{{ item.label }} ▼</span>
+          <ul class="dropdown-menu">
+            <li *ngFor="let sub of item.dropdown" (click)="sub.action ? sub.action() : navigate(sub.link)">
+              {{ sub.label }}
+            </li>
+          </ul>
+        </div>
+      </ng-container>
+      <ng-template #simpleLink>
+        <a *ngIf="item.link" routerLink="{{item.link}}">{{ item.label }}</a>
+        <button *ngIf="item.action" (click)="item.action()">{{ item.label }}</button>
+      </ng-template>
+    </li>
+  </ul>
 
-  <ng-template #guest>
-    <a routerLink="/login">Login</a>
-    <a routerLink="/signup">Signup</a>
-  </ng-template>
+  <!-- Menu hamburger mobile -->
+  <div class="hamburger" (click)="toggleMobileMenu = !toggleMobileMenu">
+    ☰
+  </div>
+
+  <!-- Menu mobile -->
+  <ul class="nav-items-mobile" [class.open]="toggleMobileMenu">
+    <li *ngFor="let item of navItems">
+      <a *ngIf="item.link" routerLink="{{item.link}}" (click)="toggleMobileMenu=false">{{ item.label }}</a>
+      <button *ngIf="item.action" (click)="item.action(); toggleMobileMenu=false">{{ item.label }}</button>
+    </li>
+  </ul>
 </nav>
 <hr>
