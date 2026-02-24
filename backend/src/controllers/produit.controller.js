@@ -5,82 +5,68 @@ const Produit = require('../models/Produit');
  * @route   GET /api/produits
  * @access  Public
  */
-exports.getAllProduits = async (req, res) => {
-   try {
-      const {
-         page = 1,
-         limit = 10,
-         boutiqueId,
-         categorie,
-         prixMin,
-         prixMax,
-         enPromotion,
-         sort = 'date_desc'
-      } = req.query;
+exports.getAllProduits = async (req, res, next) => {
+    try {
+        const {
+            boutiqueId,
+            categorie,
+            prixMin,
+            prixMax,
+            enPromotion,
+            sortBy = "date",
+            order = "desc",
+            page = 1,
+            limit = 10
+        } = req.query;
 
-      const query = {};
+        const filters = { actif: true };
 
-      // 🔎 Filtres
-      if (boutiqueId) query.boutique = boutiqueId;
+        if (boutiqueId) filters.boutique = boutiqueId;
+        if (categorie) filters.categorie = categorie;
 
-      if (categorie) {
-         query["categories.nom"] = categorie;
-      }
+        if (prixMin || prixMax) {
+            filters["variantes.prix"] = {};
+            if (prixMin) filters["variantes.prix"].$gte = Number(prixMin);
+            if (prixMax) filters["variantes.prix"].$lte = Number(prixMax);
+        }
 
-      if (prixMin || prixMax) {
-         query["variantes.prix"] = {};
-         if (prixMin) query["variantes.prix"].$gte = Number(prixMin);
-         if (prixMax) query["variantes.prix"].$lte = Number(prixMax);
-      }
+        if (enPromotion === "true") {
+            filters.enPromotion = true;
+        }
 
-      if (enPromotion !== undefined) {
-         query.enPromotion = enPromotion === "true";
-      }
+        // TRI
+        let sortOptions = {};
+        const sortFields = {
+            prix: "variantes.prix",
+            date: "createdAt",
+            vues: "vues"
+        };
 
-      // 🔽 TRI
-      let sortOption = { createdAt: -1 };
+        const field = sortFields[sortBy] || "createdAt";
+        sortOptions[field] = order === "asc" ? 1 : -1;
 
-      switch (sort) {
-         case 'prix_asc':
-            sortOption = { "variantes.prix": 1 };
-            break;
-         case 'prix_desc':
-            sortOption = { "variantes.prix": -1 };
-            break;
-         case 'vues_desc':
-            sortOption = { vues: -1 };
-            break;
-         case 'date_asc':
-            sortOption = { createdAt: 1 };
-            break;
-         default:
-            sortOption = { createdAt: -1 };
-      }
+        // PAGINATION
+        const skip = (page - 1) * limit;
 
-      const produits = await Produit.find(query)
-         .populate('boutique', 'nom')
-         .sort(sortOption)
-         .skip((page - 1) * limit)
-         .limit(Number(limit));
+        const produits = await Produit.find(filters)
+            .populate("boutique")
+            .sort(sortOptions)
+            .skip(skip)
+            .limit(Number(limit));
 
-      const total = await Produit.countDocuments(query);
+        const total = await Produit.countDocuments(filters);
 
-      res.status(200).json({
-         success: true,
-         total,
-         page: Number(page),
-         pages: Math.ceil(total / limit),
-         data: produits
-      });
+        res.json({
+            total,
+            page: Number(page),
+            pages: Math.ceil(total / limit),
+            data: produits
+        });
 
-   } catch (error) {
-      res.status(500).json({
-         success: false,
-         message: error.message
-      });
-   }
+    } catch (err) {
+        next(err);
+    }
 };
-
 
 /**
  * @desc    GET produit par ID

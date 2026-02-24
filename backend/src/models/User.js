@@ -7,7 +7,7 @@ const userSchema = new mongoose.Schema({
   motDePasse: { type: String, required: true },
   telephone: { type: String },
   nom: { type: String },
-  role: { type: String },
+  role: { type: String,enum:["admin","boutique","client"] },
   prenom: { type: String },
   Image: { type: String }
 });

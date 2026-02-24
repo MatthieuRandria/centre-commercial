@@ -11,10 +11,12 @@ const centreRoutes = require("./routes/centre.routes");
 const boutiqueCategRoutes = require("./routes/boutiqueCategorie.routes");
 const boutiqueRoutes = require("./routes/boutique.routes");
 const prodRoutes = require("./routes/produit.routes");
+const panierRoutes = require("./routes/panier.routes");
 app.use("/api/auth", authRoutes);
 app.use("/centres", centreRoutes);
 app.use("/boutiquesCateg", boutiqueCategRoutes);
 app.use("/boutiques", boutiqueRoutes);
 app.use("/produits", prodRoutes);
+app.use("/panier",panierRoutes);
 
 module.exports = app;
