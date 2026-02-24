@@ -57,7 +57,7 @@ const horaireSchema = new Schema({
 
 const boutiqueSchema = new Schema({
    nom: { type: String, required: true, trim: true, index: true },
-   slug: { type: String, required: true, unique: true, lowercase: true, trim: true, index: true },
+   slug: { type: String, required: false, unique: true, lowercase: true, trim: true, index: true },
    centre_commercial: { type: Schema.Types.ObjectId, ref: 'CentreCommercial', required: true, index: true },
    categorie: {
       type: Schema.Types.ObjectId,

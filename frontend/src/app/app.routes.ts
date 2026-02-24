@@ -8,14 +8,18 @@ import { AdminComponent } from './pages/admin/admin.component';
 import { BoutiqueComponent } from './pages/boutique/boutique.component';
 import { ClientComponent } from './pages/client/client.component';
 import { RoleGuard } from './guards/role-guard.guard';
+import { ProduitsListComponent } from './produit/produits-list/produits-list.component';
+import { BoutiqueListComponent } from './pages/boutique-list/boutique-list.component';
 
 export const routes: Routes = [
     // { path: '', redirectTo: 'login', pathMatch: 'full' },
     { path: '', component: HomeComponent },
     { path: 'login', component: LoginComponent },
     { path: 'signup', component: SignupComponent },
-
+    
     { path: 'admin', component: AdminComponent, canActivate: [AuthGuard, RoleGuard], data: { role: 'admin' } },  
+    { path: 'produits', component: ProduitsListComponent },
+    { path: 'boutiques', component: BoutiqueListComponent,canActivate: [AuthGuard],data: { role: "admin" }},
     { path: 'boutique', component: BoutiqueComponent,canActivate: [AuthGuard, RoleGuard], data: { role: 'boutique' } },
     { path: 'client', component: ClientComponent,canActivate: [AuthGuard, RoleGuard], data: { role: 'client' } },
     {path: 'dashboard',    component: DashboardComponent,canActivate: [AuthGuard]}

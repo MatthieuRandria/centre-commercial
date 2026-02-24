@@ -9,7 +9,7 @@ const centreCommercialSchema = new Schema({
       ville: { type: String, required: true, trim: true, index: true },
       code_postal: { type: String, required: true, trim: true },
       pays: { type: String, required: true, default: 'France' },
-      coordonnees_gps: { latitude: Number, longitude: Numbe    }
+      coordonnees_gps: { latitude: Number, longitude: Number    }
    },
    description: { type: String, trim: true, maxlength: 2000 },
    superficie: { type: Number, min: 0 },
