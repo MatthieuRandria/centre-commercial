@@ -1232,7 +1232,7 @@ EVENEMENTS Collection:
                   PHASE 5 - AVIS ET FAVORIS
 ================================================================================
 
-[ ] TASK 5.1 - Modèle Avis (Backend)
+[X] TASK 5.1 - Modèle Avis (Backend)
    Fichier: backend/models/Avis.js
    
    Description:
@@ -1245,7 +1245,7 @@ EVENEMENTS Collection:
    
    Collections: avis, users, produits, boutiques, commandes
 
-[ ] TASK 5.2 - Controller Avis
+[X] TASK 5.2 - Controller Avis
    Fichier: backend/controllers/avis.controller.js
    
    Description:
@@ -1261,7 +1261,7 @@ EVENEMENTS Collection:
    
    Collections: avis, commandes
 
-[ ] TASK 5.3 - Routes Avis
+[X] TASK 5.3 - Routes Avis
    Fichier: backend/routes/avis.routes.js
    
    Routes:
