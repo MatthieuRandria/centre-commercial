@@ -810,7 +810,7 @@ EVENEMENTS Collection:
                   PHASE 4 - PANIER ET COMMANDES
 ================================================================================
 
-[ ] TASK 4.1 - Modèle Panier (Backend)
+[X] TASK 4.1 - Modèle Panier (Backend)
    Fichier: backend/models/Panier.js
    
    Description:
@@ -824,7 +824,7 @@ EVENEMENTS Collection:
    
    Collections: paniers, produits
 
-[ ] TASK 4.2 - Controller Panier
+[X] TASK 4.2 - Controller Panier
    Fichier: backend/controllers/panier.controller.js
    
    Description:
@@ -843,7 +843,7 @@ EVENEMENTS Collection:
    
    Collections: paniers, produits
 
-[ ] TASK 4.3 - Routes Panier
+[X] TASK 4.3 - Routes Panier
    Fichier: backend/routes/panier.routes.js
    
    Routes:
@@ -939,7 +939,7 @@ EVENEMENTS Collection:
    - Badge avec nombre (si > 0)
    - Click → /panier ou dropdown mini-panier
 
-[ ] TASK 4.7 - Modèle Commande (Backend)
+[X] TASK 4.7 - Modèle Commande (Backend)
    Fichier: backend/models/Commande.js
    
    Description:
@@ -953,7 +953,7 @@ EVENEMENTS Collection:
    
    Collections: commandes, produits, boutiques
 
-[ ] TASK 4.8 - Controller Commande
+[X] TASK 4.8 - Controller Commande
    Fichier: backend/controllers/commande.controller.js
    
    Description:
@@ -980,7 +980,7 @@ EVENEMENTS Collection:
    
    Collections: commandes, paniers, produits
 
-[ ] TASK 4.9 - Routes Commandes
+[X] TASK 4.9 - Routes Commandes
    Fichier: backend/routes/commande.routes.js
    
    Routes:
