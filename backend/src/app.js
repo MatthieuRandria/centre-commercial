@@ -13,6 +13,7 @@ const boutiqueRoutes = require("./routes/boutique.routes");
 const prodRoutes = require("./routes/produit.routes");
 const panierRoutes = require("./routes/panier.routes");
 const commandeRoutes = require("./routes/commande.routes");
+const avisRoutes = require("./routes/avis.routes");
 app.use("/api/auth", authRoutes);
 app.use("/centres", centreRoutes);
 app.use("/boutiquesCateg", boutiqueCategRoutes);
@@ -20,5 +21,6 @@ app.use("/boutiques", boutiqueRoutes);
 app.use("/produits", prodRoutes);
 app.use("/panier",panierRoutes);
 app.use("/commande",commandeRoutes);
+app.use("/avis",avisRoutes);
 
 module.exports = app;
