@@ -1,40 +1,114 @@
 <nav class="navbar">
-  <!-- Logo / Nom boutique -->
+
+  <!-- Logo -->
   <div class="logo">
-    <a routerLink="/">🛍️ MaBoutique</a>
+    <a routerLink="/">Hyper<span>Magasin</span></a>
   </div>
 
-  <!-- Menu principal -->
+  <!-- Liens centre -->
   <ul class="nav-items">
     <li *ngFor="let item of navItems" class="nav-item">
       <ng-container *ngIf="item.dropdown; else simpleLink">
         <div class="dropdown">
-          <span>{{ item.label }} ▼</span>
+          <span class="dropdown-trigger">{{ item.label }}
+            <svg class="chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+              <polyline points="6 9 12 15 18 9"/>
+            </svg>
+          </span>
           <ul class="dropdown-menu">
-            <li *ngFor="let sub of item.dropdown" (click)="sub.action ? sub.action() : navigate(sub.link)">
+            <li *ngFor="let sub of item.dropdown"
+                (click)="sub.action ? sub.action() : navigate(sub.link)">
               {{ sub.label }}
             </li>
           </ul>
         </div>
       </ng-container>
       <ng-template #simpleLink>
-        <a *ngIf="item.link" routerLink="{{item.link}}">{{ item.label }}</a>
+        <a *ngIf="item.link" [routerLink]="item.link" routerLinkActive="active"
+           [routerLinkActiveOptions]="{ exact: item.link === '/' }">{{ item.label }}</a>
         <button *ngIf="item.action" (click)="item.action()">{{ item.label }}</button>
       </ng-template>
     </li>
   </ul>
 
-  <!-- Menu hamburger mobile -->
-  <div class="hamburger" (click)="toggleMobileMenu = !toggleMobileMenu">
-    ☰
+  <!-- Droite : auth -->
+  <div class="navbar-right">
+
+    <!-- Non connecté -->
+    <ng-container *ngIf="!user; else loggedIn">
+      <a class="btn-cx" routerLink="/login">Connexion</a>
+      <a class="btn-ins" routerLink="/signup">Inscription</a>
+    </ng-container>
+
+    <!-- Connecté : avatar + dropdown -->
+    <ng-template #loggedIn>
+      <div class="user-menu" [class.open]="userMenuOpen">
+        <button class="user-btn" (click)="userMenuOpen = !userMenuOpen">
+          <div class="user-av">{{ initials }}</div>
+          <span class="user-name">{{ shortName }}</span>
+          <svg class="chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+            <polyline points="6 9 12 15 18 9"/>
+          </svg>
+        </button>
+        <div class="user-dropdown">
+          <div class="dd-header">
+            <div class="dd-header-name">{{ user?.nom || user?.name }}</div>
+            <div class="dd-header-email">{{ user?.email }}</div>
+          </div>
+          <div class="dd-body">
+            <a class="dd-item" routerLink="/profil" (click)="userMenuOpen=false">Mon profil</a>
+            <div class="dd-divider"></div>
+            <button class="dd-item danger" (click)="logout()">Déconnexion</button>
+          </div>
+        </div>
+      </div>
+    </ng-template>
+
+    <!-- Hamburger -->
+    <button class="hamburger" [class.open]="toggleMobileMenu"
+            (click)="toggleMobileMenu = !toggleMobileMenu">
+      <span></span><span></span><span></span>
+    </button>
+
+  </div>
+</nav>
+
+<!-- Mobile drawer -->
+<div class="mobile-drawer" [class.open]="toggleMobileMenu">
+
+  <!-- Bloc user connecté -->
+  <div *ngIf="user" class="m-user-info">
+    <div class="m-user-av">{{ initials }}</div>
+    <div>
+      <div class="m-user-name">{{ user?.nom || user?.name }}</div>
+      <div class="m-user-email">{{ user?.email }}</div>
+    </div>
   </div>
 
-  <!-- Menu mobile -->
-  <ul class="nav-items-mobile" [class.open]="toggleMobileMenu">
-    <li *ngFor="let item of navItems">
-      <a *ngIf="item.link" routerLink="{{item.link}}" (click)="toggleMobileMenu=false">{{ item.label }}</a>
-      <button *ngIf="item.action" (click)="item.action(); toggleMobileMenu=false">{{ item.label }}</button>
-    </li>
-  </ul>
-</nav>
-<hr>
+  <!-- Liens -->
+  <li *ngFor="let item of navItems" style="list-style:none">
+    <a *ngIf="item.link" class="m-link" [routerLink]="item.link"
+       routerLinkActive="active" [routerLinkActiveOptions]="{ exact: item.link === '/' }"
+       (click)="toggleMobileMenu=false">{{ item.label }}</a>
+    <button *ngIf="item.action" class="m-link"
+            (click)="item.action(); toggleMobileMenu=false">{{ item.label }}</button>
+  </li>
+
+  <div class="m-divider"></div>
+
+  <!-- Auth mobile -->
+  <ng-container *ngIf="!user; else mLoggedIn">
+    <div class="m-auth">
+      <a class="btn-ins" routerLink="/signup" (click)="toggleMobileMenu=false">Inscription</a>
+      <a class="btn-cx"  routerLink="/login"  (click)="toggleMobileMenu=false">Connexion</a>
+    </div>
+  </ng-container>
+
+  <ng-template #mLoggedIn>
+    <a class="m-link" routerLink="/profil"     (click)="toggleMobileMenu=false">Mon profil</a>
+    <a class="m-link" routerLink="/parametres" (click)="toggleMobileMenu=false">Parametres</a>
+    <div class="m-divider"></div>
+    <button class="m-link danger" (click)="logout()">Deconnexion</button>
+  </ng-template>
+
+</div>

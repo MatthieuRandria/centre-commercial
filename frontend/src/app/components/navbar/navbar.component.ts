@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, HostListener } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router, RouterModule } from '@angular/router';
 import { AuthService } from '../../services/auth.service';
@@ -14,85 +14,75 @@ interface NavItem {
   selector: 'app-navbar',
   standalone: true,
   imports: [CommonModule, RouterModule],
-  templateUrl: "./navbar.component.html",
-  styleUrl:"./navbar.component.scss"
+  templateUrl: './navbar.component.html',
+  styleUrl: './navbar.component.scss'
 })
+export class NavbarComponent implements OnInit {
 
-export class NavbarComponent implements OnInit{
   user: any = null;
-  navItems: NavItem[]=[];
-  toggleMobileMenu: boolean = false;
+  navItems: NavItem[] = [];
+  toggleMobileMenu = false;
+  userMenuOpen = false;
 
-  ngOnInit(): void {
-    this.loadUser();
+  get initials(): string {
+    const name = this.user?.nom || this.user?.name || '';
+    const parts = name.trim().split(' ');
+    return ((parts[0]?.[0] ?? '') + (parts[1]?.[0] ?? '')).toUpperCase();
   }
-  
+
+  get shortName(): string {
+    const name = this.user?.nom || this.user?.name || '';
+    const parts = name.trim().split(' ');
+    return parts[0] + (parts[1] ? ' ' + parts[1][0] + '.' : '');
+  }
+
   constructor(private authService: AuthService, private router: Router) {
     this.authService.currentUser$.subscribe(user => {
       this.user = user;
+      this.buildNavItems();
     });
   }
 
-  navigate(link?: string) {
-    if (!link) return;
-    // ajoute "/" si ce n'est pas un chemin absolu
-    const path = link.startsWith('/') ? link : '/' + link;
-    this.router.navigate([path]);
-  }
-
-  loadUser() {
+  ngOnInit(): void {
     this.user = this.authService.getCurrentUser();
     this.buildNavItems();
   }
 
-  buildNavItems() {
-    if (!this.user) {
-      // Utilisateur non connecté
-      this.navItems = [
-        { label: 'Accueil', link: '/' },
-        { label: 'Login', link: '/login' },
-        { label: 'Signup', link: '/signup' }
-      ];
-    } else {
-      switch (this.user.role) {
-        case "client":
-          this.navItems = [
-            { label: 'Accueil', link: '/' },
-            { label: 'Panier', link: '/cart' },
-            { label: 'Favoris', link: '/favorites' },
-            { label: 'Profil', link: '/profile' },
-            { label: 'Déconnexion', action: () => this.logout() }
-          ];
-          break;
-        case "boutique":
-          this.navItems = [
-            { label: 'Accueil', link: '/' },
-            { label: 'Dashboard', link: '/dashboard' },
-            { label: 'Profil', link: '/profile' },
-            { label: 'Déconnexion', action: () => this.logout() }
-          ];
-          break;
-        case "admin":
-          this.navItems = [
-            { label: 'Dashboard', link: '/dashboard' },
-            { label: 'Utilisateurs', link: '/users' },
-            { label: 'Boutiques', link: '/shops' },
-            { label: 'Déconnexion', action: () => this.logout() }
-          ];
-          break;
-        default:
-          this.navItems = [{ label: 'Accueil', link: '/' }];
-      }
+  buildNavItems(): void {
+    // Liens toujours visibles
+    this.navItems = [
+      { label: 'Accueil', link: '/' },
+      { label: 'Boutique', link: '/boutique' },
+      { label: 'Contact', link: '/contact' },
+    ];
+
+    // Liens visibles uniquement si connecté en tant que client
+    if (this.user?.role === 'client') {
+      this.navItems.splice(2, 0,
+        { label: 'Mes commandes', link: '/commandes' },
+        { label: 'Mes favoris', link: '/favoris' }
+      );
     }
   }
 
-  logout() {
+  navigate(link?: string): void {
+    if (!link) return;
+    this.router.navigate([link.startsWith('/') ? link : '/' + link]);
+  }
+
+  logout(): void {
+    this.userMenuOpen = false;
+    this.toggleMobileMenu = false;
     this.authService.logout();
     this.router.navigate(['/login']);
   }
 
-  isLoggedIn() {
-    return !!localStorage.getItem('token');
+  // Ferme le dropdown user au clic extérieur
+  @HostListener('document:click', ['$event'])
+  onDocumentClick(e: MouseEvent): void {
+    const target = e.target as HTMLElement;
+    if (!target.closest('.user-menu')) {
+      this.userMenuOpen = false;
+    }
   }
-
 }
