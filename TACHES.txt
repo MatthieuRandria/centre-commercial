@@ -1312,7 +1312,7 @@ EVENEMENTS Collection:
    Actions:
    - Click étoiles + "Publier" → POST /api/avis/produit
 
-[ ] TASK 5.5 - Modèle Favoris (Backend)
+[X] TASK 5.5 - Modèle Favoris (Backend)
    Fichier: backend/models/Favoris.js
    
    Description:
@@ -1326,7 +1326,7 @@ EVENEMENTS Collection:
    
    Collections: favoris, produits
 
-[ ] TASK 5.6 - Controller Favoris
+[X] TASK 5.6 - Controller Favoris
    Fichier: backend/controllers/favoris.controller.js
    
    Description:
@@ -1338,7 +1338,7 @@ EVENEMENTS Collection:
    
    Collections: favoris, produits
 
-[ ] TASK 5.7 - Routes Favoris
+[X] TASK 5.7 - Routes Favoris
    Fichier: backend/routes/favoris.routes.js
    
    Routes:
