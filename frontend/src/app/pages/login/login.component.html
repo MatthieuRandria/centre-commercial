@@ -1,39 +1,123 @@
-<div class="login-card">
+<!-- PANEL GAUCHE -->
+<div class="left-panel">
+  <div class="brand">
+    <a class="brand-logo" routerLink="/">HyperMagasin</a>
+    <h2 class="brand-headline">
+      Bienvenue<br>
+      <span>sur votre espace</span><br>
+      commercial.
+    </h2>
+    <p class="brand-sub">
+      Accès à votre tableau de bord, gestion de vos boutiques
+      et suivi de vos commandes en un seul endroit.
+    </p>
+  </div>
 
-  <h2>Connexion</h2>
-  <p class="login-subtitle">Accédez à votre espace sécurisé</p>
+  <div class="trust-items">
+    <div class="trust-item"><span class="trust-dot"></span>Gestion centralisée et temps réel</div>
+    <div class="trust-item"><span class="trust-dot"></span>Accès sécurisé et personnalisé</div>
+  </div>
+</div>
 
-      <p style="color:red">{{ error }}</p>
-      <!-- <div id="success" class="alert success"></div> -->
+<!-- PANEL DROIT -->
+<div class="right-panel">
+  <div class="form-wrapper">
 
-      <div class="field">
-          <label for="mail">Adresse email</label>
-          <input type="email" placeholder="Email" [(ngModel)]="email">
-          <p style="color:red">{{ emailError }}</p>
-      </div>
+    <div class="form-header">
+      <h1>Se connecter</h1>
+      <p>Pas encore de compte ? <a routerLink="/signup">Créer un compte</a></p>
+    </div>
 
-      <div class="field password-field">
-        <label for="pwd">Mot de passe</label>
-        
-        <div class="password-wrapper">
-            <input type="password" placeholder="Mot de passe" [(ngModel)]="motDePasse">
-            <!-- <button type="button" class="toggle-password" aria-label="Afficher le mot de passe"></button> -->
-              <p style="color:red">{{ mdpError }}</p>
+    <!-- ALERT ERROR -->
+    <div class="alert alert-error" [class.show]="error">
+      <span class="alert-icon">&#8864;</span>
+      <span>{{ error }}</span>
+    </div>
+
+    <!-- ALERT SUCCESS -->
+    <div class="alert alert-success" [class.show]="success">
+      <span class="alert-icon">&#10003;</span>
+      <span>Connexion réussie. Redirection en cours...</span>
+    </div>
+
+    <!-- FORM -->
+    <form (ngSubmit)="login()" novalidate>
+
+      <!-- EMAIL -->
+      <div class="form-group">
+        <label class="form-label" for="email">
+          Adresse email <span class="required">*</span>
+        </label>
+        <div class="input-wrap">
+          <input
+            type="email"
+            id="email"
+            placeholder="votre&#64;email.com"
+            autocomplete="email"
+            [(ngModel)]="email"
+            name="email"
+            [class.error]="emailError"
+            (blur)="onEmailBlur()"
+          >
+          <span class="input-icon">&#64;</span>
         </div>
+        <div class="field-error" [class.show]="emailError">{{ emailError }}</div>
       </div>
 
-      <div class="login-options">
-          <label>
-              <input type="checkbox"> Se souvenir de moi
-          </label>
-          <a href="#">Mot de passe oublié ?</a>
+      <!-- MOT DE PASSE -->
+      <div class="form-group">
+        <label class="form-label" for="password">
+          Mot de passe <span class="required">*</span>
+        </label>
+        <div class="input-wrap">
+          <input
+            [type]="showPassword ? 'text' : 'password'"
+            id="password"
+            placeholder="Minimum 8 caractères"
+            autocomplete="current-password"
+            [(ngModel)]="motDePasse"
+            name="motDePasse"
+            [class.error]="mdpError"
+            (blur)="onMdpBlur()"
+          >
+          <button
+            type="button"
+            class="toggle-pw"
+            (click)="showPassword = !showPassword"
+          >{{ showPassword ? 'Cacher' : 'Voir' }}</button>
+        </div>
+        <div class="field-error" [class.show]="mdpError">{{ mdpError }}</div>
       </div>
 
-      <button (click)="login()" class="btn-primary" id="loginBtn">
-          <span class="btn-text">Se connecter</span>
-          <span class="btn-loader" aria-hidden="true"></span>
+      <!-- OPTIONS -->
+      <div class="options-row">
+        <label class="checkbox-label">
+          <input type="checkbox" id="remember"> Se souvenir de moi
+        </label>
+        <a class="forgot-link" href="#">Mot de passe oublié ?</a>
+      </div>
+
+      <!-- SUBMIT -->
+      <button
+        type="submit"
+        class="btn-submit"
+        [class.loading]="loading"
+        [disabled]="loading"
+      >
+        <span class="btn-text">Se connecter</span>
+        <span class="spinner"></span>
       </button>
 
-      <p class="secure-note">Connexion sécurisée – Vos informations sont protégées.</p>      
-      <p class="auth-footer">Pas encore de compte ?<a href="/signup">Créer un compte</a></p>
+      <div class="divider">
+        <span class="divider-line"></span>
+        <span class="divider-text">ou</span>
+        <span class="divider-line"></span>
+      </div>
+
+      <div class="register-cta">
+        Nouveau sur HyperMagasin ? <a routerLink="/signup">Créer un compte gratuitement</a>
+      </div>
+
+    </form>
+  </div>
 </div>

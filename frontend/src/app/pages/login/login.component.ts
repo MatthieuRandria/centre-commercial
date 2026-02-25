@@ -1,16 +1,16 @@
 import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { RouterModule } from '@angular/router';
 import { AuthService } from '../../services/auth.service';
 import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-login',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, RouterModule],
   templateUrl: './login.component.html',
   styleUrl: './login.component.scss'
-
 })
 export class LoginComponent {
   email = '';
@@ -19,33 +19,46 @@ export class LoginComponent {
   emailError = '';
   mdpError = '';
   loading = false;
+  success = false;
+  showPassword = false;
 
-  constructor(private authService: AuthService, private router: Router) {}
+  constructor(private authService: AuthService, private router: Router) { }
 
-  validateForm(): boolean {
-    this.emailError = '';
-    this.mdpError = '';
-    let valid = true;
-
+  // ── Validation live (blur) ──
+  onEmailBlur(): void {
     if (!this.email) {
       this.emailError = 'Email requis';
-      valid = false;
     } else if (!/^\S+@\S+\.\S+$/.test(this.email)) {
       this.emailError = 'Email invalide';
-      valid = false;
+    } else {
+      this.emailError = '';
     }
-
-    if (!this.motDePasse) {
-      this.mdpError = 'Mot de passe requis';
-      valid = false;
-    }
-
-    return valid;
   }
 
+  onMdpBlur(): void {
+    if (!this.motDePasse) {
+      this.mdpError = 'Mot de passe requis';
+    } else if (this.motDePasse.length < 8) {
+      this.mdpError = 'Le mot de passe doit contenir au moins 8 caractères';
+    } else {
+      this.mdpError = '';
+    }
+  }
 
-  login() {
+  // ── Validation complète avant submit ──
+  validateForm(): boolean {
+    this.onEmailBlur();
+    this.onMdpBlur();
+    return !this.emailError && !this.mdpError;
+  }
+
+  // ── Submit ──
+  login(): void {
     this.error = '';
+    this.success = false;
+
+    if (!this.validateForm()) return;
+
     this.loading = true;
 
     this.authService.login({
@@ -53,22 +66,19 @@ export class LoginComponent {
       motDePasse: this.motDePasse
     }).subscribe({
       next: res => {
-        const role=res.user.role;
+        const role = res.user.role;
         this.authService.setSession(res.token, res.user);
-        if(role==="client"){
-          this.router.navigate(['']);
-        }
-        if (role==="boutique") {
-          this.router.navigate(['/boutique']);
-        }if (role==="admin"){
-          this.router.navigate(['/admin']);
-        }
+        this.success = true;
+        setTimeout(() => {
+          if (role === 'client') this.router.navigate(['']);
+          if (role === 'boutique') this.router.navigate(['/boutique']);
+          if (role === 'admin') this.router.navigate(['/admin']);
+        }, 600);
       },
       error: err => {
-        this.error = err.error.message || 'Erreur de connexion';
+        this.error = err.error?.message || 'Erreur de connexion';
         this.loading = false;
       }
     });
   }
-
 }
