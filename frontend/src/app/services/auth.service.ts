@@ -53,6 +53,10 @@ export class AuthService {
     return this.isBrowser && !!localStorage.getItem('token');
   }
 
+  getToken(){
+    return localStorage.getItem('token');
+  }
+
   getCurrentUser() {
     return this.currentUserSubject.value;
   }

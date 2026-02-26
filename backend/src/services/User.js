@@ -29,3 +29,18 @@ exports.createUser = async (email, telephone, motDePasse, role, nom, prenom, ima
         throw error;
     }
 };
+
+/* Find by ID */
+exports.findById = async (id) => {
+  return await User.findById(id);
+};
+
+exports.updateUser = async (id, data) => {
+  const user = await User.findById(id);
+  if (!user) throw new Error("Utilisateur introuvable");
+
+  Object.assign(user, data);
+  await user.save();
+
+  return user;
+};
