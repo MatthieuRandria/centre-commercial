@@ -11,6 +11,7 @@ import { ClientComponent } from './pages/client/client.component';
 import { RoleGuard } from './guards/role-guard.guard';
 import { ProduitsListComponent } from './produit/produits-list/produits-list.component';
 import { BoutiqueListComponent } from './pages/boutique-list/boutique-list.component';
+import { MeComponent } from './pages/me/me.component';
 
 export const routes: Routes = [
     // { path: '', redirectTo: 'login', pathMatch: 'full' },
@@ -21,8 +22,9 @@ export const routes: Routes = [
     { path: 'admin', component: AdminComponent, canActivate: [AuthGuard, RoleGuard], data: { role: 'admin' } },
     { path: 'produits', component: ProduitsListComponent },
     { path: 'boutiques', component: BoutiqueListComponent, canActivate: [AuthGuard], data: { role: "admin" } },
-    { path: 'boutique', component: BoutiquesComponent, canActivate: [AuthGuard, RoleGuard], data: { role: 'boutique' } },
+    { path: 'boutique', component: BoutiquesComponent, canActivate: [AuthGuard] },
     { path: 'boutique/:slug', component: BoutiqueDetailComponent, canActivate: [AuthGuard] },
     { path: 'client', component: ClientComponent, canActivate: [AuthGuard, RoleGuard], data: { role: 'client' } },
+    { path: 'profil', component: MeComponent, canActivate: [AuthGuard] },
     { path: 'dashboard', component: DashboardComponent, canActivate: [AuthGuard] }
 ];

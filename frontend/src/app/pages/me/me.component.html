@@ -1,0 +1,276 @@
+<div class="page-body">
+
+  <!-- ═══════════════════════════ SIDEBAR ═══════════════════════════ -->
+  <aside class="account-sidebar" *ngIf="user">
+    <div class="acc-head">
+      <div class="acc-avatar-wrap">
+        <div class="acc-avatar">
+          <img *ngIf="photoPreviewUrl" [src]="photoPreviewUrl" alt="avatar" />
+          <span *ngIf="!photoPreviewUrl">{{ avatarInitial }}</span>
+        </div>
+        <label class="acc-avatar-edit" for="photoInputSidebar">&#9998;</label>
+      </div>
+      <div class="acc-name">{{ user.prenom }} {{ user.nom }}</div>
+      <div class="acc-email">{{ user.email }}</div>
+      <div class="fidelite-bar">
+        <div class="fid-label">Points fidélité</div>
+        <div class="fid-val">{{ user.fidelitePoints | number }} pts</div>
+        <div class="fid-bar-track">
+          <div class="fid-bar-fill" [style.width.%]="fidelitePercent"></div>
+        </div>
+        <div class="fid-next">
+          {{ user.fideliteNextLevel - user.fidelitePoints }} pts pour le niveau {{ user.fideliteNextLevelName }}
+        </div>
+      </div>
+    </div>
+
+    <nav class="acc-nav">
+      <a class="acc-nav-item active" routerLink="/account/profil">
+        <span class="nav-ic">&#128100;</span>Mon profil
+      </a>
+      <a class="acc-nav-item" routerLink="/account/commandes">
+        <span class="nav-ic">&#128203;</span>Mes commandes
+      </a>
+      <a class="acc-nav-item" routerLink="/account/favoris">
+        <span class="nav-ic">&#9829;</span>Mes favoris
+      </a>
+      <a class="acc-nav-item" routerLink="/account/fidelite">
+        <span class="nav-ic">&#11088;</span>Points fidélité
+      </a>
+      <a class="acc-nav-item" routerLink="/account/adresses">
+        <span class="nav-ic">&#128205;</span>Mes adresses
+      </a>
+      <a class="acc-nav-item" routerLink="/account/parametres">
+        <span class="nav-ic">&#9881;</span>Paramètres
+      </a>
+      <a class="acc-nav-item danger" routerLink="/login">
+        <span class="nav-ic">&#10132;</span>Déconnexion
+      </a>
+    </nav>
+  </aside>
+
+  <!-- ═══════════════════════════ MAIN ═══════════════════════════════ -->
+  <div class="main-section" *ngIf="user">
+
+    <!-- ── PROFIL ─────────────────────────────────────────────────── -->
+    <div class="section-card">
+      <div class="sc-head">
+        <div>
+          <h2>Mon profil</h2>
+          <p>Vos informations personnelles</p>
+        </div>
+      </div>
+
+      <!-- Photo -->
+      <div class="photo-section">
+        <div class="photo-preview">
+          <img *ngIf="photoPreviewUrl" [src]="photoPreviewUrl" alt="preview" />
+          <span *ngIf="!photoPreviewUrl">{{ avatarInitial }}</span>
+        </div>
+        <div class="photo-info">
+          <div class="photo-title">Photo de profil</div>
+          <div class="photo-sub">JPG ou PNG, max 2 Mo. Votre photo sera visible sur votre profil.</div>
+          <div class="photo-btns">
+            <label class="btn-upload" for="photoInput">Changer la photo</label>
+            <button class="btn-remove-photo" type="button" (click)="removePhoto()">Supprimer</button>
+          </div>
+        </div>
+        <input type="file" id="photoInput" accept="image/*" style="display:none;" (change)="onPhotoSelected($event)" />
+        <input type="file" id="photoInputSidebar" accept="image/*" style="display:none;" (change)="onPhotoSelected($event)" />
+      </div>
+
+      <div class="sc-body">
+        <!-- Success alert -->
+        <div class="alert success" *ngIf="profilSuccess">
+          <span class="alert-icon">&#10003;</span>
+          <span>{{ profilSuccessMsg }}</span>
+        </div>
+
+        <form [formGroup]="profilForm" (ngSubmit)="saveProfile()" novalidate>
+          <div class="form-grid">
+            <!-- Nom -->
+            <div class="form-group">
+              <label class="form-label">Nom <span class="req">*</span></label>
+              <input
+                type="text"
+                class="form-input"
+                formControlName="nom"
+                placeholder="Votre nom"
+                [class.error]="f['nom'].invalid && f['nom'].touched"
+              />
+              <span class="field-error" *ngIf="f['nom'].invalid && f['nom'].touched">
+                Ce champ est requis.
+              </span>
+            </div>
+
+            <!-- Prénom -->
+            <div class="form-group">
+              <label class="form-label">Prénom <span class="req">*</span></label>
+              <input
+                type="text"
+                class="form-input"
+                formControlName="prenom"
+                placeholder="Votre prénom"
+                [class.error]="f['prenom'].invalid && f['prenom'].touched"
+              />
+              <span class="field-error" *ngIf="f['prenom'].invalid && f['prenom'].touched">
+                Ce champ est requis.
+              </span>
+            </div>
+
+            <!-- Email -->
+            <div class="form-group full">
+              <label class="form-label">Adresse email <span class="req">*</span></label>
+              <input
+                type="email"
+                class="form-input"
+                formControlName="email"
+                placeholder="votre@email.mg"
+                [class.error]="f['email'].invalid && f['email'].touched"
+              />
+              <span class="form-hint">Un email de confirmation sera envoyé si vous modifiez votre adresse.</span>
+              <span class="field-error" *ngIf="f['email'].invalid && f['email'].touched">
+                Email invalide.
+              </span>
+            </div>
+
+            <!-- Téléphone -->
+            <div class="form-group full">
+              <label class="form-label">Téléphone</label>
+              <div class="input-with-prefix">
+                <span class="input-prefix">+261</span>
+                <input type="tel" formControlName="telephone" placeholder="34 00 000 00" />
+              </div>
+            </div>
+          </div>
+
+          <div class="form-actions">
+            <button type="submit" class="btn-save" [disabled]="profilSaving">
+              <span class="spinner" *ngIf="profilSaving"></span>
+              <span>{{ profilSaving ? 'Enregistrement...' : 'Enregistrer les modifications' }}</span>
+            </button>
+            <button type="button" class="btn-cancel-f" (click)="resetProfilForm()">Annuler</button>
+          </div>
+        </form>
+      </div>
+    </div>
+    <!-- ── MOT DE PASSE ────────────────────────────────────────────── -->
+    <div class="section-card" *ngIf="pwForm">
+      <div class="sc-head">
+        <div>
+          <h2>Changer le mot de passe</h2>
+          <p>Utilisez un mot de passe fort d'au moins 8 caractères</p>
+        </div>
+      </div>
+      <div class="sc-body">
+        <div class="alert error" *ngIf="pwError">
+          <span class="alert-icon">&#9888;</span>
+          <span>{{ pwError }}</span>
+        </div>
+
+        <form [formGroup]="pwForm" (ngSubmit)="savePw()" novalidate>
+          <div class="form-grid">
+            <!-- Mot de passe actuel -->
+            <div class="form-group full">
+              <label class="form-label">Mot de passe actuel <span class="req">*</span></label>
+              <div class="pw-input-wrap">
+                <input
+                  [type]="pwShowOld ? 'text' : 'password'"
+                  class="form-input"
+                  formControlName="pwOld"
+                  placeholder="Votre mot de passe actuel"
+                  [class.error]="pw['pwOld'].invalid && pw['pwOld'].touched"
+                />
+                <button type="button" class="pw-toggle" (click)="pwShowOld = !pwShowOld">
+                  {{ pwShowOld ? '🙈' : '👁' }}
+                </button>
+              </div>
+            </div>
+
+            <!-- Nouveau mot de passe -->
+            <div class="form-group">
+              <label class="form-label">Nouveau mot de passe <span class="req">*</span></label>
+              <div class="pw-input-wrap">
+                <input
+                  [type]="pwShowNew ? 'text' : 'password'"
+                  class="form-input"
+                  formControlName="pwNew"
+                  placeholder="Min. 8 caractères"
+                  (input)="checkPwStrength($any($event.target).value)"
+                  [class.error]="pw['pwNew'].invalid && pw['pwNew'].touched"
+                />
+                <button type="button" class="pw-toggle" (click)="pwShowNew = !pwShowNew">
+                  {{ pwShowNew ? '🙈' : '👁' }}
+                </button>
+              </div>
+              <div class="pw-strength">
+                <div
+                  class="pw-strength-bar"
+                  [style.width.%]="pwStrengthPercent"
+                  [style.background]="pwStrengthColors[pwStrengthScore]"
+                ></div>
+              </div>
+              <span class="form-hint" [style.color]="pwStrengthColors[pwStrengthScore]" style="font-weight:600;">
+                {{ pwStrengthLabels[pwStrengthScore] }}
+              </span>
+            </div>
+
+            <!-- Confirmer -->
+            <div class="form-group">
+              <label class="form-label">Confirmer le mot de passe <span class="req">*</span></label>
+              <div class="pw-input-wrap">
+                <input
+                  [type]="pwShowConfirm ? 'text' : 'password'"
+                  class="form-input"
+                  formControlName="pwConfirm"
+                  placeholder="Répétez le mot de passe"
+                  [class.error]="pwForm.hasError('mismatch') && pw['pwConfirm'].touched"
+                />
+                <button type="button" class="pw-toggle" (click)="pwShowConfirm = !pwShowConfirm">
+                  {{ pwShowConfirm ? '🙈' : '👁' }}
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <div class="form-actions">
+            <button type="submit" class="btn-save" [disabled]="pwSaving">
+              <span class="spinner" *ngIf="pwSaving"></span>
+              <span>{{ pwSaving ? 'Modification...' : 'Modifier le mot de passe' }}</span>
+            </button>
+            <button type="button" class="btn-cancel-f" (click)="resetPwForm()">Annuler</button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <!-- ── ZONE DANGER ─────────────────────────────────────────────── -->
+    <div class="section-card">
+      <div class="sc-head">
+        <div>
+          <h2>Zone de danger</h2>
+          <p>Actions irréversibles sur votre compte</p>
+        </div>
+      </div>
+      <div class="sc-body">
+        <div class="danger-zone">
+          <div class="dz-info">
+            <h3>Supprimer mon compte</h3>
+            <p>
+              Cette action est irréversible. Toutes vos données (commandes, favoris, historique)
+              seront définitivement supprimées.
+            </p>
+          </div>
+          <button class="btn-danger-del" type="button" (click)="confirmDelete()">
+            Supprimer mon compte
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════ TOAST ═════════════════════════════════ -->
+<div class="toast" [class.show]="toastVisible" [class.success]="toastType === 'success'">
+  {{ toastMsg }}
+</div>
