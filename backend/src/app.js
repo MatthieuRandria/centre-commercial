@@ -15,6 +15,7 @@ const panierRoutes = require("./routes/panier.routes");
 const commandeRoutes = require("./routes/commande.routes");
 const avisRoutes = require("./routes/avis.routes");
 const favorisRoutes = require("./routes/favoris.routes");
+
 app.use("/api/auth", authRoutes);
 app.use("/centres", centreRoutes);
 app.use("/boutiquesCateg", boutiqueCategRoutes);

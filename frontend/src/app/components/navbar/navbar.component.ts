@@ -52,7 +52,7 @@ export class NavbarComponent implements OnInit {
     // Liens toujours visibles
     this.navItems = [
       { label: 'Accueil', link: '/' },
-      { label: 'Boutique', link: '/boutique' },
+      { label: 'Boutiques', link: '/boutique' },
       { label: 'Contact', link: '/contact' },
     ];
 
