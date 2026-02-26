@@ -1,0 +1,229 @@
+<!-- LOADING -->
+<div class="loading-state" *ngIf="loading">
+  <div class="spinner"></div>
+  <p>Chargement...</p>
+</div>
+
+<!-- ERROR -->
+<div class="error-state" *ngIf="error && !loading">
+  <p>{{ error }}</p>
+  <a routerLink="/boutique" class="btn-back">← Retour aux boutiques</a>
+</div>
+
+<!-- DETAIL -->
+<ng-container *ngIf="!loading && !error && boutique">
+
+  <!-- BREADCRUMB -->
+  <div class="breadcrumb-bar">
+    <a routerLink="/">Accueil</a>
+    <span class="breadcrumb-sep">›</span>
+    <a routerLink="/boutique">Boutiques</a>
+    <span class="breadcrumb-sep">›</span>
+    <span>{{ boutique.nom }}</span>
+  </div>
+
+  <!-- BANNER -->
+  <div class="banner-section">
+    <div class="banner-pattern"></div>
+    <div class="banner-overlay"></div>
+  </div>
+
+  <!-- INFO HEADER -->
+  <div class="info-header">
+    <div class="info-header-inner">
+
+      <div class="boutique-logo-wrapper">
+        <img alt="" *ngIf="boutique.infos.logo_url; else logoLetter"
+          [src]="boutique.infos.logo_url" [alt]="boutique.nom" class="boutique-logo-img" />
+        <ng-template #logoLetter>
+          <span class="boutique-logo-letter">{{ getInitiale(boutique.nom) }}</span>
+        </ng-template>
+      </div>
+
+      <div class="boutique-meta">
+        <div class="boutique-meta-top">
+          <span class="boutique-name-main">{{ boutique.nom }}</span>
+
+          <span class="status-badge-lg" [class.open]="isOpen()" [class.closed]="!isOpen()">
+            <span class="status-dot"></span>
+            {{ getStatutLabel() }}
+          </span>
+
+          <span class="boutique-category-tag">{{ boutique.categorie.nom }}</span>
+        </div>
+
+        <p class="boutique-meta-desc">{{ boutique.infos.description }}</p>
+
+        <div class="boutique-meta-contacts">
+          <div class="contact-item" *ngIf="boutique.infos.telephone">
+            <span class="contact-icon">
+              <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 12 19.79 19.79 0 0 1 1.61 3.4 2 2 0 0 1 3.6 1.22h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L7.91 8.77a16 16 0 0 0 6.29 6.29l.93-.93a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+            </span>
+            <span>{{ boutique.infos.telephone }}</span>
+          </div>
+
+          <div class="contact-item" *ngIf="boutique.infos.email">
+            <span class="contact-icon">
+              <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+            </span>
+            <span>{{ boutique.infos.email }}</span>
+          </div>
+
+          <div class="contact-item">
+            <span class="horaire-today">
+              Aujourd'hui : <span>{{ getTodayHoraire() }}</span>
+            </span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- PAGE BODY -->
+  <div class="page-body">
+    <div class="tabs-wrapper">
+
+      <!-- TABS NAV -->
+      <div class="tabs-nav">
+        <button class="tab-btn" [class.active]="activeTab === 0" (click)="switchTab(0)">
+          Produits ({{ produits.length }})
+        </button>
+        <button class="tab-btn" [class.active]="activeTab === 1" (click)="switchTab(1)">
+          Horaires
+        </button>
+        <button class="tab-btn" [class.active]="activeTab === 2" (click)="switchTab(2)">
+          Localisation
+        </button>
+        <button class="tab-btn" [class.active]="activeTab === 3" (click)="switchTab(3)">
+          Avis ({{ boutique.nombre_avis }})
+        </button>
+      </div>
+
+      <!-- ===== ONGLET PRODUITS ===== -->
+      <div class="tab-panel" [class.active]="activeTab === 0">
+
+        <div class="empty-produits" *ngIf="produits.length === 0">
+          <svg xmlns="http://www.w3.org/2000/svg" width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 01-8 0"/></svg>
+          <p>Aucun produit disponible pour cette boutique.</p>
+        </div>
+
+        <div class="produits-grid" *ngIf="produits.length > 0">
+          <a class="produit-card" *ngFor="let produit of produits" [routerLink]="['/produits', produit._id]">
+            <div class="produit-img">
+              <img alt="" *ngIf="produit.images && produit.images.length > 0" [src]="produit.images[0]" [alt]="produit.nom" />
+              <div *ngIf="!produit.images || produit.images.length === 0" class="produit-placeholder"></div>
+            </div>
+            <div class="produit-body">
+              <div class="produit-name">{{ produit.nom }}</div>
+              <div class="produit-price">{{ getProduitPrice(produit) | number }} Ar</div>
+            </div>
+          </a>
+        </div>
+      </div>
+
+      <!-- ===== ONGLET HORAIRES ===== -->
+      <div class="tab-panel" [class.active]="activeTab === 1">
+        <table class="horaires-tbl">
+          <thead>
+            <tr>
+              <th>Jour</th>
+              <th>Ouverture</th>
+              <th>Fermeture</th>
+              <th>Statut</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let h of boutique.horaires" [class.today]="isToday(h.jour)">
+              <td>
+                <span class="day-pill">
+                  <span class="day-marker"></span>
+                  {{ h.jour }}
+                  <span class="today-tag" *ngIf="isToday(h.jour)">Aujourd'hui</span>
+                </span>
+              </td>
+              <td class="horaire-time">{{ h.ouvert ? h.heures.ouverture : '—' }}</td>
+              <td class="horaire-time">{{ h.ouvert ? h.heures.fermeture : '—' }}</td>
+              <td>
+                <span class="open-text" *ngIf="h.ouvert">Ouvert</span>
+                <span class="closed-text" *ngIf="!h.ouvert">Fermé</span>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- ===== ONGLET LOCALISATION ===== -->
+      <div class="tab-panel" [class.active]="activeTab === 2">
+        <div class="localisation-grid">
+
+          <div class="locinfo-card">
+            <div class="locinfo-title">Emplacement dans le centre</div>
+            <div class="locinfo-row">
+              <span class="locinfo-key">Centre commercial</span>
+              <span class="locinfo-val">{{ boutique.centre_commercial.nom }}</span>
+            </div>
+            <div class="locinfo-row">
+              <span class="locinfo-key">Numéro emplacement</span>
+              <span class="locinfo-val">{{ boutique.localisation.numero_local }}</span>
+            </div>
+            <div class="locinfo-row">
+              <span class="locinfo-key">Étage</span>
+              <span class="locinfo-val">{{ boutique.localisation.etage }}</span>
+            </div>
+            <div class="locinfo-row" *ngIf="boutique.localisation.zone">
+              <span class="locinfo-key">Zone</span>
+              <span class="locinfo-val">{{ boutique.localisation.zone }}</span>
+            </div>
+          </div>
+
+          <div class="locinfo-card">
+            <div class="locinfo-title">Adresse du centre</div>
+            <div class="locinfo-row">
+              <span class="locinfo-key">Ville</span>
+              <span class="locinfo-val">{{ boutique.centre_commercial.adresse.ville }}</span>
+            </div>
+            <div class="locinfo-row" *ngIf="boutique.centre_commercial.adresse.code_postal">
+              <span class="locinfo-key">Code postal</span>
+              <span class="locinfo-val">{{ boutique.centre_commercial.adresse.code_postal }}</span>
+            </div>
+          </div>
+
+          <div class="map-block">
+            <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" style="opacity:0.4"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+            <div class="map-label">Aperçu cartographique</div>
+            <small>{{ boutique.centre_commercial.adresse.ville }}</small>
+          </div>
+
+        </div>
+      </div>
+
+      <!-- ===== ONGLET AVIS ===== -->
+      <div class="tab-panel" [class.active]="activeTab === 3">
+        <div class="avis-header">
+          <div class="avis-score">
+            <div class="score-num">{{ boutique.note_moyenne | number:'1.1-1' }}</div>
+            <div class="stars">
+              <ng-container *ngFor="let filled of getStars(boutique.note_moyenne)">
+                <span class="star" [class.empty]="!filled">&#9733;</span>
+              </ng-container>
+            </div>
+            <div class="score-total">{{ boutique.nombre_avis }} avis</div>
+          </div>
+          <div class="avis-bars">
+            <div class="bar-row" *ngFor="let n of [5,4,3,2,1]">
+              <span class="bar-label">{{ n }}</span>
+              <div class="bar-track"><div class="bar-fill" [style.width.%]="n === 5 ? 60 : n === 4 ? 25 : n === 3 ? 10 : 4"></div></div>
+              <span class="bar-count"></span>
+            </div>
+          </div>
+        </div>
+
+        <div class="avis-empty" *ngIf="boutique.nombre_avis === 0">
+          <p>Aucun avis pour cette boutique.</p>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+</ng-container>

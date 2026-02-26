@@ -1,2 +1,212 @@
-<h2 class="title">Page d’accueil</h2>
-<p class="welcome">Bienvenue sur mon application Angular</p>
+<!-- HERO CAROUSEL -->
+<section class="hero" #heroSection>
+  <div class="hero-slides" [style.transform]="'translateX(-' + currentSlide * 100 + '%)'">
+
+    <div class="hero-slide">
+      <div class="slide-bg slide-bg-1"></div>
+      <div class="slide-pattern"></div>
+      <div class="slide-deco">
+        <svg xmlns="http://www.w3.org/2000/svg" width="120" height="120" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.15)" stroke-width="0.8"><path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 01-8 0"/></svg>
+      </div>
+      <div class="slide-content">
+        <span class="slide-tag">Nouveautes Printemps 2026</span>
+        <h1 class="slide-title">Votre mode,<br>votre style</h1>
+        <p class="slide-sub">Decouvrez les derniers trends au Galaxy Mall.<br>+48 boutiques, un seul endroit.</p>
+        <a class="slide-cta" routerLink="/produits">Explorer le catalogue</a>
+        <a class="slide-cta-secondary" routerLink="/boutique">Nos boutiques</a>
+      </div>
+    </div>
+
+    <div class="hero-slide">
+      <div class="slide-bg slide-bg-2"></div>
+      <div class="slide-pattern"></div>
+      <div class="slide-deco">
+        <svg xmlns="http://www.w3.org/2000/svg" width="120" height="120" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.15)" stroke-width="0.8"><rect x="5" y="2" width="14" height="20" rx="2" ry="2"/><line x1="12" y1="18" x2="12.01" y2="18"/></svg>
+      </div>
+      <div class="slide-content">
+        <span class="slide-tag">Tech &amp; Electronique</span>
+        <h1 class="slide-title">Innovation<br>au quotidien</h1>
+        <p class="slide-sub">Les meilleurs produits tech vous attendent.<br>Apple, Samsung, et bien plus.</p>
+        <a class="slide-cta" routerLink="/produits">Voir les produits</a>
+        <a class="slide-cta-secondary" routerLink="/boutique">Toutes les boutiques</a>
+      </div>
+    </div>
+
+    <div class="hero-slide">
+      <div class="slide-bg slide-bg-3"></div>
+      <div class="slide-pattern"></div>
+      <div class="slide-deco">
+        <svg xmlns="http://www.w3.org/2000/svg" width="120" height="120" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.15)" stroke-width="0.8"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+      </div>
+      <div class="slide-content">
+        <span class="slide-tag">Collections exclusives</span>
+        <h1 class="slide-title">Style &amp;<br>elegance</h1>
+        <p class="slide-sub">Des selections curees par nos experts mode.<br>Nouvelles collections chaque semaine.</p>
+        <a class="slide-cta" routerLink="/produits">Decouvrir</a>
+        <a class="slide-cta-secondary" routerLink="/boutique">Nos boutiques</a>
+      </div>
+    </div>
+
+  </div>
+
+  <button class="carousel-arrow prev" (click)="moveSlide(-1)">
+    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
+  </button>
+  <button class="carousel-arrow next" (click)="moveSlide(1)">
+    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
+  </button>
+  <div class="carousel-dots">
+    <button class="c-dot" *ngFor="let s of [0,1,2]" [class.active]="currentSlide === s" (click)="goSlide(s)"></button>
+  </div>
+</section>
+
+<!-- SEARCH -->
+<section class="search-section">
+  <div class="search-inner">
+    <div class="search-label">Que recherchez-vous ?</div>
+    <div class="search-bar" [class.focused]="searchFocused">
+      <svg class="search-icon" xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+      <input class="search-input" type="text" placeholder="Robe, iPhone, Nike, Zara..."
+        [(ngModel)]="searchQuery"
+        (focus)="searchFocused=true"
+        (blur)="searchFocused=false"
+        (keyup.enter)="onSearch()" />
+      <button class="search-btn" (click)="onSearch()">Rechercher</button>
+    </div>
+    <div class="search-tags">
+      <a class="search-tag" *ngFor="let tag of searchTags" (click)="searchByTag(tag)">{{ tag }}</a>
+    </div>
+  </div>
+</section>
+
+<!-- CATEGORIES -->
+<section class="section">
+  <div class="container">
+    <div class="section-header">
+      <div>
+        <div class="section-title">Categories populaires</div>
+        <div class="section-subtitle">Trouvez ce que vous cherchez rapidement</div>
+      </div>
+    </div>
+    <div class="cats-grid">
+      <a class="cat-card" *ngFor="let cat of categories" routerLink="/produits">
+        <span class="cat-icon-wrap">
+          <svg *ngIf="cat.icon === 'shirt'" xmlns="http://www.w3.org/2000/svg" width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20.38 3.46L16 2a4 4 0 01-8 0L3.62 3.46a2 2 0 00-1.34 2.23l.58 3.57a1 1 0 00.99.84H6v10c0 1.1.9 2 2 2h8a2 2 0 002-2V10h2.15a1 1 0 00.99-.84l.58-3.57a2 2 0 00-1.34-2.23z"/></svg>
+          <svg *ngIf="cat.icon === 'cpu'" xmlns="http://www.w3.org/2000/svg" width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="4" width="16" height="16" rx="2" ry="2"/><rect x="9" y="9" width="6" height="6"/><line x1="9" y1="1" x2="9" y2="4"/><line x1="15" y1="1" x2="15" y2="4"/><line x1="9" y1="20" x2="9" y2="23"/><line x1="15" y1="20" x2="15" y2="23"/><line x1="20" y1="9" x2="23" y2="9"/><line x1="20" y1="14" x2="23" y2="14"/><line x1="1" y1="9" x2="4" y2="9"/><line x1="1" y1="14" x2="4" y2="14"/></svg>
+          <svg *ngIf="cat.icon === 'activity'" xmlns="http://www.w3.org/2000/svg" width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+          <svg *ngIf="cat.icon === 'star'" xmlns="http://www.w3.org/2000/svg" width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+          <svg *ngIf="cat.icon === 'coffee'" xmlns="http://www.w3.org/2000/svg" width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8h1a4 4 0 010 8h-1"/><path d="M2 8h16v9a4 4 0 01-4 4H6a4 4 0 01-4-4V8z"/><line x1="6" y1="1" x2="6" y2="4"/><line x1="10" y1="1" x2="10" y2="4"/><line x1="14" y1="1" x2="14" y2="4"/></svg>
+          <svg *ngIf="cat.icon === 'home'" xmlns="http://www.w3.org/2000/svg" width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+          <svg *ngIf="cat.icon === 'gift'" xmlns="http://www.w3.org/2000/svg" width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 12 20 22 4 22 4 12"/><rect x="2" y="7" width="20" height="5"/><line x1="12" y1="22" x2="12" y2="7"/><path d="M12 7H7.5a2.5 2.5 0 010-5C11 2 12 7 12 7z"/><path d="M12 7h4.5a2.5 2.5 0 000-5C13 2 12 7 12 7z"/></svg>
+          <svg *ngIf="cat.icon === 'book'" xmlns="http://www.w3.org/2000/svg" width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5A2.5 2.5 0 016.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 014 19.5v-15A2.5 2.5 0 016.5 2z"/></svg>
+        </span>
+        <span class="cat-label">{{ cat.nom }}</span>
+      </a>
+    </div>
+  </div>
+</section>
+
+<!-- PRODUITS VEDETTE -->
+<section class="section alt">
+  <div class="container">
+    <div class="section-header">
+      <div>
+        <div class="section-title">Produits en vedette</div>
+        <div class="section-subtitle">Selectionnes par notre equipe pour vous</div>
+      </div>
+      <a class="see-all" routerLink="/produits">Voir tout le catalogue</a>
+    </div>
+
+    <div class="loading-state" *ngIf="loadingProduits">
+      <div class="spinner"></div>
+    </div>
+
+    <div class="prods-grid" *ngIf="!loadingProduits">
+      <a class="prod-card" *ngFor="let p of produits" routerLink="/produits">
+        <div class="prod-img">
+          <img alt="" *ngIf="p.images && p.images.length > 0" [src]="p.images[0]" [alt]="p.nom" />
+          <div *ngIf="!p.images || p.images.length === 0" class="prod-img-ph"></div>
+          <span class="vedette-tag">Vedette</span>
+        </div>
+        <div class="prod-body">
+          <div class="prod-boutique">{{ p.boutique?.nom || 'Galaxy Mall' }}</div>
+          <div class="prod-name">{{ p.nom }}</div>
+          <div class="prod-price-row">
+            <span class="price-main">{{ p.prix | number }} Ar</span>
+          </div>
+          <span class="stock-badge-sm sb-in">En stock</span>
+        </div>
+        <div class="prod-footer">
+          <button class="btn-add-cart" (click)="$event.preventDefault()">+ Ajouter au panier</button>
+        </div>
+      </a>
+    </div>
+  </div>
+</section>
+
+<!-- BOUTIQUES -->
+<section class="section">
+  <div class="container">
+    <div class="section-header">
+      <div>
+        <div class="section-title">Nos boutiques partenaires</div>
+        <div class="section-subtitle">{{ boutiques.length }} boutiques au Galaxy Mall</div>
+      </div>
+      <a class="see-all" routerLink="/boutique">Voir toutes les boutiques</a>
+    </div>
+
+    <div class="loading-state" *ngIf="loadingBoutiques">
+      <div class="spinner"></div>
+    </div>
+
+    <div class="boutiques-grid" *ngIf="!loadingBoutiques">
+      <a class="boutique-card" *ngFor="let b of boutiques" [routerLink]="['/boutique', b.slug]">
+        <div class="boutique-av">{{ getInitiale(b.nom) }}</div>
+        <div class="boutique-info">
+          <div class="boutique-name">{{ b.nom }}</div>
+          <div class="boutique-cat">{{ b.categorie?.nom }} — {{ b.localisation?.zone || b.localisation?.etage }}</div>
+        </div>
+        <div class="boutique-active-dot" [class.inactive]="b.statut !== 'active'"></div>
+      </a>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer class="footer">
+  <div class="footer-body">
+    <div class="footer-brand">
+      <div class="footer-logo">CentreShop</div>
+      <p class="footer-desc">La plateforme officielle du Galaxy Mall d'Antananarivo. Decouvrez, comparez et achetez les produits de vos boutiques preferees.</p>
+      <div class="socials">
+        <a class="social-btn" href="#" title="Facebook">
+          <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 2h-3a5 5 0 00-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 011-1h3z"/></svg>
+        </a>
+        <a class="social-btn" href="#" title="Instagram">
+          <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"/><path d="M16 11.37A4 4 0 1112.63 8 4 4 0 0116 11.37z"/><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"/></svg>
+        </a>
+        <a class="social-btn" href="#" title="Twitter / X">
+          <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M23 3a10.9 10.9 0 01-3.14 1.53 4.48 4.48 0 00-7.86 3v1A10.66 10.66 0 013 4s-4 9 5 13a11.64 11.64 0 01-7 2c9 5 20 0 20-11.5a4.5 4.5 0 00-.08-.83A7.72 7.72 0 0023 3z"/></svg>
+        </a>
+      </div>
+    </div>
+    <div class="footer-col">
+      <h3>Boutique</h3>
+      <a routerLink="/boutique">Nos boutiques</a>
+      <a routerLink="/produits">Catalogue</a>
+    </div>
+    <div class="footer-col">
+      <h3>Mon compte</h3>
+      <a routerLink="/login">Connexion</a>
+      <a routerLink="/signup">Inscription</a>
+    </div>
+    <div class="footer-col">
+      <h3>Aide</h3>
+      <a href="#">Contact</a>
+    </div>
+  </div>
+  <div class="footer-bottom">
+    <span>&copy; 2026 CentreShop — Galaxy Mall Antananarivo. Tous droits reserves.</span>
+    <span>Fait a Madagascar</span>
+  </div>
+</footer>

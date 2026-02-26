@@ -1,1 +1,165 @@
-<p>boutique works!</p>
+<!-- HERO -->
+<div class="page-hero">
+  <h1>Nos Boutiques</h1>
+  <p>Découvrez toutes les boutiques disponibles dans nos centres commerciaux</p>
+  <div class="hero-search">
+    <svg class="hero-search-icon" xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+    <input
+      type="text"
+      placeholder="Rechercher une boutique..."
+      [value]="searchQuery"
+      (input)="onSearch($any($event.target).value)"
+    />
+  </div>
+</div>
+
+<!-- BODY -->
+<div class="page-body">
+
+  <!-- SIDEBAR -->
+  <aside class="sidebar">
+
+    <div class="sidebar-section">
+      <div class="sidebar-title">
+        <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+        Recherche
+      </div>
+      <input
+        type="text"
+        class="sidebar-search"
+        placeholder="Nom de la boutique..."
+        [value]="searchQuery"
+        (input)="onSearch($any($event.target).value)"
+      />
+    </div>
+
+    <div class="sidebar-section">
+      <div class="sidebar-title">
+        <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg>
+        Catégories
+      </div>
+      <div class="category-list">
+
+        <label class="category-item" [class.active]="!selectedCategorie" (click)="onCategorieChange('')">
+          <input type="checkbox" [checked]="!selectedCategorie" (change)="onCategorieChange('')" (click)="$event.stopPropagation()">
+          <span class="cat-label">Toutes</span>
+          <span class="cat-count">{{ total }}</span>
+        </label>
+
+        <label class="category-item" *ngFor="let cat of categories"
+          [class.active]="selectedCategorie === cat.id"
+          (click)="onCategorieChange(cat.id)">
+          <input type="checkbox" [checked]="selectedCategorie === cat.id" (change)="onCategorieChange(cat.id)" (click)="$event.stopPropagation()">
+          <span class="cat-label">{{ cat.nom }}</span>
+        </label>
+
+      </div>
+      <button class="btn-reset-filters" (click)="resetFilters()">
+        Réinitialiser les filtres
+      </button>
+    </div>
+
+  </aside>
+
+  <!-- MAIN -->
+  <div class="main-area">
+
+    <div class="results-bar">
+      <span class="results-count">
+        <strong>{{ total }}</strong> boutique(s) trouvée(s)
+      </span>
+    </div>
+
+    <!-- LOADING -->
+    <div class="loading-state" *ngIf="loading">
+      <div class="spinner"></div>
+      <p>Chargement des boutiques...</p>
+    </div>
+
+    <!-- ERROR -->
+    <div class="error-state" *ngIf="error && !loading">
+      <svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+      <p>{{ error }}</p>
+      <button (click)="loadBoutiques()">Réessayer</button>
+    </div>
+
+    <!-- EMPTY -->
+    <div class="empty-state" *ngIf="!loading && !error && boutiques.length === 0">
+      <svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+      <p>Aucune boutique trouvée pour vos critères.</p>
+      <button (click)="resetFilters()">Effacer les filtres</button>
+    </div>
+
+    <!-- GRID -->
+    <div class="boutiques-grid" *ngIf="!loading && !error && boutiques.length > 0">
+      <a
+        class="boutique-card"
+        *ngFor="let boutique of boutiques"
+        [routerLink]="['/boutique', boutique.slug]"
+      >
+        <!-- Image / Logo -->
+        <div class="card-image">
+          <img alt=""
+            *ngIf="boutique.infos.logo_url; else placeholder"
+            [src]="boutique.infos.logo_url"
+            [alt]="boutique.nom"
+          />
+          <ng-template #placeholder>
+            <div class="card-logo-placeholder">{{ getInitiale(boutique.nom) }}</div>
+          </ng-template>
+
+          <span
+            class="card-status-badge"
+            [class.badge-open]="boutique.statut === 'active'"
+            [class.badge-travaux]="boutique.statut === 'en_travaux'"
+            [class.badge-closed]="boutique.statut === 'inactive' || boutique.statut === 'fermee_definitivement'"
+          >
+            <span class="badge-dot"></span>
+            {{ getStatutLabel(boutique.statut) }}
+          </span>
+        </div>
+
+        <!-- Body -->
+        <div class="card-body">
+          <span class="card-category">{{ boutique.categorie.nom }}</span>
+          <div class="card-name">{{ boutique.nom }}</div>
+          <p class="card-desc">{{ boutique.infos.description }}</p>
+        </div>
+
+        <!-- Footer -->
+        <div class="card-footer">
+          <span class="btn-voir">Voir la boutique →</span>
+        </div>
+      </a>
+    </div>
+
+    <!-- PAGINATION -->
+    <div class="pagination" *ngIf="totalPages > 1 && !loading">
+      <button
+        class="pagination-btn"
+        [disabled]="!hasPrevPage"
+        (click)="onPageChange(currentPage - 1)"
+      >
+        Précédent
+      </button>
+
+      <button
+        *ngFor="let page of getPages()"
+        class="pagination-page"
+        [class.active]="page === currentPage"
+        (click)="onPageChange(page)"
+      >
+        {{ page }}
+      </button>
+
+      <button
+        class="pagination-btn"
+        [disabled]="!hasNextPage"
+        (click)="onPageChange(currentPage + 1)"
+      >
+        Suivant
+      </button>
+    </div>
+
+  </div>
+</div>

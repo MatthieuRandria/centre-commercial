@@ -2,10 +2,10 @@ const mongoose = require("mongoose");
 const { Schema } = mongoose;
 
 const VarianteSchema = new Schema({
-    nom: { type: String, required: true },
+    type: { type: String },   // ex: "taille", "couleur"
+    valeur: { type: String }, // ex: "XL", "Rouge"
     prix: { type: Number, required: true, min: 0 },
-    stock: { type: Number, default: 0, min: 0 },
-    sku: { type: String }
+    stock: { type: Number, default: 0, min: 0 }
 }, { _id: false });
 
 const ProduitCategories = new Schema({
