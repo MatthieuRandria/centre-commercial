@@ -5,7 +5,7 @@ import { RouterModule } from '@angular/router';
 import { BoutiqueService } from '../../services/boutique.service';
 import {   Boutique, BoutiqueFilters,Categorie, CentreCommercial } from '../../models/boutique.model';
 import { debounceTime, distinctUntilChanged, finalize, forkJoin, Subject, takeUntil } from 'rxjs';
-
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-admin-boutique',
@@ -37,6 +37,7 @@ private destroy$ = new Subject<void>();
     total: 0, page: 1, limit: 10,
     totalPages: 1, hasNextPage: false, hasPrevPage: false
   };
+  // router: any;
 
   get pageNumbers(): number[] {
     const range = 2;
@@ -64,7 +65,8 @@ private destroy$ = new Subject<void>();
 
   constructor(
     private fb: FormBuilder,
-    private boutiqueService: BoutiqueService
+    private boutiqueService: BoutiqueService,
+    private router: Router
   ) {}
 
   // ───────────────────────────────────────────────────────────────────────────
@@ -215,8 +217,8 @@ private destroy$ = new Subject<void>();
   }
 
   editBoutique(b: Boutique): void {
-    // this.router.navigate(['/admin/boutiques', b._id, 'edit']);
-    console.log('Modifier boutique', b._id);
+    this.router.navigate(['/admin/boutiques', b._id, 'edit']);
+    // console.log('Modifier boutique', b._id);
   }
 
   openDeleteModal(b: Boutique): void {
@@ -292,8 +294,8 @@ private destroy$ = new Subject<void>();
   }
 
   openAddModal(): void {
-    // this.router.navigate(['/admin/boutiques/new']);
-    console.log('Ajouter boutique');
+    this.router.navigate(['/admin/boutiques/add']);
+    // console.log('Ajouter boutique');
   }
 
   // ─── Helpers d'affichage ──────────────────────────────────────────────────

@@ -28,6 +28,16 @@
       </div>
 
       <div class="filter-groups-row">
+        <!-- Recherche -->
+        <div class="filter-group">
+          <label>Recherche</label>
+          <input
+            type="text"
+            class="filter-input"
+            placeholder="Nom de la boutique..."
+            formControlName="search"
+          />
+        </div>
 
         <!-- Centre commercial -->
         <div class="filter-group">
@@ -63,17 +73,6 @@
             <option value="">Tous les statuts</option>
             <option *ngFor="let s of statuts" [value]="s.value">{{ s.label }}</option>
           </select>
-        </div>
-
-        <!-- Recherche -->
-        <div class="filter-group">
-          <label>Recherche</label>
-          <input
-            type="text"
-            class="filter-input"
-            placeholder="Nom de la boutique..."
-            formControlName="search"
-          />
         </div>
 
         <!-- Tri -->

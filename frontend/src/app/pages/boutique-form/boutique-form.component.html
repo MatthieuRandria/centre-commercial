@@ -1,0 +1,414 @@
+<!-- boutique-form.component.html -->
+<div class="boutique-form-wrapper">
+
+  <!-- ─── HEADER ──────────────────────────────────────────────────────────── -->
+  <div class="page-header">
+    <div class="header-left">
+      <button class="back-btn" type="button" (click)="goBack()" title="Retour à la liste">←</button>
+      <div class="header-title">
+        <h1>
+          {{ pageTitle }}
+          <span class="header-badge">Admin</span>
+        </h1>
+        <p class="breadcrumb">
+          <a routerLink="/admin">Dashboard</a> /
+          <a routerLink="/admin/boutiques">Boutiques</a> /
+          {{ pageTitle }}
+        </p>
+      </div>
+    </div>
+    <div class="header-actions">
+      <button class="btn-secondary" type="button" (click)="goBack()">Annuler</button>
+      <button class="btn-primary" type="button" (click)="onSubmit()" [disabled]="isSubmitting">
+        <span *ngIf="!isSubmitting">💾 Enregistrer</span>
+        <span *ngIf="isSubmitting" class="spinner-inline"></span>
+        <span *ngIf="isSubmitting">Enregistrement...</span>
+      </button>
+    </div>
+  </div>
+
+  <!-- ─── SUCCESS BANNER ──────────────────────────────────────────────────── -->
+  <div class="success-banner" *ngIf="submitSuccess">
+    ✅ Boutique enregistrée avec succès ! Redirection en cours...
+  </div>
+
+  <!-- ─── ERROR BANNER ────────────────────────────────────────────────────── -->
+  <div class="error-banner" *ngIf="errorMessage">
+    ⚠ {{ errorMessage }}
+  </div>
+
+  <!-- ─── FORM CARD ────────────────────────────────────────────────────────── -->
+  <div class="tabs-wrapper" [formGroup]="form">
+
+    <!-- TABS NAV -->
+    <div class="tabs-nav">
+      <button
+        class="tab-btn"
+        *ngFor="let tab of tabs; let i = index"
+        [class.active]="activeTab === i"
+        type="button"
+        (click)="switchTab(i)"
+      >
+        <span class="tab-number" [class.done]="activeTab > i">
+          {{ activeTab > i ? '✓' : tab.number }}
+        </span>
+        <span class="tab-icon">{{ tab.icon }}</span>
+        <span class="tab-label">{{ tab.label }}</span>
+      </button>
+    </div>
+
+    <!-- ═══════════════════════════════════════════════════════════════════════
+         ONGLET 1 — INFORMATIONS GÉNÉRALES
+    ════════════════════════════════════════════════════════════════════════ -->
+    <div class="tab-panel" [class.active]="activeTab === 0">
+
+      <div class="form-section">
+        <div class="section-title">Identification</div>
+        <div class="form-grid">
+
+          <div class="form-group full">
+            <label>Nom de la boutique <span class="required">*</span></label>
+            <input type="text" formControlName="nom" placeholder="Ex: Zara Madagascar"
+                   [class.input-error]="isFieldInvalid('nom')" />
+            <span class="field-hint">Nom tel qu'il apparaîtra publiquement</span>
+            <span class="field-error" *ngIf="isFieldInvalid('nom')">Le nom est obligatoire (min. 2 caractères)</span>
+          </div>
+
+          <div class="form-group">
+            <label>Centre commercial <span class="required">*</span></label>
+            <select formControlName="centreId" [class.input-error]="isFieldInvalid('centreId')">
+              <option value="">{{ isLoadingRefs ? 'Chargement...' : '— Sélectionner un centre —' }}</option>
+              <option *ngFor="let c of centres" [value]="c._id">{{ c.nom }}</option>
+            </select>
+            <span class="field-error" *ngIf="isFieldInvalid('centreId')">Veuillez choisir un centre</span>
+          </div>
+
+          <div class="form-group">
+            <label>Catégorie <span class="required">*</span></label>
+            <select formControlName="categorieId" [class.input-error]="isFieldInvalid('categorieId')">
+              <option value="">{{ isLoadingRefs ? 'Chargement...' : '— Sélectionner une catégorie —' }}</option>
+              <option *ngFor="let cat of categories" [value]="cat._id">{{ cat.icone }} {{ cat.nom }}</option>
+            </select>
+            <span class="field-error" *ngIf="isFieldInvalid('categorieId')">Veuillez choisir une catégorie</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="form-section">
+        <div class="section-title">Statut de la boutique <span class="required">*</span></div>
+        <div class="radio-group">
+          <label class="radio-card" *ngFor="let s of statuts">
+            <input type="radio" formControlName="statut" [value]="s.value" />
+            <span class="radio-label">
+              <span class="radio-dot"></span>
+              <span class="radio-status-dot" [ngClass]="s.dot"></span>
+              {{ s.label }}
+            </span>
+          </label>
+        </div>
+      </div>
+
+      <div class="tab-nav-arrows">
+        <button class="btn-tab-nav primary" type="button" (click)="switchTab(1)">
+          Suivant : Infos détaillées →
+        </button>
+      </div>
+    </div>
+
+    <!-- ═══════════════════════════════════════════════════════════════════════
+         ONGLET 2 — INFORMATIONS DÉTAILLÉES
+    ════════════════════════════════════════════════════════════════════════ -->
+    <div class="tab-panel" [class.active]="activeTab === 1">
+
+      <div class="form-section">
+        <div class="section-title">Description</div>
+        <div class="form-grid cols-1">
+          <div class="form-group">
+            <label>Description de la boutique</label>
+            <textarea formControlName="description"
+                      placeholder="Décrivez la boutique, ses produits, son ambiance..."></textarea>
+          </div>
+        </div>
+      </div>
+
+      <div class="form-section">
+        <div class="section-title">Médias</div>
+        <div class="form-grid">
+
+          <!-- Logo -->
+          <div class="form-group">
+            <label>Logo</label>
+            <div class="upload-zone" (click)="logoInput.click()">
+              <input #logoInput type="file" accept="image/*" style="display:none" (change)="onLogoChange($event)" />
+              <ng-container *ngIf="!logoPreview">
+                <div class="upload-icon">🖼️</div>
+                <div class="upload-text">Cliquer pour choisir</div>
+                <div class="upload-hint">PNG, JPG — max 2 Mo — 200×200px</div>
+              </ng-container>
+              <ng-container *ngIf="logoPreview">
+                <img [src]="logoPreview" alt="Aperçu logo" class="upload-preview-img" />
+                <div class="upload-hint" style="margin-top:8px">Cliquer pour changer</div>
+              </ng-container>
+            </div>
+          </div>
+
+          <!-- Bannière -->
+          <div class="form-group">
+            <label>Bannière</label>
+            <div class="upload-zone" (click)="bannerInput.click()">
+              <input #bannerInput type="file" accept="image/*" style="display:none" (change)="onBannerChange($event)" />
+              <ng-container *ngIf="!bannerPreview">
+                <div class="upload-icon">🖼️</div>
+                <div class="upload-text">Cliquer pour choisir</div>
+                <div class="upload-hint">PNG, JPG — max 5 Mo — 1200×400px</div>
+              </ng-container>
+              <ng-container *ngIf="bannerPreview">
+                <img [src]="bannerPreview" alt="Aperçu bannière" class="upload-preview-img" />
+                <div class="upload-hint" style="margin-top:8px">Cliquer pour changer</div>
+              </ng-container>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="form-section">
+        <div class="section-title">Identité visuelle & Contact</div>
+        <div class="form-grid">
+
+          <div class="form-group">
+            <label>Couleur principale</label>
+            <div class="color-picker-group">
+              <input type="color" formControlName="couleur" />
+              <input type="text" class="color-hex-input" formControlName="couleur_hex"
+                     placeholder="#000000" maxlength="7" />
+            </div>
+            <span class="field-hint">Couleur de la marque pour l'affichage</span>
+          </div>
+
+          <div class="form-group"><!-- spacer --></div>
+
+          <div class="form-group">
+            <label>Téléphone</label>
+            <input type="tel" formControlName="telephone" placeholder="Ex: +261 34 00 000 00" />
+          </div>
+
+          <div class="form-group">
+            <label>Email</label>
+            <input type="email" formControlName="email"
+                   [class.input-error]="isFieldInvalid('email')"
+                   placeholder="Ex: contact@boutique.mg" />
+            <span class="field-error" *ngIf="isFieldInvalid('email')">Email invalide</span>
+          </div>
+
+          <div class="form-group">
+            <label>Site web</label>
+            <input type="text" formControlName="site_web" placeholder="https://..." />
+          </div>
+
+          <div class="form-group">
+            <label>Superficie (m²)</label>
+            <input type="number" formControlName="superficie" placeholder="Ex: 120" min="0" />
+          </div>
+
+          <div class="form-group">
+            <label>Capacité d'accueil</label>
+            <input type="number" formControlName="capacite_accueil" placeholder="Ex: 50" min="0" />
+          </div>
+        </div>
+      </div>
+
+      <div class="form-section">
+        <div class="section-title">Réseaux sociaux</div>
+        <div class="form-grid">
+          <div class="form-group">
+            <label>Facebook</label>
+            <input type="text" formControlName="facebook" placeholder="https://facebook.com/..." />
+          </div>
+          <div class="form-group">
+            <label>Instagram</label>
+            <input type="text" formControlName="instagram" placeholder="https://instagram.com/..." />
+          </div>
+          <div class="form-group">
+            <label>Twitter / X</label>
+            <input type="text" formControlName="twitter" placeholder="https://twitter.com/..." />
+          </div>
+          <div class="form-group">
+            <label>LinkedIn</label>
+            <input type="text" formControlName="linkedin" placeholder="https://linkedin.com/..." />
+          </div>
+        </div>
+      </div>
+
+      <div class="tab-nav-arrows">
+        <button class="btn-tab-nav" type="button" (click)="switchTab(0)">← Précédent</button>
+        <button class="btn-tab-nav primary" type="button" (click)="switchTab(2)">Suivant : Localisation →</button>
+      </div>
+    </div>
+
+    <!-- ═══════════════════════════════════════════════════════════════════════
+         ONGLET 3 — LOCALISATION
+    ════════════════════════════════════════════════════════════════════════ -->
+    <div class="tab-panel" [class.active]="activeTab === 2">
+
+      <div class="form-section">
+        <div class="section-title">Emplacement dans le centre</div>
+        <div class="form-grid cols-3">
+          <div class="form-group">
+            <label>Numéro de local</label>
+            <input type="text" formControlName="numero_local" placeholder="Ex: A-12" />
+          </div>
+          <div class="form-group">
+            <label>Étage</label>
+            <input type="text" formControlName="etage" placeholder="Ex: RDC, 1er, 2ème" />
+          </div>
+          <div class="form-group">
+            <label>Zone</label>
+            <input type="text" formControlName="zone" placeholder="Ex: Aile Nord, Bloc B" />
+          </div>
+        </div>
+      </div>
+
+      <div class="form-section">
+        <div class="section-title">Coordonnées GPS</div>
+        <div class="form-grid">
+          <div class="form-group">
+            <label>Latitude</label>
+            <input type="number" step="any" formControlName="latitude" placeholder="Ex: -18.9190" />
+            <span class="field-hint">Coordonnée géographique Nord/Sud</span>
+          </div>
+          <div class="form-group">
+            <label>Longitude</label>
+            <input type="number" step="any" formControlName="longitude" placeholder="Ex: 47.5361" />
+            <span class="field-hint">Coordonnée géographique Est/Ouest</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="form-section">
+        <div class="section-title">
+          Carte interactive
+          <span class="badge-optional">Optionnel</span>
+        </div>
+        <div class="map-placeholder">
+          <div class="map-icon">🗺️</div>
+          <p>Renseignez latitude et longitude pour positionner la boutique</p>
+          <small *ngIf="form.get('latitude')?.value && form.get('longitude')?.value">
+            📍 {{ form.get('latitude')?.value }}, {{ form.get('longitude')?.value }}
+          </small>
+        </div>
+      </div>
+
+      <div class="tab-nav-arrows">
+        <button class="btn-tab-nav" type="button" (click)="switchTab(1)">← Précédent</button>
+        <button class="btn-tab-nav primary" type="button" (click)="switchTab(3)">Suivant : Horaires →</button>
+      </div>
+    </div>
+
+    <!-- ═══════════════════════════════════════════════════════════════════════
+         ONGLET 4 — HORAIRES
+    ════════════════════════════════════════════════════════════════════════ -->
+    <div class="tab-panel" [class.active]="activeTab === 3">
+      <div class="form-section">
+        <div class="section-title">Horaires d'ouverture hebdomadaires</div>
+
+        <table class="horaires-table">
+          <thead>
+            <tr>
+              <th>Jour</th>
+              <th>Ouverture</th>
+              <th>Fermeture</th>
+              <th>Pause déjeuner</th>
+              <th>Fermé ce jour</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr
+              *ngFor="let jour of jours; let i = index"
+              [formGroup]="horaireAt(i)"
+              [class.row-closed]="!horaireAt(i).get('ouvert')?.value"
+            >
+              <!-- Jour -->
+              <td>
+                <div class="day-name">
+                  <span class="day-abbr" [class.weekend]="jour.weekend">{{ jour.abbr }}</span>
+                  {{ jour.label }}
+                </div>
+              </td>
+
+              <!-- Ouverture -->
+              <td>
+                <input
+                  type="time"
+                  formControlName="ouverture"
+                  [class.disabled-input]="!horaireAt(i).get('ouvert')?.value"
+                />
+              </td>
+
+              <!-- Fermeture -->
+              <td>
+                <div class="horaire-inputs">
+                  <span class="horaire-sep">→</span>
+                  <input
+                    type="time"
+                    formControlName="fermeture"
+                    [class.disabled-input]="!horaireAt(i).get('ouvert')?.value"
+                  />
+                </div>
+              </td>
+
+              <!-- Pause déjeuner -->
+              <td>
+                <div class="pause-cell" *ngIf="horaireAt(i).get('ouvert')?.value">
+                  <label class="toggle">
+                    <input type="checkbox" formControlName="pause_actif" />
+                    <span class="toggle-slider"></span>
+                  </label>
+                  <span class="pause-inputs" *ngIf="horaireAt(i).get('pause_actif')?.value">
+                    <input type="time" formControlName="pause_debut" class="time-small" />
+                    <span class="horaire-sep">–</span>
+                    <input type="time" formControlName="pause_fin" class="time-small" />
+                  </span>
+                  <span class="toggle-label" *ngIf="!horaireAt(i).get('pause_actif')?.value">Aucune</span>
+                </div>
+                <span class="fermee-label" *ngIf="!horaireAt(i).get('ouvert')?.value">—</span>
+              </td>
+
+              <!-- Toggle Fermé -->
+              <td>
+                <div class="toggle-wrapper">
+                  <label class="toggle">
+                    <input type="checkbox" [checked]="!horaireAt(i).get('ouvert')?.value"
+                           (change)="horaireAt(i).get('ouvert')!.setValue(!$any($event.target).checked)" />
+                    <span class="toggle-slider"></span>
+                  </label>
+                  <span class="toggle-label">Fermé</span>
+                </div>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="tab-nav-arrows">
+        <button class="btn-tab-nav" type="button" (click)="switchTab(2)">← Précédent</button>
+      </div>
+    </div>
+
+    <!-- ─── FORM FOOTER ──────────────────────────────────────────────────── -->
+    <div class="form-footer">
+      <div class="footer-left">
+        <span class="required-note">*</span> Champs obligatoires
+      </div>
+      <div class="footer-actions">
+        <button class="btn-secondary" type="button" (click)="goBack()">Annuler</button>
+        <button class="btn-primary" type="button" (click)="onSubmit()" [disabled]="isSubmitting">
+          <span *ngIf="!isSubmitting">💾 Enregistrer la boutique</span>
+          <span *ngIf="isSubmitting">
+            <span class="spinner-inline"></span> Enregistrement...
+          </span>
+        </button>
+      </div>
+    </div>
+
+  </div><!-- /tabs-wrapper -->
+</div>

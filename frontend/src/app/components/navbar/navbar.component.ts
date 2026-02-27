@@ -67,7 +67,7 @@ export class NavbarComponent implements OnInit {
     if (this.user?.role === 'admin') {
       this.navItems.splice(2, 0,
         { label: 'Admin', link: '/admin' },
-        { label: 'Gerer Boutique', link: '/gerer-boutiques' },
+        { label: 'Gerer Boutique', link: '/admin/boutiques' },
         { label: 'Gerer Client', link: '/favoris' }
       );
     }
