@@ -13,6 +13,7 @@ import { ProduitsListComponent } from './produit/produits-list/produits-list.com
 import { BoutiqueListComponent } from './pages/boutique-list/boutique-list.component';
 import { MeComponent } from './pages/me/me.component';
 import { ContactComponent } from './pages/contact/contact.component';
+import { AdminBoutiqueComponent } from './pages/admin-boutique/admin-boutique.component';
 
 export const routes: Routes = [
     // { path: '', redirectTo: 'login', pathMatch: 'full' },
@@ -21,6 +22,7 @@ export const routes: Routes = [
     { path: 'signup', component: SignupComponent },
 
     { path: 'admin', component: AdminComponent, canActivate: [AuthGuard, RoleGuard], data: { role: 'admin' } },
+    { path: 'gerer-boutiques', component: AdminBoutiqueComponent, canActivate: [AuthGuard, RoleGuard], data: { role: 'admin' } },
     { path: 'produits', component: ProduitsListComponent },
     { path: 'contact', component: ContactComponent },
     { path: 'boutiques', component: BoutiqueListComponent, canActivate: [AuthGuard], data: { role: "admin" } },
