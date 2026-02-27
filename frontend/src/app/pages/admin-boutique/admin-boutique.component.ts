@@ -304,7 +304,7 @@ private destroy$ = new Subject<void>();
       active:                'Active',
       inactive:              'Inactive',
       en_travaux:            'En travaux',
-      fermee_definitivement: 'Fermée'
+      fermee_definitivement: 'fermee_definitivement'
     };
     return map[statut] ?? statut;
   }
