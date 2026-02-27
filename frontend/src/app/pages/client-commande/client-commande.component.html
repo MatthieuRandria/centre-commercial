@@ -1,0 +1,176 @@
+<!-- mes-commandes.component.html -->
+<div class="page-wrapper">
+
+  <div class="page-body">
+
+    <!-- ─── SIDEBAR COMPTE ──────────────────────────────────────────────── -->
+    <aside class="account-sidebar">
+      <div class="acc-head">
+        <div class="acc-avatar">{{ user.initiale }}</div>
+        <div class="acc-name">{{ user.prenom }} {{ user.nom }}</div>
+        <div class="acc-email">{{ user.email }}</div>
+      </div>
+      <nav class="acc-nav">
+        <a class="acc-nav-item" routerLink="/profil">
+          <span class="nav-dot"></span> Mon profil
+        </a>
+        <a class="acc-nav-item active" routerLink="/commandes">
+          <span class="nav-dot"></span> Mes commandes
+        </a>
+        <a class="acc-nav-item" routerLink="/favoris">
+          <span class="nav-dot"></span> Mes favoris
+        </a>
+        <a class="acc-nav-item" routerLink="/adresses">
+          <span class="nav-dot"></span> Mes adresses
+        </a>
+        <a class="acc-nav-item" routerLink="/mot-de-passe">
+          <span class="nav-dot"></span> Changer mot de passe
+        </a>
+        <button class="acc-nav-item deconnexion" type="button" (click)="deconnexion()">
+          <span class="nav-dot dot-red"></span> Déconnexion
+        </button>
+      </nav>
+    </aside>
+
+    <!-- ─── MAIN ────────────────────────────────────────────────────────── -->
+    <div class="main-section">
+
+      <div class="section-header">
+        <h1 class="section-title">Mes commandes</h1>
+        <div class="filter-tabs">
+          <button
+            class="filter-tab"
+            *ngFor="let tab of filterTabs"
+            [class.active]="filtreActif === tab.value"
+            type="button"
+            (click)="setFiltre(tab.value)"
+          >{{ tab.label }}</button>
+        </div>
+      </div>
+
+      <!-- Erreur -->
+      <div class="error-banner" *ngIf="errorMessage">
+        ⚠ {{ errorMessage }}
+        <button type="button" (click)="loadCommandes()">Réessayer</button>
+      </div>
+
+      <div class="table-card">
+
+        <!-- Skeletons -->
+        <ng-container *ngIf="isLoading">
+          <div class="skeleton-row" *ngFor="let i of [1,2,3,4,5]"></div>
+        </ng-container>
+
+        <!-- Table données -->
+        <ng-container *ngIf="!isLoading">
+          <table class="data-table" *ngIf="commandes.length > 0">
+            <thead>
+              <tr>
+                <th>N° Commande</th>
+                <th>Date</th>
+                <th>Montant</th>
+                <th>Articles</th>
+                <th>Statut</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr
+                *ngFor="let cmd of commandes"
+                (click)="goToDetail(cmd)"
+                class="cmd-row"
+              >
+                <td><div class="order-num">{{ cmd.numeroCommande }}</div></td>
+                <td><div class="order-date">{{ formatDate(cmd.createdAt) }}</div></td>
+                <td><div class="order-montant">{{ formatMontant(cmd.total) }}</div></td>
+                <td><span class="articles-count">{{ articlesLabel(cmd.articles.length) }}</span></td>
+                <td>
+                  <span class="statut-badge" [ngClass]="statutClass(cmd.statut)">
+                    <span class="statut-dot"></span>
+                    {{ statutLabels[cmd.statut] ?? cmd.statut }}
+                  </span>
+                </td>
+                <td (click)="$event.stopPropagation()">
+
+                  <!-- Confirmation annulation inline -->
+                  <div class="confirm-cancel" *ngIf="confirmingId === cmd._id">
+                    <span class="confirm-text">Annuler cette commande ?</span>
+                    <button
+                      class="btn-confirm-yes"
+                      type="button"
+                      [disabled]="isAnnulation"
+                      (click)="confirmerAnnulation($event)"
+                    >
+                      <span class="spinner" *ngIf="isAnnulation"></span>
+                      Oui
+                    </button>
+                    <button class="btn-confirm-no" type="button" (click)="annulerConfirm($event)">Non</button>
+                  </div>
+
+                  <!-- Boutons normaux -->
+                  <div class="action-btns" *ngIf="confirmingId !== cmd._id">
+                    <button
+                      class="btn-voir-cmd"
+                      type="button"
+                      (click)="goToDetail(cmd)"
+                    >Voir</button>
+                    <button
+                      class="btn-annuler-cmd"
+                      type="button"
+                      *ngIf="peutAnnuler(cmd)"
+                      (click)="demandAnnulation($event, cmd)"
+                    >Annuler</button>
+                  </div>
+
+                </td>
+              </tr>
+            </tbody>
+          </table>
+
+          <!-- État vide -->
+          <div class="empty-state" *ngIf="commandes.length === 0">
+            <div class="empty-icon">📋</div>
+            <p>Aucune commande trouvée</p>
+            <span>
+              {{
+                filtreActif === 'toutes'
+                  ? 'Vous n\'avez pas encore passé de commande.'
+                  : 'Aucune commande dans cette catégorie.'
+              }}
+            </span>
+            <a class="btn-shop" routerLink="/catalogue">Découvrir le catalogue</a>
+          </div>
+        </ng-container>
+
+        <!-- Pagination -->
+        <div class="pag-wrap" *ngIf="!isLoading && commandes.length > 0">
+          <span class="pag-info">{{ totalCommandes }} commande{{ totalCommandes > 1 ? 's' : '' }}</span>
+          <div class="pagination">
+            <button
+              class="pg-nav"
+              type="button"
+              [disabled]="page === 1"
+              (click)="goToPage(page - 1)"
+            >Précédent</button>
+
+            <button
+              class="pg-btn"
+              *ngFor="let p of pages"
+              type="button"
+              [class.active]="p === page"
+              (click)="goToPage(p)"
+            >{{ p }}</button>
+
+            <button
+              class="pg-nav"
+              type="button"
+              [disabled]="page === totalPages"
+              (click)="goToPage(page + 1)"
+            >Suivant</button>
+          </div>
+        </div>
+
+      </div><!-- /table-card -->
+    </div><!-- /main-section -->
+  </div><!-- /page-body -->
+</div>

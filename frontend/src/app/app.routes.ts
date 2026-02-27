@@ -14,22 +14,27 @@ import { MeComponent } from './pages/me/me.component';
 import { ContactComponent } from './pages/contact/contact.component';
 import { AdminBoutiqueComponent } from './pages/admin-boutique/admin-boutique.component';
 import { BoutiqueFormComponent } from './pages/boutique-form/boutique-form.component';
+import { ClientCommandeComponent } from './pages/client-commande/client-commande.component';
 
 export const routes: Routes = [
     // { path: '', redirectTo: 'login', pathMatch: 'full' },
     { path: '', component: HomeComponent },
     { path: 'login', component: LoginComponent },
     { path: 'signup', component: SignupComponent },
+    { path: 'produits', component: ProduitsListComponent },
+    { path: 'contact', component: ContactComponent },
 
     { path: 'admin', component: AdminComponent, canActivate: [AuthGuard, RoleGuard], data: { role: 'admin' } },
     { path: 'admin/boutiques', component: AdminBoutiqueComponent, canActivate: [AuthGuard, RoleGuard], data: { role: 'admin' } },
     { path: 'admin/boutiques/add', component: BoutiqueFormComponent, canActivate: [AuthGuard, RoleGuard], data: { role: 'admin' } },
     { path: 'admin/boutiques/:id/edit', component: BoutiqueFormComponent, canActivate: [AuthGuard, RoleGuard], data: { role: 'admin' } },
-    { path: 'produits', component: ProduitsListComponent },
-    { path: 'contact', component: ContactComponent },
+    
+    { path: 'profil', component: MeComponent, canActivate: [AuthGuard] },
+    { path: 'client', component: ClientComponent, canActivate: [AuthGuard, RoleGuard], data: { role: 'client' } },
+    { path: 'client/commandes', component: ClientCommandeComponent, canActivate: [AuthGuard, RoleGuard], data: { role: 'client' } },
+    
     { path: 'boutique', component: BoutiquesComponent, canActivate: [AuthGuard] },
     { path: 'boutique/:slug', component: BoutiqueDetailComponent, canActivate: [AuthGuard] },
-    { path: 'client', component: ClientComponent, canActivate: [AuthGuard, RoleGuard], data: { role: 'client' } },
-    { path: 'profil', component: MeComponent, canActivate: [AuthGuard] },
+    
     { path: 'dashboard', component: DashboardComponent, canActivate: [AuthGuard] }
 ];
