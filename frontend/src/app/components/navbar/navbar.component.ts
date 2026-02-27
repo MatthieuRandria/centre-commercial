@@ -59,7 +59,7 @@ export class NavbarComponent implements OnInit {
     // Liens visibles uniquement si connecté en tant que client
     if (this.user?.role === 'client') {
       this.navItems.splice(2, 0,
-        { label: 'Mes commandes', link: '/commandes' },
+        { label: 'Mes commandes', link: '/client/commandes' },
         { label: 'Mes favoris', link: '/favoris' }
       );
     }
