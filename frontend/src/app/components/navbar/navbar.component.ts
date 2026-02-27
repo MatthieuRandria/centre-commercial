@@ -63,6 +63,14 @@ export class NavbarComponent implements OnInit {
         { label: 'Mes favoris', link: '/favoris' }
       );
     }
+    // Liens visibles uniquement si connecté en tant qu'admin
+    if (this.user?.role === 'admin') {
+      this.navItems.splice(2, 0,
+        { label: 'Admin', link: '/admin' },
+        { label: 'Gerer Boutique', link: '/admin/boutiques' },
+        { label: 'Gerer Client', link: '/favoris' }
+      );
+    }
   }
 
   navigate(link?: string): void {

@@ -1,0 +1,360 @@
+<div class="boutiques-list-container">
+
+  <!-- HEADER -->
+  <div class="page-header">
+    <div class="header-content">
+      <h1>Gestion des Boutiques</h1>
+      <p class="subtitle">{{ pagination.total }} boutique(s) au total</p>
+    </div>
+    <div class="header-actions">
+      <button class="btn-export" (click)="exportCsv()" [disabled]="isLoading">&#8681; Exporter CSV</button>
+      <button class="btn-primary" (click)="openAddModal()">+ Ajouter</button>
+    </div>
+  </div>
+
+  <!-- BANNER ERREUR GLOBAL -->
+  <div class="error-banner" *ngIf="errorMessage">
+    <span>⚠ {{ errorMessage }}</span>
+    <button class="btn-retry" (click)="loadBoutiques()">Réessayer</button>
+  </div>
+
+  <div class="content-wrapper">
+
+    <!-- ─── SIDEBAR FILTRES ─────────────────────────────────────────────── -->
+    <aside class="filters-sidebar" [formGroup]="filterForm">
+      <div class="filters-header">
+        <h2>Filtres</h2>
+        <button class="btn-reset" type="button" (click)="resetFilters()">Réinitialiser</button>
+      </div>
+
+      <div class="filter-groups-row">
+        <!-- Recherche -->
+        <div class="filter-group">
+          <label>Recherche</label>
+          <input
+            type="text"
+            class="filter-input"
+            placeholder="Nom de la boutique..."
+            formControlName="search"
+          />
+        </div>
+
+        <!-- Centre commercial -->
+        <div class="filter-group">
+          <label>
+            Centre Commercial
+            <span class="label-loading" *ngIf="isLoadingRefs">⏳</span>
+          </label>
+          <select class="filter-select" formControlName="centreId">
+            <option value="">Tous les centres</option>
+            <option *ngFor="let c of centres" [value]="c._id">{{ c.nom }}</option>
+          </select>
+        </div>
+
+        <!-- Catégorie -->
+        <div class="filter-group">
+          <label>
+            Catégorie
+            <span class="label-loading" *ngIf="isLoadingRefs">⏳</span>
+          </label>
+          <select class="filter-select" formControlName="categorieId">
+            <option value="">Toutes les catégories</option>
+            <option *ngFor="let cat of categories" [value]="cat._id">
+              <!-- {{ cat.icone }} -->
+              {{ cat.nom }}
+            </option>
+          </select>
+        </div>
+
+        <!-- Statut -->
+        <div class="filter-group">
+          <label>Statut</label>
+          <select class="filter-select" formControlName="statut">
+            <option value="">Tous les statuts</option>
+            <option *ngFor="let s of statuts" [value]="s.value">{{ s.label }}</option>
+          </select>
+        </div>
+
+        <!-- Tri -->
+        <div class="filter-group">
+          <label>Trier par</label>
+          <select class="filter-select" formControlName="sort">
+            <option value="createdAt">Date de création</option>
+            <option value="nom">Nom</option>
+            <option value="note_moyenne">Note moyenne</option>
+            <option value="nombre_vues">Nombre de vues</option>
+            <option value="nombre_favoris">Favoris</option>
+          </select>
+        </div>
+
+        <!-- Ordre -->
+        <div class="filter-group">
+          <label>Ordre</label>
+          <select class="filter-select" formControlName="order">
+            <option value="desc">Décroissant</option>
+            <option value="asc">Croissant</option>
+          </select>
+        </div>
+
+        <!-- Note minimum -->
+        <div class="filter-group">
+          <label>Note minimum</label>
+          <select class="filter-select" formControlName="noteMin">
+            <option value="">Toutes les notes</option>
+            <option value="4">4★ et plus</option>
+            <option value="3">3★ et plus</option>
+            <option value="2">2★ et plus</option>
+          </select>
+        </div>
+
+      </div>
+
+      <div class="filter-stats">
+        <div class="stat-item">
+          <strong>{{ pagination.total }}</strong>
+          <span>résultat(s)</span>
+        </div>
+        <div class="stat-item">
+          <strong>{{ pagination.totalPages }}</strong>
+          <span>page(s)</span>
+        </div>
+      </div>
+    </aside>
+
+    <!-- ─── MAIN ────────────────────────────────────────────────────────── -->
+    <main class="main-content">
+
+      <!-- Skeleton loader -->
+      <div class="skeleton-rows" *ngIf="isLoading">
+        <div class="skeleton-row" *ngFor="let i of [1,2,3,4,5]"></div>
+      </div>
+
+      <ng-container *ngIf="!isLoading">
+
+        <!-- ─── TABLE desktop ────────────────────────────────────────────── -->
+        <div class="table-container">
+          <table class="boutiques-table">
+            <thead>
+              <tr>
+                <th>Logo</th>
+                <th>Nom / Local</th>
+                <th>Catégorie</th>
+                <th>Centre</th>
+                <th>Statut</th>
+                <th>Note</th>
+                <th>Créé le</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              <!-- Empty state -->
+              <tr *ngIf="boutiques.length === 0">
+                <td colspan="8" class="empty-state">
+                  <div class="empty-icon">🏪</div>
+                  <p>Aucune boutique trouvée</p>
+                  <button class="btn-reset" type="button" (click)="resetFilters()">
+                    Réinitialiser les filtres
+                  </button>
+                </td>
+              </tr>
+
+              <tr *ngFor="let b of boutiques">
+
+                <!-- Logo -->
+                <td>
+                  <div class="logo-container">
+                    <img
+                      *ngIf="b.infos.logo_url"
+                      [src]="b.infos.logo_url"
+                      [alt]="b.nom"
+                      class="logo-img"
+                    />
+                    <span
+                      *ngIf="!b.infos.logo_url"
+                      class="logo-placeholder"
+                      [style.background]="b.categorie.couleur + '22'"
+                      [style.color]="b.categorie.couleur"
+                    >{{ getInitial(b.nom) }}</span>
+                  </div>
+                </td>
+
+                <!-- Nom + localisation -->
+                <td>
+                  <div class="boutique-name">
+                    <strong>{{ b.nom }}</strong>
+                    <small class="boutique-id">
+                      {{ b.localisation.etage }} · Local {{ b.localisation.numero_local }}
+                      <span *ngIf="b.localisation.zone"> · {{ b.localisation.zone }}</span>
+                    </small>
+                    <span class="open-now-badge" *ngIf="b.est_ouvert_maintenant">● Ouvert</span>
+                  </div>
+                </td>
+
+                <!-- Catégorie -->
+                <td>
+                  <span
+                    class="category-badge"
+                    [style.background]="b.categorie.couleur + '22'"
+                    [style.color]="b.categorie.couleur"
+                  >{{ b.categorie.icone }} {{ b.categorie.nom }}</span>
+                </td>
+
+                <!-- Centre -->
+                <td>
+                  <span class="centre-name">{{ b.centre_commercial.nom }}</span>
+                  <small class="boutique-id">{{ b.centre_commercial.adresse.ville }}</small>
+                </td>
+
+                <!-- Statut -->
+                <td>
+                  <span class="status-badge" [ngClass]="statutClass(b.statut)">
+                    {{ statutLabel(b.statut) }}
+                  </span>
+                </td>
+
+                <!-- Note -->
+                <td>
+                  <div class="note-cell">
+                    <span class="stars" [title]="b.note_moyenne + '/5'">
+                      {{ renderStars(b.note_moyenne) }}
+                    </span>
+                    <small class="note-count">
+                      {{ b.note_moyenne | number:'1.1-1' }} ({{ b.nombre_avis }} avis)
+                    </small>
+                  </div>
+                </td>
+
+                <!-- Date -->
+                <td>
+                  <span class="creation-date">{{ formatDate(b.createdAt) }}</span>
+                </td>
+
+                <!-- Actions -->
+                <td>
+                  <div class="action-buttons">
+                    <button class="btn-action btn-view"   (click)="viewBoutique(b)">Détails</button>
+                    <button class="btn-action btn-edit"   (click)="editBoutique(b)">Modifier</button>
+                    <button class="btn-action btn-delete" (click)="openDeleteModal(b)">Supprimer</button>
+                  </div>
+                </td>
+
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <!-- ─── CARDS mobile ─────────────────────────────────────────────── -->
+        <div class="mobile-cards">
+
+          <div class="empty-state" *ngIf="boutiques.length === 0">
+            <div class="empty-icon">🏪</div>
+            <p>Aucune boutique trouvée</p>
+            <button class="btn-reset" type="button" (click)="resetFilters()">
+              Réinitialiser les filtres
+            </button>
+          </div>
+
+          <div class="boutique-card" *ngFor="let b of boutiques">
+            <div class="card-top">
+              <div class="logo-container">
+                <img *ngIf="b.infos.logo_url" [src]="b.infos.logo_url" [alt]="b.nom" class="logo-img" />
+                <span
+                  *ngIf="!b.infos.logo_url"
+                  class="logo-placeholder"
+                  [style.background]="b.categorie.couleur + '22'"
+                  [style.color]="b.categorie.couleur"
+                >{{ getInitial(b.nom) }}</span>
+              </div>
+              <div class="card-info">
+                <div class="card-nom">{{ b.nom }}</div>
+                <div class="card-id">
+                  {{ b.localisation.etage }} · Local {{ b.localisation.numero_local }}
+                </div>
+              </div>
+              <span class="status-badge" [ngClass]="statutClass(b.statut)">
+                {{ statutLabel(b.statut) }}
+              </span>
+            </div>
+
+            <div class="card-meta">
+              <span
+                class="category-badge"
+                [style.background]="b.categorie.couleur + '22'"
+                [style.color]="b.categorie.couleur"
+              >{{ b.categorie.icone }} {{ b.categorie.nom }}</span>
+              <span class="card-centre">{{ b.centre_commercial.nom }}</span>
+              <span class="open-now-badge" *ngIf="b.est_ouvert_maintenant">● Ouvert</span>
+            </div>
+
+            <div class="card-note">
+              <span class="stars">{{ renderStars(b.note_moyenne) }}</span>
+              <span class="note-count">
+                {{ b.note_moyenne | number:'1.1-1' }} · {{ b.nombre_avis }} avis · {{ b.nombre_favoris }} ♥
+              </span>
+            </div>
+
+            <div class="card-actions">
+              <button class="btn-action btn-view"   (click)="viewBoutique(b)">Détails</button>
+              <button class="btn-action btn-edit"   (click)="editBoutique(b)">Modifier</button>
+              <button class="btn-action btn-delete" (click)="openDeleteModal(b)">Supprimer</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- PAGINATION -->
+        <div class="pagination" *ngIf="pagination.totalPages > 1">
+          <button
+            class="pagination-btn"
+            [disabled]="!pagination.hasPrevPage"
+            (click)="goToPage(pagination.page - 1)"
+          >← Préc.</button>
+
+          <div class="pagination-pages">
+            <button
+              class="pagination-page"
+              *ngFor="let p of pageNumbers"
+              [class.active]="p === pagination.page"
+              (click)="goToPage(p)"
+            >{{ p }}</button>
+          </div>
+
+          <button
+            class="pagination-btn"
+            [disabled]="!pagination.hasNextPage"
+            (click)="goToPage(pagination.page + 1)"
+          >Suiv. →</button>
+        </div>
+
+        <div class="pagination-info">
+          Affichage de {{ showFrom }} à {{ showTo }} sur {{ pagination.total }} boutique(s)
+        </div>
+
+      </ng-container>
+    </main>
+  </div>
+</div>
+
+<!-- ─── MODAL SUPPRESSION ───────────────────────────────────────────────── -->
+<div class="modal-overlay" [class.open]="deleteModalOpen" (click)="closeDeleteModal()">
+  <div class="modal-content" (click)="$event.stopPropagation()">
+    <div class="modal-header">
+      <h2>Confirmation de suppression</h2>
+      <button class="modal-close" type="button" (click)="closeDeleteModal()">✕</button>
+    </div>
+    <div class="modal-body">
+      <p>Êtes-vous sûr de vouloir supprimer la boutique :</p>
+      <div class="delete-target">
+        <strong>{{ deleteTargetName }}</strong>
+      </div>
+      <p class="warning-text">
+        Le statut passera à "Fermée définitivement". Cette action est irréversible.
+      </p>
+    </div>
+    <div class="modal-footer">
+      <button class="btn-cancel" type="button" (click)="closeDeleteModal()">Annuler</button>
+      <button class="btn-confirm-delete" type="button" (click)="confirmDelete()">
+        Confirmer la suppression
+      </button>
+    </div>
+  </div>
+</div>

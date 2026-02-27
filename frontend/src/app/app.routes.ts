@@ -10,8 +10,10 @@ import { BoutiqueDetailComponent } from './pages/boutique-details/boutique-detai
 import { ClientComponent } from './pages/client/client.component';
 import { RoleGuard } from './guards/role-guard.guard';
 import { ProduitsListComponent } from './produit/produits-list/produits-list.component';
-import { BoutiqueListComponent } from './pages/boutique-list/boutique-list.component';
 import { MeComponent } from './pages/me/me.component';
+import { ContactComponent } from './pages/contact/contact.component';
+import { AdminBoutiqueComponent } from './pages/admin-boutique/admin-boutique.component';
+import { BoutiqueFormComponent } from './pages/boutique-form/boutique-form.component';
 
 export const routes: Routes = [
     // { path: '', redirectTo: 'login', pathMatch: 'full' },
@@ -20,8 +22,11 @@ export const routes: Routes = [
     { path: 'signup', component: SignupComponent },
 
     { path: 'admin', component: AdminComponent, canActivate: [AuthGuard, RoleGuard], data: { role: 'admin' } },
+    { path: 'admin/boutiques', component: AdminBoutiqueComponent, canActivate: [AuthGuard, RoleGuard], data: { role: 'admin' } },
+    { path: 'admin/boutiques/add', component: BoutiqueFormComponent, canActivate: [AuthGuard, RoleGuard], data: { role: 'admin' } },
+    { path: 'admin/boutiques/:id/edit', component: BoutiqueFormComponent, canActivate: [AuthGuard, RoleGuard], data: { role: 'admin' } },
     { path: 'produits', component: ProduitsListComponent },
-    { path: 'boutiques', component: BoutiqueListComponent, canActivate: [AuthGuard], data: { role: "admin" } },
+    { path: 'contact', component: ContactComponent },
     { path: 'boutique', component: BoutiquesComponent, canActivate: [AuthGuard] },
     { path: 'boutique/:slug', component: BoutiqueDetailComponent, canActivate: [AuthGuard] },
     { path: 'client', component: ClientComponent, canActivate: [AuthGuard, RoleGuard], data: { role: 'client' } },
