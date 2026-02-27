@@ -1,0 +1,205 @@
+<!-- HERO -->
+<section class="page-hero">
+  <span class="tag">Galaxy Mall — Antananarivo</span>
+  <h1>Contactez-nous</h1>
+  <p>Une question sur le centre, un problème de commande ou simplement envie d'en savoir plus ? Nous sommes là.</p>
+  <nav class="breadcrumb">
+    <a routerLink="/accueil">Accueil</a>
+    <span>›</span>
+    <span>Contact</span>
+  </nav>
+</section>
+
+<div class="page-body">
+
+  <!-- CONTACT + INFOS -->
+  <div class="contact-layout">
+
+    <!-- FORMULAIRE -->
+    <div class="form-card">
+      <div class="card-head">
+        <h2>Envoyez-nous un message</h2>
+        <p>Nous vous répondrons dans les 24 heures ouvrables</p>
+      </div>
+      <div class="card-body">
+
+        <!-- SUCCESS ALERT -->
+        <div class="form-alert success" *ngIf="showSuccess">
+          ✓ Message envoyé avec succès ! Nous vous répondrons très bientôt.
+        </div>
+
+        <form [formGroup]="contactForm" (ngSubmit)="onSubmit()" novalidate>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label">Nom <span class="req">*</span></label>
+              <input
+                type="text"
+                class="form-input"
+                [class.error]="isInvalid('nom')"
+                formControlName="nom"
+                placeholder="Votre nom"
+              />
+              <span class="field-error" *ngIf="isInvalid('nom')">Nom requis (min. 2 caractères)</span>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Prénom <span class="req">*</span></label>
+              <input
+                type="text"
+                class="form-input"
+                [class.error]="isInvalid('prenom')"
+                formControlName="prenom"
+                placeholder="Votre prénom"
+              />
+              <span class="field-error" *ngIf="isInvalid('prenom')">Prénom requis (min. 2 caractères)</span>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Adresse email <span class="req">*</span></label>
+            <input
+              type="email"
+              class="form-input"
+              [class.error]="isInvalid('email')"
+              formControlName="email"
+              placeholder="votre@email.mg"
+            />
+            <span class="field-error" *ngIf="isInvalid('email')">Adresse email invalide</span>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Sujet <span class="req">*</span></label>
+            <select
+              class="subject-select"
+              [class.error]="isInvalid('sujet')"
+              formControlName="sujet"
+            >
+              <option value="">— Choisir un sujet —</option>
+              <option *ngFor="let s of sujets" [value]="s.value">{{ s.label }}</option>
+            </select>
+            <span class="field-error" *ngIf="isInvalid('sujet')">Veuillez choisir un sujet</span>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Message <span class="req">*</span></label>
+            <textarea
+              class="form-input"
+              [class.error]="isInvalid('message')"
+              formControlName="message"
+              placeholder="Décrivez votre demande en détail..."
+            ></textarea>
+            <span class="field-error" *ngIf="isInvalid('message')">Message trop court (min. 10 caractères)</span>
+          </div>
+
+          <button type="submit" class="btn-send" [class.loading]="isLoading" [disabled]="isLoading">
+            <span class="spinner" *ngIf="isLoading"></span>
+            <span *ngIf="!isLoading">✉ Envoyer le message</span>
+            <span *ngIf="isLoading">Envoi en cours...</span>
+          </button>
+
+        </form>
+      </div>
+    </div>
+
+    <!-- SIDEBAR -->
+    <div class="infos-sidebar">
+
+      <!-- INFOS CENTRE -->
+      <div class="info-card">
+        <div class="info-card-head">
+          <span class="ic">🏪</span>
+          <h3>Galaxy Mall</h3>
+        </div>
+        <div class="info-card-body">
+          <div class="info-row">
+            <div class="info-row-icon">📍</div>
+            <div class="info-row-text">
+              <div class="info-row-label">Adresse</div>
+              <div class="info-row-val">Rue Ravoninahitriniarivo<br>Andraharo, Antananarivo 101</div>
+            </div>
+          </div>
+          <div class="info-row">
+            <div class="info-row-icon">📞</div>
+            <div class="info-row-text">
+              <div class="info-row-label">Téléphone</div>
+              <div class="info-row-val"><a href="tel:+261202222222">+261 20 22 222 22</a></div>
+            </div>
+          </div>
+          <div class="info-row">
+            <div class="info-row-icon">📧</div>
+            <div class="info-row-text">
+              <div class="info-row-label">Email</div>
+              <div class="info-row-val"><a href="mailto:contact@centrshop.mg"></a></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- HORAIRES -->
+      <div class="info-card">
+        <div class="info-card-head">
+          <span class="ic">🕐</span>
+          <h3>Horaires d'ouverture</h3>
+        </div>
+        <div class="info-card-body">
+          <div class="h-open-badge" [class.closed]="!isOpenNow">
+            <div class="h-dot" [class.closed]="!isOpenNow"></div>
+            {{ isOpenNow ? 'Ouvert maintenant' : 'Fermé actuellement' }}
+          </div>
+          <div class="horaire-grid">
+            <div class="horaire-row" *ngFor="let h of horaires">
+              <span class="h-day">{{ h.jour }}</span>
+              <span class="h-hours" [class.h-closed]="h.ferme">
+                {{ h.ferme ? 'Fermé' : h.heures }}
+              </span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- MAP -->
+      <div class="map-card">
+        <a class="map-placeholder" href="https://maps.google.com/?q=Andraharo+Antananarivo" target="_blank" rel="noopener">
+          <div class="map-icon">🗺</div>
+          <div class="map-label">Voir sur Google Maps</div>
+          <div class="map-sub">Cliquez pour ouvrir</div>
+        </a>
+        <div class="map-card-body">
+          <span class="map-addr">Andraharo, Antananarivo 101</span>
+          <a class="btn-maps" href="https://maps.google.com/?q=Andraharo+Antananarivo" target="_blank" rel="noopener">Itinéraire</a>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- FAQ -->
+  <div class="faq-section">
+    <div class="faq-header">
+      <h2>Questions fréquentes</h2>
+      <p>Trouvez rapidement une réponse à votre question</p>
+    </div>
+    <div class="faq-grid">
+      <div
+        class="faq-item"
+        *ngFor="let faq of faqs"
+        [class.open]="faq.open"
+        (click)="toggleFaq(faq)"
+      >
+        <div class="faq-question">
+          <span class="faq-q-text">{{ faq.question }}</span>
+          <span class="faq-icon">+</span>
+        </div>
+        <div class="faq-answer">
+          <p>{{ faq.answer }}</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<!-- TOAST -->
+<div class="toast" [class.show]="toast.visible" [class.success]="toast.type === 'success'">
+  {{ toast.message }}
+</div>
