@@ -130,7 +130,7 @@ export class ClientCommandeComponent implements OnInit, OnDestroy {
 
   // ─── Navigation ────────────────────────────────────────────────────────────
   goToDetail(cmd: CommandeClient): void {
-    this.router.navigate(['/commandes', cmd._id]);
+    this.router.navigate(['/client/commandes', cmd._id]);
   }
 
   // ─── Annulation ───────────────────────────────────────────────────────────

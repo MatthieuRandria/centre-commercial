@@ -26,6 +26,9 @@ export const routes: Routes = [
     { path: 'signup', component: SignupComponent },
     { path: 'contact', component: ContactComponent },
 
+    { path: 'boutique', component: BoutiquesComponent },
+    { path: 'boutique/:slug', component: BoutiqueDetailComponent},
+
     { path: 'produits', component: CatalogueComponent },
     { path: 'produits/:id', component: ProduitDetailComponent },
 
@@ -37,10 +40,8 @@ export const routes: Routes = [
     { path: 'profil', component: MeComponent, canActivate: [AuthGuard] },
     { path: 'client', component: ClientComponent, canActivate: [AuthGuard, RoleGuard], data: { role: 'client' } },
     { path: 'client/commandes', component: ClientCommandeComponent, canActivate: [AuthGuard, RoleGuard], data: { role: 'client' } },
-    { path: 'commandes/:id', component: CommandeDetailComponent, canActivate: [AuthGuard] },
+    { path: 'client/commandes/:id', component: CommandeDetailComponent, canActivate: [AuthGuard] },
     
-    { path: 'boutique', component: BoutiquesComponent, canActivate: [AuthGuard] },
-    { path: 'boutique/:slug', component: BoutiqueDetailComponent, canActivate: [AuthGuard] },
     
     { path: 'dashboard', component: DashboardComponent, canActivate: [AuthGuard] }
 ];
