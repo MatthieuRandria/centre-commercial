@@ -1,0 +1,319 @@
+<!-- produit-detail.component.html -->
+<div class="page-wrapper">
+
+  <!-- BREADCRUMB -->
+  <div class="breadcrumb-bar" *ngIf="produit">
+    <a routerLink="/">Accueil</a> ›
+    <a routerLink="/produits">Catalogue</a> ›
+    <span *ngIf="getCategoriesLabel()">{{ getCategoriesLabel() }} ›</span>
+    <span>{{ produit.nom }}</span>
+  </div>
+
+  <!-- ─── SKELETON ──────────────────────────────────────────────────────── -->
+  <div class="page-body" *ngIf="isLoading">
+    <div class="sk-gallery">
+      <div class="sk-block sk-main-img"></div>
+      <div class="sk-thumbs">
+        <div class="sk-block sk-thumb" *ngFor="let i of [1,2,3,4]"></div>
+      </div>
+    </div>
+    <div class="sk-info-col">
+      <div class="sk-block sk-title"></div>
+      <div class="sk-block sk-rating"></div>
+      <div class="sk-block sk-price"></div>
+      <div class="sk-block sk-variants"></div>
+      <div class="sk-block sk-cta"></div>
+    </div>
+  </div>
+
+  <!-- ─── ERREUR ────────────────────────────────────────────────────────── -->
+  <div class="error-page" *ngIf="!isLoading && errorMessage && !produit">
+    <div class="error-icon">📦</div>
+    <p>{{ errorMessage }}</p>
+    <button class="btn-back" type="button" (click)="router.navigate(['/catalogue'])">← Retour au catalogue</button>
+  </div>
+
+  <!-- ─── CONTENU ──────────────────────────────────────────────────────── -->
+  <ng-container *ngIf="!isLoading && produit">
+
+    <!-- Succès panier -->
+    <div class="cart-success-toast" *ngIf="cartSuccess">
+      ✓ Ajouté au panier
+    </div>
+
+    <div class="page-body">
+
+      <!-- ═══ GALERIE ════════════════════════════════════════════════════ -->
+      <div class="gallery">
+        <div class="main-img">
+          <img
+            *ngIf="hasImages"
+            [src]="images[activeImgIdx]"
+            [alt]="produit.nom"
+            class="main-img-el"
+          />
+          <div class="main-img-placeholder" *ngIf="!hasImages">
+            <div class="img-ph-inner"></div>
+          </div>
+        </div>
+        <div class="thumbnails" *ngIf="images.length > 1">
+          <div
+            class="thumb"
+            *ngFor="let img of images; let i = index"
+            [class.active]="i === activeImgIdx"
+            (click)="selectImage(i)"
+          >
+            <img [src]="img" [alt]="produit.nom + ' ' + (i+1)" />
+          </div>
+        </div>
+      </div>
+
+      <!-- ═══ INFO PRODUIT ════════════════════════════════════════════════ -->
+      <div class="product-info">
+
+        <div class="product-cat">{{ getCategoriesLabel() }}</div>
+        <h1 class="product-name">{{ produit.nom }}</h1>
+
+        <!-- Notes -->
+        <div class="rating-row" *ngIf="avis.length > 0">
+          <div class="stars-inline">
+            <span *ngFor="let on of starsArray(noteMoyenne)"
+                  class="star" [class.empty]="!on">★</span>
+          </div>
+          <span class="rating-num">{{ noteMoyenne }}</span>
+          <span class="rating-count">
+            <a (click)="setTab('avis')" style="cursor:pointer">{{ avis.length }} avis</a>
+          </span>
+        </div>
+
+        <!-- Prix -->
+        <div class="price-section">
+          <div class="price-final">{{ formatMontant(prixActuel) }}</div>
+          <div class="stock-info" [ngClass]="stockClass">
+            <span class="stock-dot"></span>
+            {{ stockLabel }}
+          </div>
+        </div>
+
+        <!-- Tailles -->
+        <div class="variants-section" *ngIf="tailles.length > 0">
+          <span class="var-label">Taille</span>
+          <div class="size-btns">
+            <button
+              class="size-btn"
+              *ngFor="let t of tailles"
+              type="button"
+              [class.active]="selectedTaille === t"
+              [class.disabled]="isStockZero(t, 'taille')"
+              [disabled]="isStockZero(t, 'taille')"
+              (click)="selectTaille(t)"
+            >{{ t }}</button>
+          </div>
+        </div>
+
+        <!-- Couleurs -->
+        <div class="variants-section" *ngIf="couleurs.length > 0">
+          <span class="var-label">Couleur</span>
+          <div class="color-btns">
+            <button
+              class="color-btn"
+              *ngFor="let c of couleurs"
+              type="button"
+              [class.active]="selectedCouleur === c"
+              [title]="c"
+              [style.background]="c"
+              (click)="selectCouleur(c)"
+            ></button>
+          </div>
+        </div>
+
+        <!-- Quantité -->
+        <div class="qty-section" *ngIf="stockActuel > 0">
+          <span class="var-label">Quantité</span>
+          <div class="qty-row">
+            <button class="qty-btn" type="button" (click)="changeQty(-1)" [disabled]="quantite <= 1">−</button>
+            <span class="qty-display">{{ quantite }}</span>
+            <button class="qty-btn" type="button" (click)="changeQty(1)" [disabled]="quantite >= stockActuel">+</button>
+          </div>
+        </div>
+
+        <!-- CTA -->
+        <div class="cta-section">
+          <button
+            class="btn-panier"
+            type="button"
+            [disabled]="isAddingCart || stockActuel === 0"
+            [class.loading]="isAddingCart"
+            (click)="addToCart()"
+          >
+            <span class="spinner-btn" *ngIf="isAddingCart"></span>
+            {{ stockActuel === 0 ? 'Rupture de stock' : (isAddingCart ? 'Ajout...' : 'Ajouter au panier') }}
+          </button>
+          <button
+            class="btn-fav"
+            type="button"
+            [class.active]="isFavori"
+            [title]="isFavori ? 'Retirer des favoris' : 'Ajouter aux favoris'"
+            (click)="toggleFavori()"
+          >{{ isFavori ? '♥' : '♡' }}</button>
+        </div>
+
+        <!-- Boutique -->
+        <div class="boutique-card" *ngIf="boutiqueName !== '—'">
+          <div class="boutique-logo-sm">{{ boutiqueName[0] | uppercase }}</div>
+          <div class="boutique-info-sm">
+            <div class="boutique-name-sm">
+              <a [routerLink]="['/boutiques', boutiqueId]">{{ boutiqueName }}</a>
+            </div>
+          </div>
+        </div>
+
+      </div><!-- /product-info -->
+    </div><!-- /page-body -->
+
+    <!-- ═══ ONGLETS BAS ════════════════════════════════════════════════════ -->
+    <div class="page-bottom">
+      <div class="bottom-tabs">
+
+        <div class="tabs-nav">
+          <button class="tab-btn" type="button"
+            [class.active]="activeTab === 'description'"
+            (click)="setTab('description')">Description</button>
+          <button class="tab-btn" type="button"
+            [class.active]="activeTab === 'avis'"
+            (click)="setTab('avis')">
+            Avis {{ avis.length > 0 ? '(' + avis.length + ')' : '' }}
+          </button>
+          <button class="tab-btn" type="button"
+            [class.active]="activeTab === 'similaires'"
+            (click)="setTab('similaires')">Produits similaires</button>
+        </div>
+
+        <!-- DESCRIPTION -->
+        <div class="tab-panel" *ngIf="activeTab === 'description'">
+          <div class="desc-text" *ngIf="produit.description; else noDesc">
+            <p>{{ produit.description }}</p>
+          </div>
+          <ng-template #noDesc>
+            <p class="empty-hint">Aucune description disponible.</p>
+          </ng-template>
+        </div>
+
+        <!-- AVIS -->
+        <div class="tab-panel" *ngIf="activeTab === 'avis'">
+
+          <!-- Summary -->
+          <div class="avis-summary" *ngIf="avis.length > 0">
+            <div class="score-col">
+              <div class="score-big">{{ noteMoyenne }}</div>
+              <div class="stars-inline score-stars">
+                <span *ngFor="let on of starsArray(noteMoyenne)"
+                      class="star" [class.empty]="!on">★</span>
+              </div>
+              <div class="score-sub">{{ avis.length }} avis</div>
+            </div>
+            <div class="bars-col">
+              <div class="bar-row" *ngFor="let b of barsNotes">
+                <span class="bar-label">{{ b.label }}</span>
+                <div class="bar-track"><div class="bar-fill" [style.width.%]="b.pct"></div></div>
+                <span class="bar-count">{{ b.count }}</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Skeleton avis -->
+          <div class="sk-avis-list" *ngIf="isLoadingAvis">
+            <div class="sk-block sk-avis-item" *ngFor="let i of [1,2,3]"></div>
+          </div>
+
+          <!-- Liste avis -->
+          <div class="avis-list" *ngIf="!isLoadingAvis">
+            <div class="avis-item" *ngFor="let a of avis">
+              <div class="avis-top">
+                <div class="avis-user">
+                  <div class="user-av">{{ userInitiale(a) }}</div>
+                  <div>
+                    <div class="user-name">{{ userName(a) }}</div>
+                    <div class="avis-date">{{ formatDate(a.createdAt) }}</div>
+                  </div>
+                </div>
+                <div class="mini-stars">
+                  <span *ngFor="let on of starsArray(a.note)"
+                        class="star" [class.empty]="!on">★</span>
+                </div>
+              </div>
+              <p class="avis-text">{{ a.commentaire }}</p>
+            </div>
+            <div class="empty-hint" *ngIf="avis.length === 0">Aucun avis pour ce produit.</div>
+          </div>
+
+          <!-- Formulaire avis -->
+          <div class="avis-form-wrap" *ngIf="currentUser; else loginPrompt">
+            <div class="avis-form-title">Laisser un avis</div>
+
+            <div class="avis-success" *ngIf="avisSuccess">✓ Votre avis a été publié !</div>
+            <div class="avis-error"   *ngIf="avisError">{{ avisError }}</div>
+
+            <div class="star-select">
+              <span
+                class="star-input"
+                *ngFor="let i of [1,2,3,4,5]"
+                [class.on]="starIsOn(i)"
+                (mouseenter)="hoverStar(i)"
+                (mouseleave)="leaveStar()"
+                (click)="setAvisNote(i)"
+              >★</span>
+            </div>
+            <textarea
+              class="avis-textarea"
+              [(ngModel)]="newAvisCommentaire"
+              placeholder="Partagez votre expérience avec ce produit..."
+              rows="4"
+            ></textarea>
+            <button
+              class="btn-submit-avis"
+              type="button"
+              [disabled]="isSubmittingAvis"
+              (click)="submitAvis()"
+            >
+              <span class="spinner-btn" *ngIf="isSubmittingAvis"></span>
+              Publier mon avis
+            </button>
+          </div>
+
+          <ng-template #loginPrompt>
+            <div class="login-prompt">
+              <a routerLink="/login">Connectez-vous</a> pour laisser un avis.
+            </div>
+          </ng-template>
+
+        </div><!-- /avis tab -->
+
+        <!-- SIMILAIRES -->
+        <div class="tab-panel" *ngIf="activeTab === 'similaires'">
+          <div class="similaires-grid" *ngIf="similaires.length > 0">
+            <div
+              class="sim-card"
+              *ngFor="let s of similaires"
+              (click)="navigateSimilaire(s._id)"
+            >
+              <div class="sim-img">
+                <img *ngIf="s.images?.[0]" [src]="s.images[0]" [alt]="s.nom" />
+                <div class="sim-ph" *ngIf="!s.images?.[0]"></div>
+              </div>
+              <div class="sim-body">
+                <div class="sim-name">{{ s.nom }}</div>
+                <div class="sim-price">{{ formatMontant(s.prix) }}</div>
+              </div>
+            </div>
+          </div>
+          <div class="empty-hint" *ngIf="similaires.length === 0">
+            Aucun produit similaire disponible.
+          </div>
+        </div>
+
+      </div><!-- /bottom-tabs -->
+    </div><!-- /page-bottom -->
+
+  </ng-container>
+</div>

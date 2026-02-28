@@ -8,7 +8,8 @@ import { Produit } from '../shared/produit.model';
   providedIn: 'root'
 })
 export class ProduitsService {
-  private apiUrl = `${environment.apiUrl}/produits`;
+  // private apiUrl = `${environment.apiUrl}/produits`;
+  private apiUrl = `http://localhost:3000/produits`;
 
   constructor(private http: HttpClient) { }
 

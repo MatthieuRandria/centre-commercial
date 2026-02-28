@@ -1,7 +1,6 @@
-/* ===============================
-   Variante
-=============================== */
 export interface Variante {
+  valeur: string | null;
+  type: string;
   nom: string;
   prix: number;
   stock: number;
@@ -9,10 +8,6 @@ export interface Variante {
 }
 
 
-/* ===============================
-   Boutique (simplifié)
-   👉 Ajuste selon ton model boutique
-=============================== */
 export interface Boutique {
   _id: string;
   nom: string;
@@ -20,19 +15,24 @@ export interface Boutique {
   description?: string;
 }
 
+export interface ProduitCategorie {
+  _id?: string;
+  nom:  string;
+}
 
 /* ===============================
    Produit
 =============================== */
 export interface Produit {
-  _id: string;
-  nom: string;
-  description: string;
-  images?: string[];
-  variantes?: Variante[];
-  boutique: any;
-  categorie?: string;
-  enPromotion?: boolean;
-  vues?: number;
-  createdAt?: string;
+  _id:          string;
+  nom:          string;
+  description?: string;
+  prix:         number;
+  boutique:     string | Boutique;
+  categories:   ProduitCategorie[];
+  images:       string[];
+  variantes:    Variante[];
+  actif:        boolean;
+  createdAt?:   string;
+  updatedAt?:   string;
 }

@@ -76,7 +76,7 @@ exports.getAllProduits = async (req, res, next) => {
 exports.getProduitById = async (req, res) => {
    try {
       const produit = await Produit.findById(req.params.id)
-         .populate('boutique', 'nom description');
+         .populate('boutique');
 
       if (!produit) {
          return res.status(404).json({
@@ -97,7 +97,7 @@ exports.getProduitById = async (req, res) => {
    } catch (error) {
       res.status(500).json({
          success: false,
-         message: error.message
+         message: `Impossible de recuperer Produit: `+error.message
       });
    }
 };
