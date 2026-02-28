@@ -15,6 +15,7 @@ import { ContactComponent } from './pages/contact/contact.component';
 import { AdminBoutiqueComponent } from './pages/admin-boutique/admin-boutique.component';
 import { BoutiqueFormComponent } from './pages/boutique-form/boutique-form.component';
 import { ClientCommandeComponent } from './pages/client-commande/client-commande.component';
+import { CommandeDetailComponent } from './pages/commande-detail/commande-detail.component';
 
 export const routes: Routes = [
     // { path: '', redirectTo: 'login', pathMatch: 'full' },
@@ -32,6 +33,7 @@ export const routes: Routes = [
     { path: 'profil', component: MeComponent, canActivate: [AuthGuard] },
     { path: 'client', component: ClientComponent, canActivate: [AuthGuard, RoleGuard], data: { role: 'client' } },
     { path: 'client/commandes', component: ClientCommandeComponent, canActivate: [AuthGuard, RoleGuard], data: { role: 'client' } },
+    { path: 'commandes/:id', component: CommandeDetailComponent, canActivate: [AuthGuard] },
     
     { path: 'boutique', component: BoutiquesComponent, canActivate: [AuthGuard] },
     { path: 'boutique/:slug', component: BoutiqueDetailComponent, canActivate: [AuthGuard] },
