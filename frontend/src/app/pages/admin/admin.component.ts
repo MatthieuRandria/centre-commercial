@@ -23,6 +23,7 @@ export interface TopProduitVM {
   nom: string; boutique: string; ventes: number; barPct: number;
 }
 export interface CommandeVM {
+  id:string;
   numero: string; date: string; client: string;
   boutique: string; montant: string;
   statut: string; statutLabel: string;
@@ -283,6 +284,7 @@ export class AdminComponent implements OnInit, AfterViewInit, OnDestroy {
 
   private mapCommandes(data: CommandeRecente[]): CommandeVM[] {
     return data.map(c => ({
+      id: c._id,
       numero:   c.numero,
       date:     new Date(c.createdAt).toLocaleDateString('fr-FR', {
         day: '2-digit', month: 'short', hour: '2-digit', minute: '2-digit'
@@ -355,7 +357,7 @@ export class AdminComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   viewCommande(cmd: CommandeVM): void {
-    this.router.navigate(['/admin/commandes', cmd.numero]);
+    this.router.navigate(['/admin/commandes', cmd.id]);
   }
 
   // Skeleton array helper

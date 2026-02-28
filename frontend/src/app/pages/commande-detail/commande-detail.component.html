@@ -1,0 +1,269 @@
+<!-- commande-detail.component.html -->
+<div class="page-wrapper">
+    
+  <!-- BREADCRUMB (desktop uniquement) -->
+  <div class="breadcrumb-bar">
+    <a routerLink="/">Accueil</a> ›
+    <a routerLink="/commandes">Mes commandes</a> ›
+    <span>{{ commande?.numeroCommande ?? '...' }}</span>
+  </div>
+
+  <!-- ─── SKELETON ──────────────────────────────────────────────────────── -->
+  <div class="page-body" *ngIf="isLoading">
+    <div class="main-col">
+      <div class="sk-block sk-header"></div>
+      <div class="sk-block sk-timeline"></div>
+      <div class="sk-block sk-table"></div>
+      <div class="sk-block sk-info"></div>
+    </div>
+    <div class="action-sidebar">
+      <div class="sk-block sk-side"></div>
+      <div class="sk-block sk-side"></div>
+    </div>
+  </div>
+
+  <!-- ─── ERREUR ────────────────────────────────────────────────────────── -->
+  <div class="error-page" *ngIf="!isLoading && errorMessage && !commande">
+    <div class="error-icon">📋</div>
+    <p>{{ errorMessage }}</p>
+    <button class="btn-back" type="button" (click)="retour()">← Retour à mes commandes</button>
+  </div>
+
+  <!-- ─── CONTENU ──────────────────────────────────────────────────────── -->
+  <div class="page-body" *ngIf="!isLoading && commande">
+    <div class="main-col">
+
+      <!-- HEADER COMMANDE -->
+      <div class="order-header">
+        <div class="oh-left">
+          <div class="oh-back" (click)="retour()">← Mes commandes</div>
+          <h1>{{ commande.numeroCommande }}</h1>
+          <div class="oh-date">Passée le {{ formatDate(commande.createdAt) }}</div>
+        </div>
+        <span class="statut-badge" [ngClass]="isAnnulee ? 's-annulee' : statutClass[commande.statut]">
+          <span class="statut-dot"></span>
+          {{ statutLabels[commande.statut] }}
+        </span>
+      </div>
+
+      <!-- RECAP MOBILE (juste sous le header, visible uniquement mobile) -->
+      <div class="mobile-recap">
+        <div class="mobile-recap-row">
+          <span>{{ commande.articles.length }} article{{ commande.articles.length > 1 ? 's' : '' }}</span>
+          <span>{{ formatMontant(commande.total) }}</span>
+        </div>
+        <div class="mobile-recap-row">
+          <span>Livraison</span>
+          <span class="green">Gratuit</span>
+        </div>
+        <div class="mobile-recap-divider"></div>
+        <div class="mobile-recap-total">
+          <span>Total</span>
+          <strong>{{ formatMontant(commande.total) }}</strong>
+        </div>
+      </div>
+
+      <!-- TIMELINE -->
+      <div class="section-card" *ngIf="!isAnnulee">
+        <div class="card-head"><h2>Suivi de commande</h2></div>
+        <div class="timeline-wrap">
+          <div class="timeline">
+            <div
+              class="tl-step"
+              *ngFor="let step of timeline; let last = last"
+              [ngClass]="step.state"
+            >
+              <div class="tl-connector" *ngIf="!last" [class.filled]="step.state === 'done'"></div>
+              <div class="tl-circle">
+                <span *ngIf="step.state === 'done'">✓</span>
+                <span *ngIf="step.state !== 'done'">{{ step.icon }}</span>
+              </div>
+              <div class="tl-label">{{ step.label }}</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ANNULÉE BANNER -->
+      <div class="annulee-banner" *ngIf="isAnnulee">
+        <span class="annulee-icon">✕</span>
+        <div>
+          <strong>Commande annulée</strong>
+          <p>Cette commande a été annulée et ne sera pas traitée.</p>
+        </div>
+      </div>
+
+      <!-- ARTICLES — TABLE (≥ 640px) -->
+      <div class="section-card hide-on-mobile">
+        <div class="card-head">
+          <h2>Articles commandés</h2>
+          <span class="articles-badge">{{ commande.articles.length }} article{{ commande.articles.length > 1 ? 's' : '' }}</span>
+        </div>
+        <div class="table-wrap">
+          <table class="articles-tbl">
+            <thead>
+              <tr>
+                <th></th>
+                <th>Produit</th>
+                <th>Boutique</th>
+                <th>Qté</th>
+                <th>Prix unit.</th>
+                <th>Total</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let art of commande.articles">
+                <td><div class="art-img"><div class="art-ph"></div></div></td>
+                <td>
+                  <div class="art-name">{{ getProductName(art) }}</div>
+                  <div class="art-variante" *ngIf="art.variante">{{ art.variante }}</div>
+                </td>
+                <td class="art-boutique">{{ getBoutiqueName(art) }}</td>
+                <td>{{ art.quantite }}</td>
+                <td class="price-cell">{{ formatMontant(art.prixUnitaire) }}</td>
+                <td class="price-cell">{{ formatMontant(art.sousTotal) }}</td>
+              </tr>
+            </tbody>
+            <tfoot>
+              <tr class="total-row">
+                <td colspan="5" class="total-label">Total commande</td>
+                <td class="total-value">{{ formatMontant(commande.total) }}</td>
+              </tr>
+            </tfoot>
+          </table>
+        </div>
+      </div>
+
+      <!-- ARTICLES — CARTES (< 640px) -->
+      <div class="section-card show-on-mobile">
+        <div class="card-head">
+          <h2>Articles commandés</h2>
+          <span class="articles-badge">{{ commande.articles.length }} article{{ commande.articles.length > 1 ? 's' : '' }}</span>
+        </div>
+        <div class="art-cards">
+          <div class="art-card" *ngFor="let art of commande.articles">
+            <div class="art-card-img"><div class="art-ph"></div></div>
+            <div class="art-card-info">
+              <div class="art-card-name">{{ getProductName(art) }}</div>
+              <div class="art-card-variante" *ngIf="art.variante">{{ art.variante }}</div>
+              <div class="art-card-boutique">{{ getBoutiqueName(art) }}</div>
+              <div class="art-card-pricing">
+                <span class="art-card-qty">× {{ art.quantite }}</span>
+                <span class="art-card-pu">{{ formatMontant(art.prixUnitaire) }}</span>
+                <span class="art-card-total">{{ formatMontant(art.sousTotal) }}</span>
+              </div>
+            </div>
+          </div>
+          <div class="art-cards-total">
+            <span>Total commande</span>
+            <strong>{{ formatMontant(commande.total) }}</strong>
+          </div>
+        </div>
+      </div>
+
+      <!-- INFORMATIONS -->
+      <div class="section-card">
+        <div class="card-head"><h2>Informations</h2></div>
+        <div class="card-body">
+          <div class="info-row">
+            <span class="info-key">Mode de retrait</span>
+            <span class="info-val">{{ formatModeRetrait(commande.modeRetrait) }}</span>
+          </div>
+          <div class="info-row">
+            <span class="info-key">Livraison</span>
+            <span class="info-val green">Gratuit</span>
+          </div>
+          <div class="info-row">
+            <span class="info-key">Statut</span>
+            <span class="info-val">{{ statutLabels[commande.statut] }}</span>
+          </div>
+          <div class="info-row" *ngIf="commande.acheteur">
+            <span class="info-key">Client</span>
+            <span class="info-val">{{ commande.acheteur.prenom }} {{ commande.acheteur.nom }}</span>
+          </div>
+          <div class="info-row" *ngIf="commande.acheteur?.email">
+            <span class="info-key">Email</span>
+            <span class="info-val">{{ commande.acheteur!.email }}</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- ACTIONS MOBILE (en bas du contenu, visible uniquement mobile) -->
+      <div class="mobile-actions">
+        <ng-container *ngIf="!confirmCancel">
+          <button class="btn-danger" type="button" *ngIf="peutAnnuler" (click)="demandeAnnulation()">
+            Annuler la commande
+          </button>
+          <button class="btn-secondary" type="button">Contacter le vendeur</button>
+          <button class="btn-green" type="button" [disabled]="!factureDisponible" [class.disabled]="!factureDisponible">
+            📄 Télécharger la facture
+          </button>
+          <p class="facture-hint" *ngIf="!factureDisponible">
+            La facture sera disponible une fois la commande livrée.
+          </p>
+        </ng-container>
+        <div class="confirm-box" *ngIf="confirmCancel">
+          <p class="confirm-text">Êtes-vous sûr de vouloir annuler cette commande ?</p>
+          <div class="confirm-btns">
+            <button class="btn-danger" type="button" [disabled]="isAnnulation" (click)="confirmerAnnulation()">
+              <span class="spinner" *ngIf="isAnnulation"></span>Oui, annuler
+            </button>
+            <button class="btn-secondary" type="button" [disabled]="isAnnulation" (click)="annulerConfirm()">Non</button>
+          </div>
+        </div>
+      </div>
+
+    </div><!-- /main-col -->
+
+    <!-- ─── SIDEBAR DESKTOP ────────────────────────────────────────────── -->
+    <div class="action-sidebar">
+
+      <div class="side-card">
+        <div class="side-card-h">Actions</div>
+        <div class="side-card-b">
+          <ng-container *ngIf="!confirmCancel">
+            <button class="btn-danger" type="button" *ngIf="peutAnnuler" (click)="demandeAnnulation()">
+              Annuler la commande
+            </button>
+            <button class="btn-secondary" type="button">Contacter le vendeur</button>
+            <button class="btn-green" type="button" [disabled]="!factureDisponible" [class.disabled]="!factureDisponible">
+              📄 Télécharger la facture
+            </button>
+            <p class="facture-hint" *ngIf="!factureDisponible">
+              La facture sera disponible une fois la commande livrée.
+            </p>
+          </ng-container>
+          <div class="confirm-box" *ngIf="confirmCancel">
+            <p class="confirm-text">Êtes-vous sûr de vouloir annuler cette commande ?</p>
+            <div class="confirm-btns">
+              <button class="btn-danger" type="button" [disabled]="isAnnulation" (click)="confirmerAnnulation()">
+                <span class="spinner" *ngIf="isAnnulation"></span>Oui, annuler
+              </button>
+              <button class="btn-secondary" type="button" [disabled]="isAnnulation" (click)="annulerConfirm()">Non</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="side-card">
+        <div class="side-card-h">Récapitulatif</div>
+        <div class="side-card-b">
+          <div class="recap-row">
+            <span>{{ commande.articles.length }} article{{ commande.articles.length > 1 ? 's' : '' }}</span>
+            <span>{{ formatMontant(commande.total) }}</span>
+          </div>
+          <div class="recap-row">
+            <span>Livraison</span>
+            <span class="green">Gratuit</span>
+          </div>
+          <div class="recap-divider"></div>
+          <div class="recap-total">
+            <span>Total</span>
+            <span class="recap-total-val">{{ formatMontant(commande.total) }}</span>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div><!-- /page-body -->
+</div>
