@@ -4,16 +4,16 @@ const router = express.Router();
 const controller = require("../controllers/favoris.controller");
 const auth = require("../middlewares/auth.middleware");
 
-router.post("/", //auth, 
+router.post("/", auth.auth, 
     controller.addFavori);
 
-router.delete("/:produitId", //auth,
+router.delete("/:produitId", auth.auth,
      controller.removeFavori);
 
-router.get("/me", //auth,
+router.get("/me", auth.auth,
      controller.getUserFavoris);
 
-router.get("/check/:produitId", //auth,
+router.get("/check/:produitId", auth.auth,
      controller.checkFavori);
 
 module.exports = router;

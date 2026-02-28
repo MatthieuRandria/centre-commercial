@@ -7,7 +7,7 @@ exports.auth= (req, res, next)=> {
   }
 
   const token = authHeader.split(' ')[1]; // format "Bearer TOKEN"
-  console.log(token);
+  // console.log(token);
   jwt.verify(token, "SECRET_KEY", (err, decoded) => {
     if (err) {
       return res.status(401).json({ message: "Token invalide" });

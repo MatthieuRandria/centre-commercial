@@ -1,0 +1,359 @@
+<!-- catalogue.component.html -->
+<div class="page-wrapper">
+
+  <!-- ═══ BREADCRUMB ════════════════════════════════════════════════════════ -->
+  <div class="breadcrumb-bar">
+    <div class="breadcrumb">
+      <a routerLink="/">Accueil</a>
+      <span>›</span>
+      <span class="current">Catalogue produits</span>
+    </div>
+  </div>
+
+  <!-- ═══ PAGE HEADER ══════════════════════════════════════════════════════ -->
+  <div class="page-header">
+    <div class="page-header-pattern"></div>
+    <div class="page-header-deco"></div>
+    <div class="page-header-inner">
+      <span class="page-header-tag">Galaxy Mall Antananarivo</span>
+      <h1>Catalogue Produits</h1>
+      <p>Découvrez tous les produits disponibles dans nos boutiques partenaires</p>
+      <div class="page-header-stats">
+        <div class="stat-pill">
+          <span class="stat-num">{{ statsTotal }}</span>
+          <span class="stat-lbl">Produits</span>
+        </div>
+        <div class="stat-pill">
+          <span class="stat-num">{{ statsBoutiques }}</span>
+          <span class="stat-lbl">Boutiques</span>
+        </div>
+        <div class="stat-pill">
+          <span class="stat-num">{{ statsPromos }}</span>
+          <span class="stat-lbl">En promo</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══ TOOLBAR ══════════════════════════════════════════════════════════ -->
+  <div class="toolbar">
+    <div class="toolbar-inner">
+
+      <!-- Recherche -->
+      <div class="search-bar-inline" [class.focused]="filters.search">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+        <input
+          type="text"
+          [value]="filters.search"
+          (input)="onSearchInput($any($event.target).value)"
+          placeholder="Rechercher un produit, une marque…"
+        />
+        <button class="search-clear" *ngIf="filters.search" (click)="clearSearch()" title="Effacer">✕</button>
+      </div>
+
+      <div class="toolbar-sep hide-mobile"></div>
+
+      <!-- Tri -->
+      <div class="sort-wrap">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><line x1="21" y1="10" x2="7" y2="10"/><line x1="21" y1="6" x2="3" y2="6"/><line x1="21" y1="14" x2="3" y2="14"/><line x1="21" y1="18" x2="13" y2="18"/></svg>
+        <select [(ngModel)]="selectedSort" (change)="onSortChange()">
+          <option *ngFor="let o of sortOptions" [value]="o.value">{{ o.label }}</option>
+        </select>
+      </div>
+
+      <!-- Filtre toggle (mobile) -->
+      <button
+        class="filter-toggle"
+        [class.has-filters]="hasFilters"
+        (click)="openSidebar()"
+      >
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"/></svg>
+        Filtres
+        <span class="filter-badge" *ngIf="activeFilterCount > 0">{{ activeFilterCount }}</span>
+      </button>
+
+      <div class="toolbar-sep hide-mobile"></div>
+      <span class="results-count hide-mobile">
+        <strong>{{ totalProduits }}</strong> résultat{{ totalProduits > 1 ? 's' : '' }}
+      </span>
+    </div>
+  </div>
+
+  <!-- ═══ MAIN ══════════════════════════════════════════════════════════════ -->
+  <div class="main-content">
+
+    <!-- ── Sidebar Desktop ─────────────────────────────────────────────── -->
+    <aside class="sidebar">
+      <div class="sidebar-card">
+        <ng-container *ngTemplateOutlet="sidebarContent"></ng-container>
+      </div>
+    </aside>
+
+    <!-- ── Sidebar Overlay Mobile ──────────────────────────────────────── -->
+    <div class="sidebar-overlay" [class.open]="sidebarOpen" (click)="closeSidebar()"></div>
+    <div class="sidebar-mobile" [class.open]="sidebarOpen">
+      <div class="sidebar-mobile-header">
+        <span class="sidebar-mobile-title">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"/></svg>
+          Filtres
+        </span>
+        <button class="sidebar-close" (click)="closeSidebar()">✕</button>
+      </div>
+      <ng-container *ngTemplateOutlet="sidebarContent"></ng-container>
+    </div>
+
+    <!-- ── Catalogue Area ──────────────────────────────────────────────── -->
+    <div class="content-area">
+
+      <!-- Chips filtres actifs -->
+      <div class="active-filters" *ngIf="activeChips.length > 0">
+        <button
+          class="filter-chip"
+          *ngFor="let chip of activeChips"
+          (click)="removeChip(chip)"
+        >
+          {{ chip.label }}
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+        </button>
+        <button class="chip-reset" (click)="resetAll()">Tout effacer</button>
+      </div>
+
+      <!-- Count mobile -->
+      <div class="results-count-mobile">
+        <strong>{{ totalProduits }}</strong> résultat{{ totalProduits > 1 ? 's' : '' }}
+      </div>
+
+      <!-- ── Skeleton ── -->
+      <div class="prods-grid" *ngIf="isLoading">
+        <div class="skel-card" *ngFor="let i of skeletonArr">
+          <div class="skeleton skel-img"></div>
+          <div class="skel-body">
+            <div class="skeleton skel-line w-40"></div>
+            <div class="skeleton skel-line w-80"></div>
+            <div class="skeleton skel-line w-60"></div>
+          </div>
+          <div class="skel-footer">
+            <div class="skeleton skel-line" style="height:32px;border-radius:7px;"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ── Empty state ── -->
+      <div class="empty-state" *ngIf="!isLoading && produits.length === 0">
+        <div class="empty-icon">📦</div>
+        <h3>Aucun produit trouvé</h3>
+        <p>Essayez de modifier vos critères ou réinitialisez les filtres.</p>
+        <button class="btn-reset-empty" (click)="resetAll()">Réinitialiser les filtres</button>
+      </div>
+
+      <!-- ── Grille produits ── -->
+      <div class="prods-grid" *ngIf="!isLoading && produits.length > 0">
+        <div
+          class="prod-card"
+          *ngFor="let p of produits"
+          (click)="navigateProduit(p._id)"
+        >
+          <div class="prod-img">
+            <img *ngIf="getFirstImage(p)" [src]="getFirstImage(p)!" [alt]="p.nom" />
+            <div class="prod-img-ph" *ngIf="!getFirstImage(p)"></div>
+            <span class="promo-tag" *ngIf="isEnPromotion(p)">-{{ getPromoPercent(p) }}%</span>
+            <button
+              class="fav-btn-card"
+              [class.active]="isFavori(p._id)"
+              (click)="toggleFavori($event, p)"
+              [title]="isFavori(p._id) ? 'Retirer des favoris' : 'Ajouter aux favoris'"
+            >{{ isFavori(p._id) ? '♥' : '♡' }}</button>
+          </div>
+
+          <div class="prod-body">
+            <div class="prod-boutique">{{ getBoutiqueName(p) }}</div>
+            <div class="prod-name">{{ p.nom }}</div>
+            <div class="prod-price-row">
+              <ng-container *ngIf="isEnPromotion(p) && getPrixPromo(p); else normalPrice">
+                <span class="price-main promo">{{ formatMontant(getPrixPromo(p)!) }}</span>
+                <span class="price-old">{{ formatMontant(getPrix(p)) }}</span>
+              </ng-container>
+              <ng-template #normalPrice>
+                <span class="price-main">{{ formatMontant(getPrix(p)) }}</span>
+              </ng-template>
+            </div>
+            <span class="stock-badge-sm" [ngClass]="getStockClass(p)">
+              <span class="stock-dot"></span>{{ getStockLabel(p) }}
+            </span>
+          </div>
+
+          <div class="prod-footer">
+            <button
+              class="btn-add-cart"
+              *ngIf="getStock(p) > 0; else rupture"
+              [disabled]="addingCartId === p._id"
+              [class.success]="cartSuccessId === p._id"
+              (click)="addToCart($event, p)"
+            >
+              <span *ngIf="cartSuccessId !== p._id && addingCartId !== p._id">+ Ajouter au panier</span>
+              <span *ngIf="addingCartId === p._id" class="spinner-btn"></span>
+              <span *ngIf="cartSuccessId === p._id">✓ Ajouté !</span>
+            </button>
+            <ng-template #rupture>
+              <button class="btn-add-cart" disabled>Indisponible</button>
+            </ng-template>
+          </div>
+        </div>
+      </div>
+
+      <!-- ── Pagination ── -->
+      <div class="pagination" *ngIf="totalPages > 1 && !isLoading">
+        <button
+          class="pag-btn"
+          (click)="goPage(filters.page - 1)"
+          [disabled]="filters.page === 1"
+        >
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
+        </button>
+
+        <ng-container *ngFor="let pg of paginationPages">
+          <button
+            *ngIf="pg !== '...'"
+            class="pag-btn"
+            [class.active]="pg === filters.page"
+            (click)="goPage(pg)"
+          >{{ pg }}</button>
+          <span *ngIf="pg === '...'" class="pag-ellipsis">…</span>
+        </ng-container>
+
+        <button
+          class="pag-btn"
+          (click)="goPage(filters.page + 1)"
+          [disabled]="filters.page === totalPages"
+        >
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
+        </button>
+      </div>
+
+    </div><!-- /content-area -->
+  </div><!-- /main-content -->
+
+  <!-- ═══ FOOTER ════════════════════════════════════════════════════════════ -->
+  <footer class="footer">
+    <div class="footer-body">
+      <div>
+        <div class="footer-logo">CentreShop</div>
+        <p class="footer-desc">La plateforme officielle du Galaxy Mall d'Antananarivo.</p>
+      </div>
+      <div class="footer-col">
+        <h3>Boutique</h3>
+        <a routerLink="/boutiques">Nos boutiques</a>
+        <a routerLink="/catalogue">Catalogue</a>
+      </div>
+      <div class="footer-col">
+        <h3>Mon compte</h3>
+        <a routerLink="/login">Connexion</a>
+        <a routerLink="/commandes">Mes commandes</a>
+      </div>
+      <div class="footer-col">
+        <h3>Aide</h3>
+        <a routerLink="/contact">Contact</a>
+        <a href="#">FAQ</a>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <span>© 2026 CentreShop — Galaxy Mall Antananarivo. Tous droits réservés.</span>
+      <span>Fait avec ❤ à Madagascar</span>
+    </div>
+  </footer>
+</div>
+
+<!-- ═══ SIDEBAR TEMPLATE ══════════════════════════════════════════════════════ -->
+<ng-template #sidebarContent>
+  <div class="sidebar-inner">
+
+    <div class="sidebar-header">
+      <h2>
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"/></svg>
+        Filtres
+      </h2>
+      <button class="reset-btn" (click)="resetAll()">Réinitialiser</button>
+    </div>
+
+    <!-- Catégories -->
+    <div class="filter-group">
+      <div class="filter-group-title">Catégories</div>
+      <div class="checkbox-list" *ngIf="categories.length > 0; else noCategories">
+        <label class="checkbox-item" *ngFor="let cat of categories">
+          <input
+            type="checkbox"
+            [checked]="filters.categories.includes(cat.nom)"
+            (change)="toggleCategory(cat.nom)"
+          />
+          <span>{{ cat.nom }}</span>
+        </label>
+      </div>
+      <ng-template #noCategories>
+        <div class="sk-sidebar-list">
+          <div class="skeleton sk-si" *ngFor="let i of [1,2,3,4,5]"></div>
+        </div>
+      </ng-template>
+    </div>
+
+    <!-- Prix -->
+    <div class="filter-group">
+      <div class="filter-group-title">Prix (Ar)</div>
+      <div class="price-inputs">
+        <input
+          class="price-input" type="number" placeholder="Min"
+          [ngModel]="filters.prixMin"
+          (ngModelChange)="filters.prixMin = $event; onPrixChange()"
+        />
+        <span class="price-sep">–</span>
+        <input
+          class="price-input" type="number" placeholder="Max"
+          [ngModel]="filters.prixMax"
+          (ngModelChange)="filters.prixMax = $event; onPrixChange()"
+        />
+      </div>
+    </div>
+
+    <!-- Boutiques -->
+    <div class="filter-group">
+      <div class="filter-group-title">Boutiques</div>
+      <div class="boutique-search-wrap">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+        <input
+          class="boutique-search" type="text" placeholder="Rechercher…"
+          [(ngModel)]="boutiqueSearch"
+        />
+      </div>
+      <div class="boutique-list" *ngIf="filteredBoutiques.length > 0; else noBoutiques">
+        <label class="checkbox-item" *ngFor="let b of filteredBoutiques">
+          <input
+            type="checkbox"
+            [checked]="filters.boutiques.includes(b._id)"
+            (change)="toggleBoutique(b._id)"
+          />
+          <span>{{ b.nom }}</span>
+        </label>
+      </div>
+      <ng-template #noBoutiques>
+        <div class="sk-sidebar-list">
+          <div class="skeleton sk-si" *ngFor="let i of [1,2,3]"></div>
+        </div>
+      </ng-template>
+    </div>
+
+    <!-- Options -->
+    <div class="filter-group">
+      <div class="filter-group-title">Options</div>
+      <div class="options-list">
+        <label class="option-item">
+          <input type="checkbox" [checked]="filters.enPromotion" (change)="togglePromo()" />
+          <span>🏷 En promotion uniquement</span>
+        </label>
+        <label class="option-item">
+          <input type="checkbox" [checked]="filters.enStock" (change)="toggleStock()" />
+          <span>✅ En stock uniquement</span>
+        </label>
+      </div>
+    </div>
+
+  </div>
+</ng-template>

@@ -12,7 +12,7 @@ export interface ContactPayload {
 
 @Injectable({ providedIn: 'root' })
 export class ContactService {
-  private apiUrl = '/api/contact'; // à adapter selon votre backend
+  private apiUrl = '/api/contact';
 
   constructor(private http: HttpClient) {}
 

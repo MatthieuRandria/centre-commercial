@@ -16,14 +16,18 @@ import { AdminBoutiqueComponent } from './pages/admin-boutique/admin-boutique.co
 import { BoutiqueFormComponent } from './pages/boutique-form/boutique-form.component';
 import { ClientCommandeComponent } from './pages/client-commande/client-commande.component';
 import { CommandeDetailComponent } from './pages/commande-detail/commande-detail.component';
+import { ProduitDetailComponent } from './pages/produit-detail/produit-detail.component';
+import { CatalogueComponent } from './pages/catalogue/catalogue.component';
 
 export const routes: Routes = [
     // { path: '', redirectTo: 'login', pathMatch: 'full' },
     { path: '', component: HomeComponent },
     { path: 'login', component: LoginComponent },
     { path: 'signup', component: SignupComponent },
-    { path: 'produits', component: ProduitsListComponent },
     { path: 'contact', component: ContactComponent },
+
+    { path: 'produits', component: CatalogueComponent },
+    { path: 'produits/:id', component: ProduitDetailComponent },
 
     { path: 'admin', component: AdminComponent, canActivate: [AuthGuard, RoleGuard], data: { role: 'admin' } },
     { path: 'admin/boutiques', component: AdminBoutiqueComponent, canActivate: [AuthGuard, RoleGuard], data: { role: 'admin' } },
