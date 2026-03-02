@@ -45,7 +45,7 @@
   position: relative;
 }
 .hero-search input {
-  width: 100%;
+  width: -webkit-fill-available;
   padding: 14px 20px 14px 48px;
   border: none;
   border-radius: 10px;
