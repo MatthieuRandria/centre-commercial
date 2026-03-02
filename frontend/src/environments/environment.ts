@@ -1,8 +1,8 @@
 export const environment = {
    production: false,
-   apiUrl: 'http://localhost:3000',
+   apiUrl: 'https://m1p13mean-mahery-matthieu-back.vercel.app',
    apiTimeout: 30000, // 30 secondes
-   imageUrl: 'http://localhost:3000/uploads',
+   imageUrl: 'https://m1p13mean-mahery-matthieu-back.vercel.app/uploads',
    defaultPageSize: 20,
    maxPageSize: 100
 };
