@@ -1,212 +1,372 @@
-<!-- HERO CAROUSEL -->
-<section class="hero" #heroSection>
-  <div class="hero-slides" [style.transform]="'translateX(-' + currentSlide * 100 + '%)'">
+<!-- home.component.html -->
+<div class="page-wrapper">
 
-    <div class="hero-slide">
-      <div class="slide-bg slide-bg-1"></div>
-      <div class="slide-pattern"></div>
-      <div class="slide-deco">
-        <svg xmlns="http://www.w3.org/2000/svg" width="120" height="120" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.15)" stroke-width="0.8"><path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 01-8 0"/></svg>
-      </div>
-      <div class="slide-content">
-        <span class="slide-tag">Nouveautes Printemps 2026</span>
-        <h1 class="slide-title">Votre mode,<br>votre style</h1>
-        <p class="slide-sub">Decouvrez les derniers trends au Galaxy Mall.<br>+48 boutiques, un seul endroit.</p>
-        <a class="slide-cta" routerLink="/produits">Explorer le catalogue</a>
-        <a class="slide-cta-secondary" routerLink="/boutique">Nos boutiques</a>
-      </div>
-    </div>
-
-    <div class="hero-slide">
-      <div class="slide-bg slide-bg-2"></div>
-      <div class="slide-pattern"></div>
-      <div class="slide-deco">
-        <svg xmlns="http://www.w3.org/2000/svg" width="120" height="120" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.15)" stroke-width="0.8"><rect x="5" y="2" width="14" height="20" rx="2" ry="2"/><line x1="12" y1="18" x2="12.01" y2="18"/></svg>
-      </div>
-      <div class="slide-content">
-        <span class="slide-tag">Tech &amp; Electronique</span>
-        <h1 class="slide-title">Innovation<br>au quotidien</h1>
-        <p class="slide-sub">Les meilleurs produits tech vous attendent.<br>Apple, Samsung, et bien plus.</p>
-        <a class="slide-cta" routerLink="/produits">Voir les produits</a>
-        <a class="slide-cta-secondary" routerLink="/boutique">Toutes les boutiques</a>
-      </div>
-    </div>
-
-    <div class="hero-slide">
-      <div class="slide-bg slide-bg-3"></div>
-      <div class="slide-pattern"></div>
-      <div class="slide-deco">
-        <svg xmlns="http://www.w3.org/2000/svg" width="120" height="120" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.15)" stroke-width="0.8"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
-      </div>
-      <div class="slide-content">
-        <span class="slide-tag">Collections exclusives</span>
-        <h1 class="slide-title">Style &amp;<br>elegance</h1>
-        <p class="slide-sub">Des selections curees par nos experts mode.<br>Nouvelles collections chaque semaine.</p>
-        <a class="slide-cta" routerLink="/produits">Decouvrir</a>
-        <a class="slide-cta-secondary" routerLink="/boutique">Nos boutiques</a>
-      </div>
-    </div>
-
-  </div>
-
-  <button class="carousel-arrow prev" (click)="moveSlide(-1)">
-    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
-  </button>
-  <button class="carousel-arrow next" (click)="moveSlide(1)">
-    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
-  </button>
-  <div class="carousel-dots">
-    <button class="c-dot" *ngFor="let s of [0,1,2]" [class.active]="currentSlide === s" (click)="goSlide(s)"></button>
-  </div>
-</section>
-
-<!-- SEARCH -->
-<section class="search-section">
-  <div class="search-inner">
-    <div class="search-label">Que recherchez-vous ?</div>
-    <div class="search-bar" [class.focused]="searchFocused">
-      <svg class="search-icon" xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
-      <input class="search-input" type="text" placeholder="Robe, iPhone, Nike, Zara..."
-        [(ngModel)]="searchQuery"
-        (focus)="searchFocused=true"
-        (blur)="searchFocused=false"
-        (keyup.enter)="onSearch()" />
-      <button class="search-btn" (click)="onSearch()">Rechercher</button>
-    </div>
-    <div class="search-tags">
-      <a class="search-tag" *ngFor="let tag of searchTags" (click)="searchByTag(tag)">{{ tag }}</a>
-    </div>
-  </div>
-</section>
-
-<!-- CATEGORIES -->
-<section class="section">
-  <div class="container">
-    <div class="section-header">
-      <div>
-        <div class="section-title">Categories populaires</div>
-        <div class="section-subtitle">Trouvez ce que vous cherchez rapidement</div>
-      </div>
-    </div>
-    <div class="cats-grid">
-      <a class="cat-card" *ngFor="let cat of categories" routerLink="/produits">
-        <span class="cat-icon-wrap">
-          <svg *ngIf="cat.icon === 'shirt'" xmlns="http://www.w3.org/2000/svg" width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20.38 3.46L16 2a4 4 0 01-8 0L3.62 3.46a2 2 0 00-1.34 2.23l.58 3.57a1 1 0 00.99.84H6v10c0 1.1.9 2 2 2h8a2 2 0 002-2V10h2.15a1 1 0 00.99-.84l.58-3.57a2 2 0 00-1.34-2.23z"/></svg>
-          <svg *ngIf="cat.icon === 'cpu'" xmlns="http://www.w3.org/2000/svg" width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="4" width="16" height="16" rx="2" ry="2"/><rect x="9" y="9" width="6" height="6"/><line x1="9" y1="1" x2="9" y2="4"/><line x1="15" y1="1" x2="15" y2="4"/><line x1="9" y1="20" x2="9" y2="23"/><line x1="15" y1="20" x2="15" y2="23"/><line x1="20" y1="9" x2="23" y2="9"/><line x1="20" y1="14" x2="23" y2="14"/><line x1="1" y1="9" x2="4" y2="9"/><line x1="1" y1="14" x2="4" y2="14"/></svg>
-          <svg *ngIf="cat.icon === 'activity'" xmlns="http://www.w3.org/2000/svg" width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
-          <svg *ngIf="cat.icon === 'star'" xmlns="http://www.w3.org/2000/svg" width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
-          <svg *ngIf="cat.icon === 'coffee'" xmlns="http://www.w3.org/2000/svg" width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8h1a4 4 0 010 8h-1"/><path d="M2 8h16v9a4 4 0 01-4 4H6a4 4 0 01-4-4V8z"/><line x1="6" y1="1" x2="6" y2="4"/><line x1="10" y1="1" x2="10" y2="4"/><line x1="14" y1="1" x2="14" y2="4"/></svg>
-          <svg *ngIf="cat.icon === 'home'" xmlns="http://www.w3.org/2000/svg" width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
-          <svg *ngIf="cat.icon === 'gift'" xmlns="http://www.w3.org/2000/svg" width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 12 20 22 4 22 4 12"/><rect x="2" y="7" width="20" height="5"/><line x1="12" y1="22" x2="12" y2="7"/><path d="M12 7H7.5a2.5 2.5 0 010-5C11 2 12 7 12 7z"/><path d="M12 7h4.5a2.5 2.5 0 000-5C13 2 12 7 12 7z"/></svg>
-          <svg *ngIf="cat.icon === 'book'" xmlns="http://www.w3.org/2000/svg" width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5A2.5 2.5 0 016.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 014 19.5v-15A2.5 2.5 0 016.5 2z"/></svg>
-        </span>
-        <span class="cat-label">{{ cat.nom }}</span>
-      </a>
-    </div>
-  </div>
-</section>
-
-<!-- PRODUITS VEDETTE -->
-<section class="section alt">
-  <div class="container">
-    <div class="section-header">
-      <div>
-        <div class="section-title">Produits en vedette</div>
-        <div class="section-subtitle">Selectionnes par notre equipe pour vous</div>
-      </div>
-      <a class="see-all" routerLink="/produits">Voir tout le catalogue</a>
-    </div>
-
-    <div class="loading-state" *ngIf="loadingProduits">
-      <div class="spinner"></div>
-    </div>
-
-    <div class="prods-grid" *ngIf="!loadingProduits">
-      <a class="prod-card" *ngFor="let p of produits" routerLink="/produits">
-        <div class="prod-img">
-          <img alt="" *ngIf="p.images && p.images.length > 0" [src]="p.images[0]" [alt]="p.nom" />
-          <div *ngIf="!p.images || p.images.length === 0" class="prod-img-ph"></div>
-          <span class="vedette-tag">Vedette</span>
+  <!-- ═══ HERO CAROUSEL ════════════════════════════════════════════════════ -->
+  <section
+    class="hero"
+    (mouseenter)="onHeroMouseEnter()"
+    (mouseleave)="onHeroMouseLeave()"
+  >
+    <div class="hero-slides" [style.transform]="slideTransform">
+      <div
+        class="hero-slide"
+        *ngFor="let slide of heroSlides; trackBy: trackByIdx; let i = index"
+      >
+        <div class="slide-bg" [ngClass]="slide.bgClass"></div>
+        <div class="slide-pattern"></div>
+        <div class="slide-deco">{{ slide.emoji }}</div>
+        <div class="slide-content">
+          <span class="slide-tag">{{ slide.tag }}</span>
+          <h1 class="slide-title" [innerHTML]="slide.title"></h1>
+          <p class="slide-sub"   [innerHTML]="slide.subtitle"></p>
+          <a class="slide-cta" [routerLink]="slide.ctaLink.split('?')[0]"
+             [queryParams]="parseQueryParams(slide.ctaLink)">
+            {{ slide.ctaLabel }}
+          </a>
+          <a *ngIf="slide.ctaSecondaryLabel"
+             class="slide-cta-secondary"
+             [routerLink]="slide.ctaSecondaryLink!.split('?')[0]"
+             [queryParams]="parseQueryParams(slide.ctaSecondaryLink!)">
+            {{ slide.ctaSecondaryLabel }}
+          </a>
         </div>
-        <div class="prod-body">
-          <div class="prod-boutique">{{ p.boutique?.nom || 'Galaxy Mall' }}</div>
-          <div class="prod-name">{{ p.nom }}</div>
-          <div class="prod-price-row">
-            <span class="price-main">{{ p.prix | number }} Ar</span>
+      </div>
+    </div>
+
+    <!-- Flèches -->
+    <button class="carousel-arrow prev" type="button" (click)="prevSlide()">←</button>
+    <button class="carousel-arrow next" type="button" (click)="nextSlide()">→</button>
+
+    <!-- Dots -->
+    <div class="carousel-dots">
+      <button
+        *ngFor="let slide of heroSlides; let i = index"
+        class="c-dot"
+        [class.active]="i === currentSlide"
+        type="button"
+        (click)="goSlide(i)"
+      ></button>
+    </div>
+  </section>
+
+  <!-- ═══ SEARCH ═══════════════════════════════════════════════════════════ -->
+  <section class="search-section">
+    <div class="search-inner">
+      <div class="search-label">Que recherchez-vous ?</div>
+      <div class="search-bar" [class.focused]="searchQuery">
+        <input
+          class="search-input"
+          type="text"
+          placeholder="Robe, iPhone, Nike, Zara..."
+          [(ngModel)]="searchQuery"
+          (keydown)="onSearchKeydown($event)"
+        />
+        <button class="search-btn" type="button" (click)="onSearch()">Rechercher</button>
+      </div>
+      <div class="search-tags">
+        <button
+          class="search-tag"
+          type="button"
+          *ngFor="let tag of searchTags"
+          (click)="onSearchTag(tag.q)"
+        >{{ tag.label }}</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══ CATÉGORIES ════════════════════════════════════════════════════════ -->
+  <section class="section">
+    <div class="container">
+      <div class="section-header">
+        <div>
+          <div class="section-title">Catégories populaires</div>
+          <div class="section-subtitle">Trouvez ce que vous cherchez rapidement</div>
+        </div>
+      </div>
+      <div class="cats-grid">
+        <a
+          class="cat-card"
+          *ngFor="let cat of categories"
+          [routerLink]="['/produits']"
+          [queryParams]="{ categorie: cat.slug }"
+        >
+          <span class="cat-emoji">{{ cat.emoji }}</span>
+          <span class="cat-label">{{ cat.label }}</span>
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══ PRODUITS EN VEDETTE ═══════════════════════════════════════════════ -->
+  <section class="section alt">
+    <div class="container">
+      <div class="section-header">
+        <div>
+          <div class="section-title">Produits en vedette</div>
+          <div class="section-subtitle">Sélectionnés par notre équipe pour vous</div>
+        </div>
+        <a class="see-all" routerLink="/produits">Voir tout le catalogue</a>
+      </div>
+
+      <!-- Skeleton -->
+      <div class="prods-grid" *ngIf="isLoading">
+        <div class="sk-card" *ngFor="let i of skeletonArr">
+          <div class="sk-img"></div>
+          <div class="sk-body">
+            <div class="sk-line w-30"></div>
+            <div class="sk-line w-70"></div>
+            <div class="sk-line w-50"></div>
           </div>
-          <span class="stock-badge-sm sb-in">En stock</span>
+          <div class="sk-footer"></div>
         </div>
-        <div class="prod-footer">
-          <button class="btn-add-cart" (click)="$event.preventDefault()">+ Ajouter au panier</button>
-        </div>
-      </a>
-    </div>
-  </div>
-</section>
-
-<!-- BOUTIQUES -->
-<section class="section">
-  <div class="container">
-    <div class="section-header">
-      <div>
-        <div class="section-title">Nos boutiques partenaires</div>
-        <div class="section-subtitle">{{ boutiques.length }} boutiques au Galaxy Mall</div>
       </div>
-      <a class="see-all" routerLink="/boutique">Voir toutes les boutiques</a>
-    </div>
 
-    <div class="loading-state" *ngIf="loadingBoutiques">
-      <div class="spinner"></div>
+      <!-- Grille produits vedette -->
+      <div class="prods-grid" *ngIf="!isLoading">
+        <ng-container *ngFor="let p of vedettes; trackBy: trackById">
+          <ng-container *ngTemplateOutlet="prodCard; context: { $implicit: p, isVedette: true }"></ng-container>
+        </ng-container>
+      </div>
     </div>
+  </section>
 
-    <div class="boutiques-grid" *ngIf="!loadingBoutiques">
-      <a class="boutique-card" *ngFor="let b of boutiques" [routerLink]="['/boutique', b.slug]">
-        <div class="boutique-av">{{ getInitiale(b.nom) }}</div>
-        <div class="boutique-info">
-          <div class="boutique-name">{{ b.nom }}</div>
-          <div class="boutique-cat">{{ b.categorie?.nom }} — {{ b.localisation?.zone || b.localisation?.etage }}</div>
+  <!-- ═══ PROMOS ════════════════════════════════════════════════════════════ -->
+  <section class="section">
+    <div class="container">
+      <div class="section-header">
+        <div>
+          <div class="section-title">Promotions du moment</div>
+          <div class="section-subtitle">Offres à durée limitée</div>
         </div>
-        <div class="boutique-active-dot" [class.inactive]="b.statut !== 'active'"></div>
-      </a>
-    </div>
-  </div>
-</section>
-
-<!-- FOOTER -->
-<footer class="footer">
-  <div class="footer-body">
-    <div class="footer-brand">
-      <div class="footer-logo">CentreShop</div>
-      <p class="footer-desc">La plateforme officielle du Galaxy Mall d'Antananarivo. Decouvrez, comparez et achetez les produits de vos boutiques preferees.</p>
-      <div class="socials">
-        <a class="social-btn" href="#" title="Facebook">
-          <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 2h-3a5 5 0 00-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 011-1h3z"/></svg>
-        </a>
-        <a class="social-btn" href="#" title="Instagram">
-          <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"/><path d="M16 11.37A4 4 0 1112.63 8 4 4 0 0116 11.37z"/><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"/></svg>
-        </a>
-        <a class="social-btn" href="#" title="Twitter / X">
-          <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M23 3a10.9 10.9 0 01-3.14 1.53 4.48 4.48 0 00-7.86 3v1A10.66 10.66 0 013 4s-4 9 5 13a11.64 11.64 0 01-7 2c9 5 20 0 20-11.5a4.5 4.5 0 00-.08-.83A7.72 7.72 0 0023 3z"/></svg>
+      </div>
+      <div class="promo-grid">
+        <a
+          class="promo-banner"
+          *ngFor="let b of promoBanners; let i = index"
+          [ngClass]="b.bgClass"
+          [routerLink]="b.link.split('?')[0]"
+          [queryParams]="parseQueryParams(b.link)"
+        >
+          <div class="promo-deco"></div>
+          <span class="promo-pct">{{ b.pct }}</span>
+          <span class="promo-tag-label">{{ b.tagLabel }}</span>
+          <div class="promo-title" [innerHTML]="b.title"></div>
+          <div class="promo-sub">{{ b.subtitle }}</div>
         </a>
       </div>
     </div>
-    <div class="footer-col">
-      <h3>Boutique</h3>
-      <a routerLink="/boutique">Nos boutiques</a>
-      <a routerLink="/produits">Catalogue</a>
+  </section>
+
+  <!-- ═══ NOUVEAUTÉS ════════════════════════════════════════════════════════ -->
+  <section class="section alt">
+    <div class="container">
+      <div class="section-header">
+        <div>
+          <div class="section-title">Nouveautés</div>
+          <div class="section-subtitle">Arrivés cette semaine dans nos boutiques</div>
+        </div>
+        <a class="see-all" routerLink="/produits" [queryParams]="{ sort: 'nouveautes' }">
+          Voir toutes les nouveautés
+        </a>
+      </div>
+
+      <!-- Skeleton -->
+      <div class="prods-grid" *ngIf="isLoading">
+        <div class="sk-card" *ngFor="let i of skeletonArr4">
+          <div class="sk-img"></div>
+          <div class="sk-body">
+            <div class="sk-line w-30"></div>
+            <div class="sk-line w-70"></div>
+          </div>
+          <div class="sk-footer"></div>
+        </div>
+      </div>
+
+      <!-- Grille nouveautés -->
+      <div class="prods-grid" *ngIf="!isLoading">
+        <ng-container *ngFor="let p of nouveautes; trackBy: trackById">
+          <ng-container *ngTemplateOutlet="prodCard; context: { $implicit: p, isNew: true }"></ng-container>
+        </ng-container>
+      </div>
     </div>
-    <div class="footer-col">
-      <h3>Mon compte</h3>
-      <a routerLink="/login">Connexion</a>
-      <a routerLink="/signup">Inscription</a>
+  </section>
+
+  <!-- ═══ BOUTIQUES ════════════════════════════════════════════════════════ -->
+  <section class="section">
+    <div class="container">
+      <div class="section-header">
+        <div>
+          <div class="section-title">Nos boutiques partenaires</div>
+          <div class="section-subtitle">{{ boutiques.length }} boutiques au Galaxy Mall</div>
+        </div>
+        <a class="see-all" routerLink="/boutique">Voir toutes les boutiques</a>
+      </div>
+
+      <!-- Skeleton -->
+      <div class="boutiques-grid" *ngIf="isLoading">
+        <div class="sk-boutique" *ngFor="let i of [1,2,3,4,5,6]"></div>
+      </div>
+
+      <!-- Grille boutiques -->
+      <div class="boutiques-grid" *ngIf="!isLoading">
+        <a
+          class="boutique-card"
+          *ngFor="let b of boutiques; trackBy: trackById"
+          [routerLink]="['/boutique', b.slug ?? b._id]"
+        >
+          <div class="boutique-av"
+            [style.background]="b.couleurBg"
+            [style.color]="b.couleurTx"
+          >{{ b.initiale }}</div>
+          <div class="boutique-info">
+            <div class="boutique-name">{{ b.nom }}</div>
+            <div class="boutique-cat">{{ getCategorieNom(b) }}{{ b.etage ? ' — ' + b.etage : '' }}</div>
+            <div class="boutique-prods" *ngIf="b.nombre_produits">{{ b.nombre_produits }} produits</div>
+          </div>
+          <div class="boutique-active-dot" *ngIf="b.actif"></div>
+        </a>
+      </div>
     </div>
-    <div class="footer-col">
-      <h3>Aide</h3>
-      <a href="#">Contact</a>
+  </section>
+
+  <!-- ═══ ÉVÉNEMENTS ════════════════════════════════════════════════════════ -->
+  <section class="section alt">
+    <div class="container">
+      <div class="section-header">
+        <div>
+          <div class="section-title">Événements à venir</div>
+          <div class="section-subtitle">Ne manquez pas nos prochains événements</div>
+        </div>
+        <a class="see-all" routerLink="/evenements">Voir tous les événements</a>
+      </div>
+      <div class="events-grid">
+        <div class="event-card" *ngFor="let ev of events">
+          <div class="event-img" [style.background]="ev.bgGrad">
+            {{ ev.emoji }}
+            <div class="event-date-badge">
+              <div class="event-day">{{ ev.day }}</div>
+              <div class="event-month">{{ ev.month }}</div>
+            </div>
+          </div>
+          <div class="event-body">
+            <div class="event-type">{{ ev.type }}</div>
+            <div class="event-title">{{ ev.title }}</div>
+            <div class="event-desc">{{ ev.desc }}</div>
+            <div class="event-meta">
+              <span>🕐 {{ ev.time }}</span>
+              <span>•</span>
+              <span>📍 {{ ev.lieu }}</span>
+              <button class="btn-event" type="button">{{ ev.btnLabel }}</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══ FOOTER ════════════════════════════════════════════════════════════ -->
+  <footer class="footer">
+    <div class="footer-body">
+      <div class="footer-brand">
+        <div class="footer-logo">CentreShop</div>
+        <p class="footer-desc">La plateforme officielle du Galaxy Mall d'Antananarivo. Découvrez, comparez et achetez en Click & Collect.</p>
+        <div class="socials">
+          <a class="social-btn" href="#" title="Facebook">f</a>
+          <a class="social-btn" href="#" title="Instagram">◎</a>
+          <a class="social-btn" href="#" title="Twitter">✕</a>
+          <a class="social-btn" href="#" title="WhatsApp">💬</a>
+        </div>
+      </div>
+      <div class="footer-col">
+        <h3>Boutique</h3>
+        <a routerLink="/boutique">Nos boutiques</a>
+        <a routerLink="/produits">Catalogue</a>
+        <a routerLink="/produits" [queryParams]="{ promo: true }">Promotions</a>
+        <a routerLink="/produits" [queryParams]="{ sort: 'nouveautes' }">Nouveautés</a>
+      </div>
+      <div class="footer-col">
+        <h3>Mon compte</h3>
+        <a routerLink="/login">Connexion</a>
+        <a routerLink="/register">Inscription</a>
+        <a routerLink="/commandes">Mes commandes</a>
+        <a routerLink="/favoris">Mes favoris</a>
+        <a routerLink="/panier">Mon panier</a>
+      </div>
+      <div class="footer-col">
+        <h3>Aide</h3>
+        <a routerLink="/contact">Contact</a>
+        <a href="#">FAQ</a>
+        <a href="#">Livraison</a>
+        <a href="#">Retours</a>
+        <a href="#">CGV</a>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <span>© 2026 CentreShop — Galaxy Mall Antananarivo. Tous droits réservés.</span>
+      <span>Fait avec ❤ à Madagascar</span>
+    </div>
+  </footer>
+
+</div><!-- /page-wrapper -->
+
+<!-- ═══ TEMPLATE CARTE PRODUIT (réutilisé vedettes + nouveautés) ═══════════ -->
+<ng-template #prodCard let-p let-isVedette="isVedette" let-isNew="isNew">
+  <div class="prod-card" (click)="navigateProduit(p._id)">
+    <div class="prod-img">
+      <img *ngIf="getFirstImage(p)" [src]="getFirstImage(p)!" [alt]="p.nom" />
+      <div class="prod-img-ph" *ngIf="!getFirstImage(p)"></div>
+
+      <!-- Tags -->
+      <span class="vedette-tag" *ngIf="isVedette && !isEnPromotion(p)">⭐ Vedette</span>
+      <span class="promo-tag"   *ngIf="isEnPromotion(p)">-{{ getPromoPercent(p) }}%</span>
+      <span class="new-tag"     *ngIf="isNew">NOUVEAU</span>
+
+      <!-- Favori -->
+      <button
+        class="fav-btn-card"
+        type="button"
+        [class.active]="isFavori(p._id)"
+        (click)="toggleFavori($event, p)"
+        [title]="isFavori(p._id) ? 'Retirer des favoris' : 'Ajouter aux favoris'"
+      >{{ isFavori(p._id) ? '♥' : '♡' }}</button>
+    </div>
+
+    <div class="prod-body">
+      <div class="prod-boutique">{{ getBoutiqueName(p) }}</div>
+      <div class="prod-name">{{ p.nom }}</div>
+      <div class="prod-price-row">
+        <ng-container *ngIf="isEnPromotion(p) && getPrixPromo(p); else normalPr">
+          <span class="price-main promo">{{ formatMontant(getPrixPromo(p)!) }}</span>
+          <span class="price-old">{{ formatMontant(getPrix(p)) }}</span>
+        </ng-container>
+        <ng-template #normalPr>
+          <span class="price-main">{{ formatMontant(getPrix(p)) }}</span>
+        </ng-template>
+      </div>
+      <span class="stock-badge-sm" [ngClass]="getStockClass(p)">{{ getStockLabel(p) }}</span>
+    </div>
+
+    <div class="prod-footer">
+      <button
+        class="btn-add-cart"
+        type="button"
+        *ngIf="getStock(p) > 0; else indispo"
+        [disabled]="addingCartId === p._id"
+        [class.success]="cartSuccessId === p._id"
+        (click)="addToCart($event, p)"
+      >
+        <span class="spinner-btn" *ngIf="addingCartId === p._id"></span>
+        <span *ngIf="cartSuccessId === p._id">✓ Ajouté !</span>
+        <span *ngIf="addingCartId !== p._id && cartSuccessId !== p._id">+ Ajouter au panier</span>
+      </button>
+      <ng-template #indispo>
+        <button class="btn-add-cart" type="button" disabled>Indisponible</button>
+      </ng-template>
     </div>
   </div>
-  <div class="footer-bottom">
-    <span>&copy; 2026 CentreShop — Galaxy Mall Antananarivo. Tous droits reserves.</span>
-    <span>Fait a Madagascar</span>
-  </div>
-</footer>
+</ng-template>
+
+<!-- ═══ TOAST ════════════════════════════════════════════════════════════════ -->
+<div class="toast" [class.show]="toastVisible" [class.success]="toastType === 'success'">
+  {{ toastMsg }}
+</div>
