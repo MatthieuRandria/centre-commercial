@@ -109,7 +109,6 @@ export class ProduitDetailComponent implements OnInit, OnDestroy {
         this.loadAvis(id);
         this.loadSimilaires();
         this.checkFavori(id);
-        console.log(this.isFavori);
       },
       error: () => { this.errorMessage = 'Produit introuvable.'; }
     });
@@ -264,7 +263,7 @@ export class ProduitDetailComponent implements OnInit, OnDestroy {
 
   // ─── Panier─
   addToCart(): void {
-    if (!this.produit || !this.currentUser || this.stockActuel === 0) return;
+    if (!this.produit || !this.currentUser || this.stockActuel === 0) {this.router.navigate(['/login']); return;}
     this.isAddingCart = true;
 
     this.panierService.addToCart({
