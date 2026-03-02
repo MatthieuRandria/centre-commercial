@@ -3,7 +3,7 @@ const commandeService = require('../services/commande.service');
 exports.createCommande = async (req, res) => {
   try {
     const { userId, modeRetrait } = req.body;
-    const commande = await commandeService.createCommande(userId, modeRetrait);
+    const commande = await commandeService.createCommande(req.user.id, modeRetrait);
     res.status(201).json({ success: true, commande });
   } catch (error) {
     res.status(400).json({ success: false, message: error.message });

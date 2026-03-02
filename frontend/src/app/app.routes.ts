@@ -18,6 +18,7 @@ import { ClientCommandeComponent } from './pages/client-commande/client-commande
 import { CommandeDetailComponent } from './pages/commande-detail/commande-detail.component';
 import { ProduitDetailComponent } from './pages/produit-detail/produit-detail.component';
 import { CatalogueComponent } from './pages/catalogue/catalogue.component';
+import { PanierComponent } from './pages/panier/panier.component';
 
 export const routes: Routes = [
     // { path: '', redirectTo: 'login', pathMatch: 'full' },
@@ -41,6 +42,7 @@ export const routes: Routes = [
     { path: 'client', component: ClientComponent, canActivate: [AuthGuard, RoleGuard], data: { role: 'client' } },
     { path: 'client/commandes', component: ClientCommandeComponent, canActivate: [AuthGuard, RoleGuard], data: { role: 'client' } },
     { path: 'client/commandes/:id', component: CommandeDetailComponent, canActivate: [AuthGuard] },
+    { path: 'panier', component: PanierComponent, canActivate: [AuthGuard] },
     
     
     { path: 'dashboard', component: DashboardComponent, canActivate: [AuthGuard] }

@@ -1,0 +1,251 @@
+<!-- panier.component.html -->
+<div class="page-wrapper">
+
+  <!-- BREADCRUMB -->
+  <div class="breadcrumb-bar">
+    <a routerLink="/">Accueil</a> › <span>Mon panier</span>
+  </div>
+
+  <div class="page-body">
+
+    <!-- ═══ SKELETON ═══════════════════════════════════════════════════════ -->
+    <ng-container *ngIf="isLoading">
+      <div class="sk-title"></div>
+      <div class="cart-layout">
+        <div>
+          <div class="sk-group" *ngFor="let i of [1,2]">
+            <div class="sk-group-head"></div>
+            <div class="sk-row" *ngFor="let j of [1,2]"></div>
+          </div>
+        </div>
+        <div class="sk-sidebar"></div>
+      </div>
+    </ng-container>
+
+    <!-- ═══ ERREUR ══════════════════════════════════════════════════════════ -->
+    <div class="error-banner" *ngIf="errorMessage && !isLoading">
+      <span>⚠ {{ errorMessage }}</span>
+      <button (click)="loadPanier()">Réessayer</button>
+    </div>
+
+    <!-- ═══ SUCCÈS COMMANDE ══════════════════════════════════════════════════ -->
+    <div class="success-toast" *ngIf="commandeSuccess">
+      ✓ Commande passée avec succès ! Redirection…
+    </div>
+
+    <!-- ═══ PANIER VIDE ══════════════════════════════════════════════════════ -->
+    <div class="empty-cart" *ngIf="!isLoading && isEmpty && !errorMessage">
+      <div class="empty-icon">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+          <path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z"/>
+          <line x1="3" y1="6" x2="21" y2="6"/>
+          <path d="M16 10a4 4 0 01-8 0"/>
+        </svg>
+      </div>
+      <h2>Votre panier est vide</h2>
+      <p>Découvrez nos boutiques et ajoutez vos articles préférés.</p>
+      <a class="btn-discover" routerLink="/produits">Découvrir nos produits</a>
+    </div>
+
+    <!-- ═══ PANIER REMPLI ════════════════════════════════════════════════════ -->
+    <ng-container *ngIf="!isLoading && !isEmpty">
+      <h1 class="page-title">
+        Mon panier
+        <span>({{ totalArticles }} article{{ totalArticles > 1 ? 's' : '' }})</span>
+      </h1>
+
+      <div class="cart-layout">
+
+        <!-- ── Colonnes articles ─────────────────────────────────────────── -->
+        <div class="articles-col">
+
+          <div
+            class="boutique-group"
+            *ngFor="let groupe of groupes"
+          >
+            <!-- Header boutique -->
+            <div class="boutique-header">
+              <div class="boutique-avatar">{{ groupe.boutiqueLogo }}</div>
+              <span class="boutique-name">{{ groupe.boutiqueName }}</span>
+            </div>
+
+            <!-- Articles -->
+            <div
+              class="article-row"
+              *ngFor="let art of groupe.articles"
+              [class.removing]="removingId === art.produit._id"
+            >
+              <!-- Image -->
+              <div class="article-img" (click)="navigateProduit(art.produit._id)">
+                <img
+                  *ngIf="getFirstImage(art)"
+                  [src]="getFirstImage(art)!"
+                  [alt]="art.produit.nom"
+                />
+                <div class="article-img-ph" *ngIf="!getFirstImage(art)"></div>
+              </div>
+
+              <!-- Info -->
+              <div class="article-info">
+                <span
+                  class="article-name"
+                  (click)="navigateProduit(art.produit._id)"
+                >{{ art.produit.nom }}</span>
+                <div class="article-prix-unit">
+                  {{ formatMontant(getPrix(art)) }} / unité
+                </div>
+              </div>
+
+              <!-- Quantité -->
+              <div class="qty-ctrl" [class.updating]="updatingId === art.produit._id">
+                <button
+                  class="qty-btn"
+                  type="button"
+                  (click)="changeQty(art.produit._id, -1)"
+                  [disabled]="getQty(art.produit._id) <= 1 || updatingId === art.produit._id"
+                >−</button>
+                <input
+                  class="qty-val"
+                  type="number"
+                  [value]="getQty(art.produit._id)"
+                  (change)="onQtyInput(art.produit._id, $any($event.target).value)"
+                  min="1"
+                />
+                <button
+                  class="qty-btn"
+                  type="button"
+                  (click)="changeQty(art.produit._id, 1)"
+                  [disabled]="updatingId === art.produit._id"
+                >+</button>
+              </div>
+
+              <!-- Sous-total -->
+              <div class="article-subtotal">
+                {{ formatMontant(getSousTotal(art)) }}
+              </div>
+
+              <!-- Supprimer -->
+              <button
+                class="btn-rm"
+                type="button"
+                [disabled]="removingId === art.produit._id"
+                (click)="removeArticle(art.produit._id)"
+                title="Supprimer"
+              >
+                <span class="spinner-sm" *ngIf="removingId === art.produit._id"></span>
+                <span *ngIf="removingId !== art.produit._id">✕</span>
+              </button>
+            </div><!-- /article-row -->
+
+            <!-- Sous-total boutique -->
+            <div class="boutique-subtotal">
+              <span class="sub-label">Sous-total {{ groupe.boutiqueName }} :</span>
+              <span class="sub-val">{{ formatMontant(groupe.sousTotal) }}</span>
+            </div>
+          </div><!-- /boutique-group -->
+
+        </div><!-- /articles-col -->
+
+        <!-- ── Sidebar récap (desktop) ─────────────────────────────────── -->
+        <div class="sidebar-col">
+          <div class="sidebar-recap">
+            <div class="recap-head"><h2>Récapitulatif</h2></div>
+            <div class="recap-body">
+              <div class="recap-row">
+                <span class="r-label">Sous-total ({{ totalArticles }} article{{ totalArticles > 1 ? 's' : '' }})</span>
+                <span class="r-val">{{ formatMontant(total) }}</span>
+              </div>
+              <div class="recap-row">
+                <span class="r-label">Frais de livraison</span>
+                <span class="r-val muted">À calculer</span>
+              </div>
+              <div class="recap-divider"></div>
+              <div class="recap-total-row">
+                <span class="t-label">Total</span>
+                <span class="t-val">{{ formatMontant(total) }}</span>
+              </div>
+              <div class="livraison-note">Les frais seront calculés à l'étape suivante</div>
+            </div>
+            <div class="recap-foot">
+              <button
+                class="btn-cmd"
+                type="button"
+                [disabled]="commandeLoading || commandeSuccess"
+                [class.loading]="commandeLoading"
+                (click)="passerCommande()"
+              >
+                <span class="spinner-btn" *ngIf="commandeLoading"></span>
+                {{ commandeSuccess ? '✓ Commande passée !' : 'Passer la commande' }}
+              </button>
+              <button
+                class="btn-vider"
+                type="button"
+                (click)="openModalVider()"
+              >Vider le panier</button>
+              <a class="continue-link" routerLink="/produits">← Continuer mes achats</a>
+            </div>
+          </div>
+        </div>
+
+      </div><!-- /cart-layout -->
+
+      <!-- ── Récap mobile (en bas du contenu) ────────────────────────── -->
+      <div class="mobile-recap">
+        <div class="mobile-recap-inner">
+          <div class="mr-row">
+            <span>{{ totalArticles }} article{{ totalArticles > 1 ? 's' : '' }}</span>
+            <span>{{ formatMontant(total) }}</span>
+          </div>
+          <div class="mr-row muted">
+            <span>Livraison</span>
+            <span>À calculer</span>
+          </div>
+          <div class="mr-divider"></div>
+          <div class="mr-total">
+            <span>Total</span>
+            <strong>{{ formatMontant(total) }}</strong>
+          </div>
+        </div>
+        <div class="mobile-recap-actions">
+          <button
+            class="btn-cmd"
+            type="button"
+            [disabled]="commandeLoading || commandeSuccess"
+            (click)="passerCommande()"
+          >
+            <span class="spinner-btn" *ngIf="commandeLoading"></span>
+            {{ commandeSuccess ? '✓ Commande passée !' : 'Passer la commande' }}
+          </button>
+          <div class="mobile-recap-links">
+            <button class="btn-vider-sm" type="button" (click)="openModalVider()">Vider le panier</button>
+            <a routerLink="/produits" class="continue-link">← Continuer mes achats</a>
+          </div>
+        </div>
+      </div>
+
+    </ng-container>
+
+  </div><!-- /page-body -->
+
+</div>
+
+<!-- ═══ MODAL VIDER ══════════════════════════════════════════════════════════ -->
+<div class="modal-overlay" [class.open]="modalViderOpen" (click)="closeModalVider()">
+  <div class="modal-box" (click)="$event.stopPropagation()">
+    <div class="modal-icon">🗑</div>
+    <h3>Vider le panier</h3>
+    <p>Êtes-vous sûr de vouloir supprimer tous les articles ? Cette action est irréversible.</p>
+    <div class="modal-btns">
+      <button class="btn-cancel" type="button" (click)="closeModalVider()">Annuler</button>
+      <button
+        class="btn-confirm"
+        type="button"
+        [disabled]="isViding"
+        (click)="confirmerVider()"
+      >
+        <span class="spinner-btn-dark" *ngIf="isViding"></span>
+        Vider le panier
+      </button>
+    </div>
+  </div>
+</div>
