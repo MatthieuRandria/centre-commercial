@@ -2,10 +2,11 @@ import { Injectable, Inject, PLATFORM_ID } from '@angular/core';
 import { isPlatformBrowser } from '@angular/common';
 import { HttpClient } from '@angular/common/http';
 import { BehaviorSubject } from 'rxjs';
+import { environment } from '../../environments/environment';
 
 @Injectable({ providedIn: 'root' })
 export class AuthService {
-  private apiUrl = 'http://localhost:3000/api/auth';
+  private apiUrl = `${environment.apiUrl}/api/auth`;
   private isBrowser: boolean;
 
   private currentUserSubject = new BehaviorSubject<any>(null);
@@ -16,12 +17,9 @@ export class AuthService {
     @Inject(PLATFORM_ID) platformId: Object
   ) {
     this.isBrowser = isPlatformBrowser(platformId);
-
     if (this.isBrowser) {
       const user = localStorage.getItem('user');
-      if (user) {
-        this.currentUserSubject.next(JSON.parse(user));
-      }
+      if (user) this.currentUserSubject.next(JSON.parse(user));
     }
   }
 
@@ -53,7 +51,7 @@ export class AuthService {
     return this.isBrowser && !!localStorage.getItem('token');
   }
 
-  getToken(){
+  getToken() {
     return localStorage.getItem('token');
   }
 

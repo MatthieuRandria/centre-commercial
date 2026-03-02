@@ -4,7 +4,7 @@ import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable, forkJoin, of } from 'rxjs';
 import { catchError, map } from 'rxjs/operators';
 import { Produit } from '../shared/produit.model';
-// import { environment } from '../../../environments/environment';
+import { environment } from '../../environments/environment';
 
 // ─── Interfaces ────────────────────────────────────────────────────────────
 export interface HomeData {
@@ -73,8 +73,8 @@ export interface EventItem {
 
 @Injectable({ providedIn: 'root' })
 export class HomeService {
-//   private base = environment.apiUrl;
-  private base = "http://localhost:3000";
+
+  private base = environment.apiUrl;
 
   constructor(private http: HttpClient) {}
 

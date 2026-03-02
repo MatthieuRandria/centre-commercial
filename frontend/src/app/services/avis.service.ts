@@ -1,8 +1,7 @@
-// services/avis.service.ts
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
-// import { environment } from '../../../environments/environment';
+import { environment } from '../../environments/environment';
 
 export interface AvisUser { _id: string; nom: string; prenom?: string; }
 
@@ -25,7 +24,7 @@ export interface CreateAvisPayload {
 
 @Injectable({ providedIn: 'root' })
 export class AvisService {
-  private base = "http://localhost:3000";
+  private base = environment.apiUrl;
 
   constructor(private http: HttpClient) {}
 

@@ -7,7 +7,7 @@ import { AuthService } from './auth.service';
 
 @Injectable({providedIn: 'root'})
 export class UserService {
-  private apiUrl = `http://localhost:3000/api/auth`;
+  private apiUrl = `${environment.apiUrl}/api/auth`;
 
 private currentUser$ = new BehaviorSubject<UserProfile>({
     nom: 'Andriamaro',
