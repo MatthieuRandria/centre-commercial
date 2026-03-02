@@ -1,0 +1,320 @@
+<!-- src/app/manager/promotions/promotions.component.html -->
+
+<div class="page-content">
+
+  <!-- ── Header ─────────────────────────────────────────────────────── -->
+  <div class="page-header">
+    <div>
+      <h1>Mes promotions</h1>
+      <p>Gérez les codes promo et offres de votre boutique</p>
+    </div>
+    <button class="btn-primary" (click)="openModal()">
+      + Créer une promotion
+    </button>
+  </div>
+
+  <!-- ── KPI Row ─────────────────────────────────────────────────────── -->
+  <div class="kpi-row">
+    <div class="kpi-chip">
+      <div class="kpi-chip-label">Total promotions</div>
+      <div class="kpi-chip-val">{{ stats().total }}</div>
+    </div>
+    <div class="kpi-chip">
+      <div class="kpi-chip-label">Actives</div>
+      <div class="kpi-chip-val green">{{ stats().actives }}</div>
+    </div>
+    <div class="kpi-chip">
+      <div class="kpi-chip-label">À venir</div>
+      <div class="kpi-chip-val blue">{{ stats().aVenir }}</div>
+    </div>
+    <div class="kpi-chip">
+      <div class="kpi-chip-label">Expirées</div>
+      <div class="kpi-chip-val red">{{ stats().expirees }}</div>
+    </div>
+  </div>
+
+  <!-- ── Filters ─────────────────────────────────────────────────────── -->
+  <div class="filters-row">
+    <div class="filter-tabs">
+      <button class="ftab" [class.active]="filtreActif === 'all'" (click)="setFiltre('all')">
+        Toutes ({{ stats().total }})
+      </button>
+      <button class="ftab" [class.active]="filtreActif === 'active'" (click)="setFiltre('active')">
+        Actives ({{ stats().actives }})
+      </button>
+      <button class="ftab" [class.active]="filtreActif === 'a_venir'" (click)="setFiltre('a_venir')">
+        À venir ({{ stats().aVenir }})
+      </button>
+      <button class="ftab" [class.active]="filtreActif === 'expiree'" (click)="setFiltre('expiree')">
+        Expirées ({{ stats().expirees }})
+      </button>
+    </div>
+    <input
+      type="text"
+      class="search-input-f"
+      placeholder="Rechercher un code..."
+      [(ngModel)]="searchQuery"
+      (ngModelChange)="onSearch()"
+    />
+  </div>
+
+  <!-- ── Table ────────────────────────────────────────────────────────── -->
+  <div class="table-card">
+
+    <!-- Loading -->
+    <div *ngIf="loading()" class="table-loading">
+      <span class="spinner"></span> Chargement...
+    </div>
+
+    <!-- Empty state -->
+    <div *ngIf="!loading() && filteredPromotions().length === 0" class="empty-state">
+      <span class="empty-icon">🏷️</span>
+      <p>Aucune promotion trouvée</p>
+      <button class="btn-primary" (click)="openModal()">Créer une promotion</button>
+    </div>
+
+    <!-- Desktop table -->
+    <table class="data-table" *ngIf="!loading() && filteredPromotions().length > 0">
+      <thead>
+        <tr>
+          <th>Code</th>
+          <th>Type</th>
+          <th>Valeur</th>
+          <th>Date début</th>
+          <th>Date fin</th>
+          <th>Utilisation</th>
+          <th>Statut</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr
+          *ngFor="let promo of filteredPromotions(); trackBy: trackById"
+          [class.row-expired]="getStatut(promo) === 'expiree'"
+          [class.row-paused]="getStatut(promo) === 'suspendue'"
+        >
+          <!-- Code -->
+          <td>
+            <span
+              class="code-badge"
+              [class.disabled]="getStatut(promo) === 'expiree'"
+              (click)="getStatut(promo) !== 'expiree' && copyCode(promo.code)"
+            >
+              {{ promo.code }}
+              <span class="copy-icon">📋</span>
+            </span>
+          </td>
+
+          <!-- Type -->
+          <td>
+            <span class="type-badge" [ngClass]="getTypeClass(promo)">
+              {{ getTypeLabel(promo) }}
+            </span>
+          </td>
+
+          <!-- Valeur -->
+          <td>
+            <span class="val-display" [class.dimmed]="getStatut(promo) === 'expiree'">
+              {{ getValeurDisplay(promo) }}
+            </span>
+          </td>
+
+          <!-- Date début -->
+          <td class="date-cell">{{ formatDate(promo.dateDebut) }}</td>
+
+          <!-- Date fin -->
+          <td class="date-cell" [class.date-warning]="isDateExpiringSoon(promo.dateFin)">
+            {{ formatDate(promo.dateFin) }}
+          </td>
+
+          <!-- Utilisation -->
+          <td class="usage-cell">
+            <b>{{ promo.nombreUtilisations }}</b>
+            / {{ promo.limiteUtilisation ?? '∞' }}
+          </td>
+
+          <!-- Statut -->
+          <td>
+            <span class="statut-badge" [ngClass]="getStatutClass(promo)">
+              <span class="statut-dot"></span>
+              {{ getStatutLabel(promo) }}
+            </span>
+          </td>
+
+          <!-- Actions -->
+          <td>
+            <div class="actions-cell">
+              <button
+                class="btn-icon danger"
+                title="Supprimer"
+                (click)="deletePromotion(promo)"
+              >
+                🗑
+              </button>
+            </div>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+
+    <!-- Mobile cards (visible on small screens) -->
+    <div class="mobile-cards" *ngIf="!loading() && filteredPromotions().length > 0">
+      <div
+        class="promo-card"
+        *ngFor="let promo of filteredPromotions(); trackBy: trackById"
+        [class.card-expired]="getStatut(promo) === 'expiree'"
+      >
+        <div class="card-top">
+          <span class="code-badge" (click)="copyCode(promo.code)">
+            {{ promo.code }} 📋
+          </span>
+          <span class="statut-badge" [ngClass]="getStatutClass(promo)">
+            <span class="statut-dot"></span>{{ getStatutLabel(promo) }}
+          </span>
+        </div>
+        <div class="card-meta">
+          <span class="type-badge" [ngClass]="getTypeClass(promo)">{{ getTypeLabel(promo) }}</span>
+          <span class="val-display">{{ getValeurDisplay(promo) }}</span>
+        </div>
+        <div class="card-dates">
+          <span>{{ formatDate(promo.dateDebut) }}</span>
+          <span class="arrow">→</span>
+          <span [class.date-warning]="isDateExpiringSoon(promo.dateFin)">{{ formatDate(promo.dateFin) }}</span>
+        </div>
+        <div class="card-footer">
+          <span class="usage-cell"><b>{{ promo.nombreUtilisations }}</b> / {{ promo.limiteUtilisation ?? '∞' }} utilisations</span>
+          <button class="btn-icon danger" (click)="deletePromotion(promo)">🗑</button>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- ── Modal Création ────────────────────────────────────────────────── -->
+<div class="modal-overlay" [class.open]="modalOpen()" (click)="$event.target === $event.currentTarget && closeModal()">
+  <div class="modal-box" [formGroup]="promoForm">
+
+    <div class="modal-head">
+      <h2>Créer une promotion</h2>
+      <button class="modal-close" (click)="closeModal()">✕</button>
+    </div>
+
+    <div class="modal-body">
+
+      <!-- Code promo -->
+      <div class="form-group">
+        <label class="form-label">Code promo <span class="req">*</span></label>
+        <div class="code-gen-row">
+          <input
+            type="text"
+            class="form-input-m"
+            formControlName="code"
+            placeholder="Ex: ZARA20"
+            (input)="forceUppercase($event)"
+            [class.input-error]="promoForm.get('code')?.invalid && promoForm.get('code')?.touched"
+          />
+          <button type="button" class="btn-gen" (click)="generateCode()">🔀 Auto-générer</button>
+        </div>
+        <div class="form-hint">Majuscules et chiffres uniquement. Doit être unique.</div>
+        <div class="form-error" *ngIf="promoForm.get('code')?.errors?.['pattern'] && promoForm.get('code')?.touched">
+          Format invalide (lettres majuscules et chiffres, 3-20 caractères)
+        </div>
+      </div>
+
+      <!-- Description -->
+      <div class="form-group">
+        <label class="form-label">Description <span class="req">*</span></label>
+        <input
+          type="text"
+          class="form-input-m"
+          formControlName="description"
+          placeholder="Ex: Promotion printemps -20%"
+        />
+      </div>
+
+      <!-- Type -->
+      <div class="form-group">
+        <label class="form-label">Type de réduction <span class="req">*</span></label>
+        <div class="type-cards">
+          <div
+            class="type-card"
+            [class.selected]="typeSelected === 'pourcentage'"
+            (click)="selectType('pourcentage')"
+          >
+            <div class="tc-icon">%</div>
+            <div class="tc-name">Pourcentage</div>
+            <div class="tc-desc">Ex: -20%</div>
+          </div>
+          <div
+            class="type-card"
+            [class.selected]="typeSelected === 'fixe'"
+            (click)="selectType('fixe')"
+          >
+            <div class="tc-icon">💵</div>
+            <div class="tc-name">Montant fixe</div>
+            <div class="tc-desc">Ex: -10 000 Ar</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Valeur -->
+      <div class="form-group">
+        <label class="form-label">Valeur <span class="req">*</span></label>
+        <div class="valeur-row" [class.focused]="promoForm.get('valeur')?.dirty">
+          <input type="number" formControlName="valeur" placeholder="Ex: 20" min="1" />
+          <span class="valeur-suffix">{{ valeurSuffix }}</span>
+        </div>
+      </div>
+
+      <!-- Dates -->
+      <div class="form-row-2">
+        <div class="form-group">
+          <label class="form-label">Date début <span class="req">*</span></label>
+          <input type="date" class="form-input-m" formControlName="dateDebut" />
+        </div>
+        <div class="form-group">
+          <label class="form-label">Date fin <span class="req">*</span></label>
+          <input type="date" class="form-input-m" formControlName="dateFin" />
+        </div>
+      </div>
+
+      <!-- Options avancées -->
+      <div class="form-row-2">
+        <div class="form-group">
+          <label class="form-label">Montant min. commande</label>
+          <input type="number" class="form-input-m" formControlName="montantMinCommande" placeholder="0" min="0" />
+        </div>
+        <div class="form-group">
+          <label class="form-label">Limite d'utilisation</label>
+          <input type="number" class="form-input-m" formControlName="limiteUtilisation" placeholder="Vide = illimité" min="1" />
+        </div>
+      </div>
+
+    </div>
+
+    <div class="modal-footer">
+      <button type="button" class="btn-cancel-m" (click)="closeModal()">Annuler</button>
+      <button
+        type="button"
+        class="btn-create-m"
+        (click)="submitPromotion()"
+        [disabled]="submitting()"
+      >
+        <span *ngIf="!submitting()">Créer la promotion</span>
+        <span *ngIf="submitting()">Création en cours...</span>
+      </button>
+    </div>
+
+  </div>
+</div>
+
+<!-- ── Toast ─────────────────────────────────────────────────────────── -->
+<div
+  class="toast"
+  [class.show]="toast !== null"
+  [class.success]="toast?.type === 'success'"
+  [class.error]="toast?.type === 'error'"
+>
+  {{ toast?.message }}
+</div>

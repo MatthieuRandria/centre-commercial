@@ -77,6 +77,11 @@ export const routes: Routes = [
         loadComponent: () =>
           import('./pages/boutique-form/boutique-form.component').then(m => m.BoutiqueFormComponent),
       },
+      {
+        path: 'promotions',
+        loadComponent:()=>
+          import('./pages/manager-promotion/manager-promotion.component').then(m => m.ManagerPromotionComponent),
+      },
     ],
   },
 

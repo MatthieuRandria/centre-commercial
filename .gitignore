@@ -3,11 +3,14 @@ node_modules/
 # Node / Express
 backend/node_modules/
 backend/.env
+backend/server.js
 
 # Angular
 frontend/node_modules/
 frontend/dist/
 frontend/.angular/
+frontend/.env
+frontend/src/environments
 
 # Logs
 npm-debug.log*
