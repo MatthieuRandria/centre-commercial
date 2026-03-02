@@ -47,7 +47,7 @@ export class CommandesService {
 
   constructor(private http: HttpClient,private authServ:AuthService) {}
 
-  // ─── Mes commandes paginées + filtrées ────────────────────────────────────
+  // ─── Mes commandes paginées + filtrées
   getMesCommandes(opts: {
     filtre?: CommandesFiltreStatut;
     page?:   number;

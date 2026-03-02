@@ -20,12 +20,17 @@ export const routes: Routes = [
     loadComponent: () =>
       import('./pages/signup/signup.component').then(m => m.SignupComponent),
   },
-
   {
     path: 'contact',
     loadComponent: () =>
       import('./pages/contact/contact.component').then(m => m.ContactComponent),
   },
+  {
+    path: 'promotions',
+    loadComponent: () =>
+      import('./pages/promotion-public/promotion-public.component').then(m => m.PromotionPublicComponent),
+  },
+
 
   // Boutique (Public)
   {
@@ -105,6 +110,11 @@ export const routes: Routes = [
         path: 'commandes/:id',
         loadComponent: () =>
           import('./pages/commande-detail/commande-detail.component').then(m => m.CommandeDetailComponent),
+      },
+      {
+        path: 'commandes/confirm/:id',
+        loadComponent: () =>
+          import('./pages/confirmation-commande/confirmation-commande.component').then(m => m.CommandeConfirmationComponent),
       },
       {
         path: 'favoris',

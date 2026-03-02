@@ -1,0 +1,91 @@
+<nav class="topbar">
+  <a class="logo" routerLink="/">CentreShop</a>
+</nav>
+
+<div class="page-body">
+
+  <!-- LOADING -->
+  <div *ngIf="loading" class="state-center">
+    <div class="spinner"></div>
+    <p>Chargement de votre commande…</p>
+  </div>
+
+  <!-- ERREUR -->
+  <div *ngIf="error" class="state-center error">
+    <span class="state-icon">⚠️</span>
+    <p>{{ error }}</p>
+    <a class="btn-accueil" routerLink="/">Retour à l'accueil</a>
+  </div>
+
+  <!-- CONTENU -->
+  <ng-container *ngIf="!loading && !error && commande">
+
+    <!-- SUCCES HERO -->
+    <div class="success-hero">
+      <div class="check-circle">
+        <span class="check-icon">✓</span>
+      </div>
+      <h1 class="success-title">Commande confirmée !</h1>
+      <p class="success-sub">
+        Merci pour votre achat. Votre commande a été bien enregistrée et est en cours de traitement.
+      </p>
+    </div>
+
+    <!-- NUMERO -->
+    <div class="order-number-card">
+      <div class="order-number-label">Numéro de commande</div>
+      <div class="order-number-val">{{ commande.numeroCommande }}</div>
+    </div>
+
+    <!-- INFO MODE RETRAIT -->
+    <div class="info-banner" [ngClass]="isClickCollect ? 'click' : 'livraison'">
+      <div class="info-icon">{{ isClickCollect ? '🛒' : '🚚' }}</div>
+      <div class="info-content">
+        <div class="info-title">
+          {{ isClickCollect ? 'Retrait en boutique — Click & Collect' : 'Livraison à domicile' }}
+        </div>
+        <div class="info-text">
+          <ng-container *ngIf="isClickCollect">
+            Vous recevrez un SMS de confirmation dès que votre commande sera prête à être retirée.
+            Présentez-vous avec votre numéro de commande à la boutique choisie.
+          </ng-container>
+          <ng-container *ngIf="!isClickCollect">
+            Un e-mail de suivi vous sera envoyé avec le numéro de tracking dès l'expédition de votre colis.
+          </ng-container>
+        </div>
+      </div>
+    </div>
+
+    <!-- RECAP COMMANDE -->
+    <div class="recap-card">
+      <div class="recap-head">
+        <h2>Détail de la commande</h2>
+        <span class="statut-badge" [ngClass]="commande.statut">{{ statutLabel }}</span>
+      </div>
+      <div class="recap-body">
+        <div class="recap-art" *ngFor="let art of commande.articles">
+          <div class="art-thumb"><div class="art-ph"></div></div>
+          <div class="art-info">
+            <div class="art-name">{{ art.nomProduit }}</div>
+            <div class="art-sub">
+              {{ boutiqueNom(art) }} — × {{ art.quantite }}
+            </div>
+          </div>
+          <div class="art-price">{{ art.sousTotal | number:'1.0-0' }} Ar</div>
+        </div>
+
+        <div class="recap-total-row">
+          <span class="k">Total payé</span>
+          <span class="v">{{ commande.total | number:'1.0-0' }} Ar</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- ACTIONS -->
+    <div class="actions-wrap">
+      <a class="btn-suivi" [routerLink]="['/client/commandes', commande._id]">Suivre ma commande</a>
+      <a class="btn-accueil" routerLink="/">Retour à l'accueil</a>
+    </div>
+
+  </ng-container>
+</div>

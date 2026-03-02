@@ -2,6 +2,7 @@ import { CommonModule } from '@angular/common';
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { ActivatedRoute, Router, RouterModule } from '@angular/router';
 import { Subject } from 'rxjs';
+import { environment } from '../../../environments/environment';
 
 export interface ArticleDetail {
   produit:      string | { _id: string; nom: string; images?: string[] };
@@ -43,6 +44,8 @@ export interface TimelineStep {
 })
 export class CommandeDetailComponent implements OnInit, OnDestroy{
   private destroy$ = new Subject<void>();
+  private apiUrl = `${environment.apiUrl}/commande`;
+  
 
   commande: CommandeDetail | null = null;
   isLoading     = false;
@@ -96,7 +99,7 @@ export class CommandeDetailComponent implements OnInit, OnDestroy{
 
     // Appel direct à l'API (via fetch natif ou HttpClient)
     // On importe HttpClient inline pour garder le composant léger
-    const url = `http://localhost:3000/commande/${id}`;
+    const url = `${this.apiUrl}/${id}`;
 
     fetch(url, {
       headers: this.getAuthHeaders()
@@ -149,7 +152,7 @@ export class CommandeDetailComponent implements OnInit, OnDestroy{
     if (!this.commande) return;
     this.isAnnulation = true;
 
-    fetch(`http://localhost:3000/commande/${this.commande._id}/statut`, {
+    fetch(`${this.apiUrl}/${this.commande._id}/statut`, {
       method: 'PUT',
       headers: { 'Content-Type': 'application/json', ...this.getAuthHeaders() },
       body: JSON.stringify({ statut: 'annulee' })
@@ -193,7 +196,7 @@ export class CommandeDetailComponent implements OnInit, OnDestroy{
   }
 
   retour(): void {
-    this.router.navigate(['/commandes']);
+    this.router.navigate(['/client/commandes']);
   }
 
 }
