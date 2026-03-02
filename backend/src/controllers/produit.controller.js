@@ -1,75 +1,76 @@
-const Produit = require('../models/Produit');
+const Produit   = require('../models/Produit');
+const mongoose  = require('mongoose');
 
-/**
- * @desc    GET tous les produits (avec filtres, tri, pagination)
- * @route   GET /produits
- * @access  Public
- */
-exports.getAllProduits = async (req, res, next) => {
+exports.getProduitCategories = async (req, res) => {
+  try {
+    const categories = await Produit.distinct('categories', { actif: true });
+    res.json({ data: categories.filter(Boolean).sort() });
+  } catch (err) {
+    res.status(500).json({ success: false, message: err.message });
+  }
+};
+
+exports.getAllProduits = async (req, res) => {
   try {
     const {
-      q,                        // recherche textuelle (ajout)
+      q,
       boutiqueId,
       categorie,
       prixMin,
       prixMax,
-      enPromotion,
-      enStock,                  // filtre stock (ajout)
+      enStock,
       sortBy = 'date',
       order  = 'desc',
       page   = 1,
-      limit  = 12               // aligné sur defaultPageSize frontend
+      limit  = 12
     } = req.query;
 
-    const filters = { actif: true };
+    const pageNum  = Math.max(1, Number(page));
+    const limitNum = Math.min(100, Math.max(1, Number(limit)));
 
-    // Recherche textuelle sur nom et description
+    // ── Filtres ────────────────────────────────────────────────────────────
+    const match = { actif: true };
+
     if (q) {
-      filters.$or = [
+      match.$or = [
         { nom:         { $regex: q, $options: 'i' } },
         { description: { $regex: q, $options: 'i' } }
       ];
     }
 
-    if (boutiqueId) filters.boutique  = boutiqueId;
-    if (categorie)  filters.categorie = categorie;
+    if (boutiqueId && mongoose.Types.ObjectId.isValid(boutiqueId)) {
+      match.boutique = boutiqueId;
+    }
+
+    // categories est un array d'objets { nom } dans le modèle Produit
+    if (categorie) {
+      match['categories.nom'] = { $regex: categorie, $options: 'i' };
+    }
 
     if (prixMin || prixMax) {
-      filters['variantes.prix'] = {};
-      if (prixMin) filters['variantes.prix'].$gte = Number(prixMin);
-      if (prixMax) filters['variantes.prix'].$lte = Number(prixMax);
+      match['variantes.prix'] = {};
+      if (prixMin) match['variantes.prix'].$gte = Number(prixMin);
+      if (prixMax) match['variantes.prix'].$lte = Number(prixMax);
     }
 
-    if (enPromotion === 'true') {
-      filters.enPromotion = true;
-    }
-
-    // Filtre en stock : au moins une variante avec stock > 0
     if (enStock === 'true') {
-      filters['variantes.stock'] = { $gt: 0 };
+      match['variantes.stock'] = { $gt: 0 };
     }
 
-    // TRI
-    const sortFields = {
-      prix: 'variantes.prix',
-      date: 'createdAt',
-      vues: 'vues'
-    };
-    const sortField = sortFields[sortBy] || 'createdAt';
+    // ── Tri ────────────────────────────────────────────────────────────────
+    const sortFields = { prix: 'variantes.prix', date: 'createdAt', vues: 'vues' };
+    const sortField   = sortFields[sortBy] ?? 'createdAt';
     const sortOptions = { [sortField]: order === 'asc' ? 1 : -1 };
 
-    // PAGINATION
-    const pageNum  = Number(page);
-    const limitNum = Number(limit);
-    const skip     = (pageNum - 1) * limitNum;
-
+    // ── Requête ────────────────────────────────────────────────────────────
     const [produits, total] = await Promise.all([
-      Produit.find(filters)
-        .populate('boutique')
+      Produit.find(match)
+        .populate('boutique', 'nom infos.logo_url')
         .sort(sortOptions)
-        .skip(skip)
-        .limit(limitNum),
-      Produit.countDocuments(filters)
+        .skip((pageNum - 1) * limitNum)
+        .limit(limitNum)
+        .lean(),
+      Produit.countDocuments(match)
     ]);
 
     res.json({
@@ -80,7 +81,7 @@ exports.getAllProduits = async (req, res, next) => {
     });
 
   } catch (err) {
-    next(err);
+    res.status(500).json({ success: false, message: err.message });
   }
 };
 
@@ -91,7 +92,12 @@ exports.getAllProduits = async (req, res, next) => {
  */
 exports.getProduitById = async (req, res) => {
   try {
-    const produit = await Produit.findById(req.params.id).populate('boutique');
+    if (!mongoose.Types.ObjectId.isValid(req.params.id)) {
+      return res.status(400).json({ success: false, message: 'ID invalide' });
+    }
+
+    const produit = await Produit.findById(req.params.id)
+      .populate('boutique', 'nom infos.logo_url infos.description');
 
     if (!produit) {
       return res.status(404).json({ success: false, message: 'Produit non trouvé' });
@@ -101,9 +107,8 @@ exports.getProduitById = async (req, res) => {
     await produit.save();
 
     res.status(200).json({ success: true, data: produit });
-
-  } catch (error) {
-    res.status(500).json({ success: false, message: `Impossible de récupérer le produit : ${error.message}` });
+  } catch (err) {
+    res.status(500).json({ success: false, message: err.message });
   }
 };
 
@@ -114,22 +119,17 @@ exports.getProduitById = async (req, res) => {
  */
 exports.createProduit = async (req, res) => {
   try {
-    let images = [];
-    if (req.files?.length) {
-      images = req.files.map(file => file.path);
-    }
-
+    const images = req.files?.length ? req.files.map(f => f.path) : [];
     const produitData = {
       ...req.body,
       images,
-      variantes: req.body.variantes ? JSON.parse(req.body.variantes) : []
+      variantes:  req.body.variantes  ? JSON.parse(req.body.variantes)  : [],
+      categories: req.body.categories ? JSON.parse(req.body.categories) : []
     };
-
     const produit = await Produit.create(produitData);
     res.status(201).json({ success: true, data: produit });
-
-  } catch (error) {
-    res.status(400).json({ success: false, message: error.message });
+  } catch (err) {
+    res.status(400).json({ success: false, message: err.message });
   }
 };
 
@@ -140,28 +140,21 @@ exports.createProduit = async (req, res) => {
  */
 exports.updateProduit = async (req, res) => {
   try {
+    if (!mongoose.Types.ObjectId.isValid(req.params.id)) {
+      return res.status(400).json({ success: false, message: 'ID invalide' });
+    }
     const updateData = { ...req.body };
-
-    if (req.files?.length) {
-      updateData.images = req.files.map(file => file.path);
-    }
-    if (req.body.variantes) {
-      updateData.variantes = JSON.parse(req.body.variantes);
-    }
+    if (req.files?.length)    updateData.images     = req.files.map(f => f.path);
+    if (req.body.variantes)   updateData.variantes  = JSON.parse(req.body.variantes);
+    if (req.body.categories)  updateData.categories = JSON.parse(req.body.categories);
 
     const produit = await Produit.findByIdAndUpdate(req.params.id, updateData, {
-      new: true,
-      runValidators: true
+      new: true, runValidators: true
     });
-
-    if (!produit) {
-      return res.status(404).json({ success: false, message: 'Produit non trouvé' });
-    }
-
+    if (!produit) return res.status(404).json({ success: false, message: 'Produit non trouvé' });
     res.status(200).json({ success: true, data: produit });
-
-  } catch (error) {
-    res.status(400).json({ success: false, message: error.message });
+  } catch (err) {
+    res.status(400).json({ success: false, message: err.message });
   }
 };
 
@@ -172,15 +165,13 @@ exports.updateProduit = async (req, res) => {
  */
 exports.deleteProduit = async (req, res) => {
   try {
-    const produit = await Produit.findByIdAndDelete(req.params.id);
-
-    if (!produit) {
-      return res.status(404).json({ success: false, message: 'Produit non trouvé' });
+    if (!mongoose.Types.ObjectId.isValid(req.params.id)) {
+      return res.status(400).json({ success: false, message: 'ID invalide' });
     }
-
+    const produit = await Produit.findByIdAndDelete(req.params.id);
+    if (!produit) return res.status(404).json({ success: false, message: 'Produit non trouvé' });
     res.status(200).json({ success: true, message: 'Produit supprimé avec succès' });
-
-  } catch (error) {
-    res.status(500).json({ success: false, message: error.message });
+  } catch (err) {
+    res.status(500).json({ success: false, message: err.message });
   }
 };

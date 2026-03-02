@@ -61,7 +61,7 @@ export class CatalogueService {
   }
 
   getCategories(): Observable<Categorie[]> {
-    return this.http.get<any>(`${this.base}/boutiquesCateg`).pipe(
+    return this.http.get<any>(`${this.base}/produits/categories`).pipe(
       map(r => Array.isArray(r) ? r : (r.data ?? [])),
       catchError(() => of([]))
     );
