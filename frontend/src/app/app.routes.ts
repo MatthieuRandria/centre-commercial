@@ -41,8 +41,8 @@ export const routes: Routes = [
     
     { path: 'profil', component: MeComponent, canActivate: [AuthGuard] },
     { path: 'client', component: ClientComponent, canActivate: [AuthGuard, RoleGuard], data: { role: 'client' } },
-    { path: 'commandes', component: ClientCommandeComponent, canActivate: [AuthGuard, RoleGuard], data: { role: 'client' } },
-    { path: 'commandes/:id', component: CommandeDetailComponent, canActivate: [AuthGuard, RoleGuard], data: { role: 'client' } },
+    { path: 'client/commandes', component: ClientCommandeComponent, canActivate: [AuthGuard, RoleGuard], data: { role: 'client' } },
+    { path: 'client/commandes/:id', component: CommandeDetailComponent, canActivate: [AuthGuard, RoleGuard], data: { role: 'client' } },
     { path: 'panier', component: PanierComponent, canActivate: [AuthGuard, RoleGuard], data: { role: 'client' } },
     { path: 'favoris', component: FavorisComponent, canActivate: [AuthGuard, RoleGuard], data: { role: 'client' } },
     

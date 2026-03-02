@@ -82,7 +82,7 @@ export class ClientCommandeComponent implements OnInit, OnDestroy {
           nom:      u.nom     ?? '',
           prenom:   u.prenom  ?? '',
           email:    u.email   ?? '',
-          initiale: ((u.prenom?.[0] ?? '') + (u.nom?.[0] ?? '')).toUpperCase() || '?'
+          initiale: (u.prenom?.[0] ?? '').toUpperCase() || '?'
         };
       }
     } catch { /* ignore */ }
@@ -130,7 +130,7 @@ export class ClientCommandeComponent implements OnInit, OnDestroy {
 
   // ─── Navigation ────────────────────────────────────────────────────────────
   goToDetail(cmd: CommandeClient): void {
-    this.router.navigate(['/commandes', cmd._id]);
+    this.router.navigate(['/client/commandes', cmd._id]);
   }
 
   // ─── Annulation ───────────────────────────────────────────────────────────
