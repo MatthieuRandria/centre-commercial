@@ -19,6 +19,10 @@ export const serverRoutes: ServerRoute[] = [
     path: 'client/commandes/:id',
     renderMode: RenderMode.Client
   },
+  {
+    path: 'client/commandes/confirm/:id',
+    renderMode: RenderMode.Client
+  },
 
   // Everything else → prerender
   {
