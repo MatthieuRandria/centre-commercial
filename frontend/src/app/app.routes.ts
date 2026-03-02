@@ -9,7 +9,6 @@ import { BoutiquesComponent } from './pages/boutique/boutique.component';
 import { BoutiqueDetailComponent } from './pages/boutique-details/boutique-details.component';
 import { ClientComponent } from './pages/client/client.component';
 import { RoleGuard } from './guards/role-guard.guard';
-import { ProduitsListComponent } from './produit/produits-list/produits-list.component';
 import { MeComponent } from './pages/me/me.component';
 import { ContactComponent } from './pages/contact/contact.component';
 import { AdminBoutiqueComponent } from './pages/admin-boutique/admin-boutique.component';

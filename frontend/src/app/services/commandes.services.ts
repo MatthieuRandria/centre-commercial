@@ -1,4 +1,4 @@
-// services/mes-commandes.service.ts
+import { environment } from '../../environments/environment';
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
@@ -43,7 +43,7 @@ const FILTRE_TO_STATUTS: Record<CommandesFiltreStatut, string[]> = {
 
 @Injectable({ providedIn: 'root' })
 export class CommandesService {
-  private base = 'http://localhost:3000';
+  private base = environment.apiUrl;
 
   constructor(private http: HttpClient,private authServ:AuthService) {}
 

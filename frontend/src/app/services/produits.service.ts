@@ -1,37 +1,27 @@
 import { Injectable } from '@angular/core';
-import { environment } from '../../environments/environment';
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
+import { environment } from '../../environments/environment';
 import { Produit } from '../shared/produit.model';
 
-@Injectable({
-  providedIn: 'root'
-})
+@Injectable({ providedIn: 'root' })
 export class ProduitsService {
-  // private apiUrl = `${environment.apiUrl}/produits`;
-  private apiUrl = `http://localhost:3000/produits`;
+  private apiUrl = `${environment.apiUrl}/produits`;
 
-  constructor(private http: HttpClient) { }
+  constructor(private http: HttpClient) {}
 
-  getProduits(filters: any): Observable<{total: number; page: number; pages: number; data: Produit[] }>{
+  getProduits(filters: any): Observable<{ total: number; page: number; pages: number; data: Produit[] }> {
     let params = new HttpParams();
-
     Object.keys(filters || {}).forEach(key => {
       if (filters[key] !== null && filters[key] !== undefined) {
         params = params.set(key, filters[key]);
       }
     });
-
-    return this.http.get<{ total: number; page: number; pages: number; data: Produit[] }>(
-      this.apiUrl,
-      { params }
-    );
+    return this.http.get<{ total: number; page: number; pages: number; data: Produit[] }>(this.apiUrl, { params });
   }
 
   searchProduits(query: string): Observable<Produit[]> {
-    return this.http.get<Produit[]>(`${this.apiUrl}/search`, {
-      params: { q: query }
-    });
+    return this.http.get<Produit[]>(`${this.apiUrl}/search`, { params: { q: query } });
   }
 
   getProduitById(id: string): Observable<Produit> {
@@ -45,6 +35,4 @@ export class ProduitsService {
   updateProduit(id: string, formData: FormData): Observable<Produit> {
     return this.http.put<Produit>(`${this.apiUrl}/${id}`, formData);
   }
-
-
 }

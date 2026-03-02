@@ -2,7 +2,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { BehaviorSubject, Observable, tap } from 'rxjs';
-// import { environment } from '../../../environments/environment';
+import { environment } from '../../environments/environment';
 
 export interface PanierProduit {
   _id:         string;
@@ -48,7 +48,7 @@ export interface AddPanierPayload {
 
 @Injectable({ providedIn: 'root' })
 export class PanierService {
-  private base = "http://localhost:3000";
+  private base = environment.apiUrl;
 
   constructor(private http: HttpClient) {}
   private getHeaders(): { Authorization?: string } {
@@ -64,7 +64,7 @@ export class PanierService {
 
 @Injectable({ providedIn: 'root' })
 export class PanierFullService {
-  private base = "http://localhost:3000";
+  private base = environment.apiUrl;
 
   // Badge panier partagé dans l'app
   private countSubject = new BehaviorSubject<number>(0);

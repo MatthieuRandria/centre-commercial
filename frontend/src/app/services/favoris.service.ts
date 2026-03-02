@@ -5,7 +5,7 @@ import { BehaviorSubject, catchError, Observable, of, tap } from 'rxjs';
 import { AuthService } from './auth.service';
 import { Produit } from '../shared/produit.model';
 import { PanierFullService, PanierService } from './panier.service';
-// import { environment } from '../../environments/environment';
+import { environment } from '../../environments/environment';
 
 export interface FavoriItem {
   _id:       string;
@@ -17,7 +17,7 @@ export type SortFavoris = 'recent' | 'price-asc' | 'price-desc' | 'name';
 
 @Injectable({ providedIn: 'root' })
 export class FavorisService {
-  private base = "http://localhost:3000";
+  private base = environment.apiUrl;
   
   private headers(): Record<string, string> {
     const token = localStorage.getItem('token');

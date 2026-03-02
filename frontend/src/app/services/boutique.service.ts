@@ -1,3 +1,4 @@
+import { environment } from '../../environments/environment';
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
@@ -6,8 +7,8 @@ import { Boutique, BoutiquePagination, BoutiqueFilters, Categorie, CentreCommerc
 
 @Injectable({ providedIn: 'root' })
 export class BoutiqueService {
-   private base = 'http://localhost:3000';
-   private apiUrl = 'http://localhost:3000/boutiques';
+   private base = environment.apiUrl;
+   private apiUrl = `${environment.apiUrl}/boutiques`;
 
    constructor(private http: HttpClient) { }
 

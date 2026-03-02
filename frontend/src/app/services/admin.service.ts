@@ -1,3 +1,4 @@
+import { environment } from '../../environments/environment';
 // services/dashboard.service.ts
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
@@ -49,7 +50,7 @@ export interface CommandesBadge {
 
 @Injectable({ providedIn: 'root' })
 export class AdminService {
-  private base = 'http://localhost:3000';
+  private base = environment.apiUrl;
 
   constructor(private http: HttpClient,private authServ:AuthService) {}
 
