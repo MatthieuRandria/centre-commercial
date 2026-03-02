@@ -110,18 +110,26 @@ exports.getProduitById = async (req, res) => {
  */
 exports.createProduit = async (req, res) => {
    try {
-      // 📸 Upload images (multer)
       let images = [];
+
       if (req.files && req.files.length > 0) {
          images = req.files.map(file => file.path);
+      }
+
+      let variantes = [];
+
+      if (req.body.variantes) {
+         if (typeof req.body.variantes === "string") {
+            variantes = JSON.parse(req.body.variantes);
+         } else {
+            variantes = req.body.variantes;
+         }
       }
 
       const produitData = {
          ...req.body,
          images,
-         variantes: req.body.variantes
-            ? JSON.parse(req.body.variantes)
-            : []
+         variantes
       };
 
       const produit = await Produit.create(produitData);
