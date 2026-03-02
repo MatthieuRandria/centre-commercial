@@ -19,6 +19,7 @@ import { CommandeDetailComponent } from './pages/commande-detail/commande-detail
 import { ProduitDetailComponent } from './pages/produit-detail/produit-detail.component';
 import { CatalogueComponent } from './pages/catalogue/catalogue.component';
 import { PanierComponent } from './pages/panier/panier.component';
+import { FavorisComponent } from './pages/favoris/favoris.component';
 
 export const routes: Routes = [
     // { path: '', redirectTo: 'login', pathMatch: 'full' },
@@ -40,9 +41,10 @@ export const routes: Routes = [
     
     { path: 'profil', component: MeComponent, canActivate: [AuthGuard] },
     { path: 'client', component: ClientComponent, canActivate: [AuthGuard, RoleGuard], data: { role: 'client' } },
-    { path: 'client/commandes', component: ClientCommandeComponent, canActivate: [AuthGuard, RoleGuard], data: { role: 'client' } },
-    { path: 'client/commandes/:id', component: CommandeDetailComponent, canActivate: [AuthGuard] },
-    { path: 'panier', component: PanierComponent, canActivate: [AuthGuard] },
+    { path: 'commandes', component: ClientCommandeComponent, canActivate: [AuthGuard, RoleGuard], data: { role: 'client' } },
+    { path: 'commandes/:id', component: CommandeDetailComponent, canActivate: [AuthGuard, RoleGuard], data: { role: 'client' } },
+    { path: 'panier', component: PanierComponent, canActivate: [AuthGuard, RoleGuard], data: { role: 'client' } },
+    { path: 'favoris', component: FavorisComponent, canActivate: [AuthGuard, RoleGuard], data: { role: 'client' } },
     
     
     { path: 'dashboard', component: DashboardComponent, canActivate: [AuthGuard] }

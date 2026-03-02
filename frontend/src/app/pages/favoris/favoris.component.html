@@ -1,0 +1,201 @@
+<div class="page-wrapper">
+
+  <!-- ═══ PAGE BODY ════════════════════════════════════════════════════════ -->
+  <div class="page-body">
+
+    <!-- ── Sidebar compte ──────────────────────────────────────────────── -->
+    <aside class="account-sidebar">
+      <div class="acc-head">
+        <div class="acc-avatar">{{ currentUser?.initiale ?? '?' }}</div>
+        <div class="acc-name">{{ displayName }}</div>
+        <div class="acc-email">{{ currentUser?.email }}</div>
+      </div>
+      <nav class="acc-nav">
+        <a class="acc-nav-item" routerLink="/profil">
+          <span class="nav-dot"></span>Mon profil
+        </a>
+        <a class="acc-nav-item" routerLink="/commandes">
+          <span class="nav-dot"></span>Mes commandes
+        </a>
+        <a class="acc-nav-item active" routerLink="/favoris">
+          <span class="nav-dot"></span>Mes favoris
+        </a>
+        <a class="acc-nav-item" routerLink="/adresses">
+          <span class="nav-dot"></span>Mes adresses
+        </a>
+        <a class="acc-nav-item" routerLink="/mot-de-passe">
+          <span class="nav-dot"></span>Changer mot de passe
+        </a>
+        <button class="acc-nav-item logout-btn" type="button" (click)="logout()">
+          <span class="nav-dot danger-dot"></span>Déconnexion
+        </button>
+      </nav>
+    </aside>
+
+    <!-- ── Section principale ─────────────────────────────────────────── -->
+    <div class="main-section">
+
+      <!-- Header -->
+      <div class="main-header">
+        <h1 class="main-title">
+          Mes favoris
+          <span *ngIf="!isLoading">{{ countLabel }}</span>
+        </h1>
+        <select
+          class="sort-select"
+          [(ngModel)]="sortValue"
+          (change)="onSortChange()"
+          *ngIf="!isEmpty"
+        >
+          <option *ngFor="let o of sortOptions" [value]="o.value">{{ o.label }}</option>
+        </select>
+      </div>
+
+      <!-- ── Skeleton ── -->
+      <div class="favoris-grid" *ngIf="isLoading">
+        <div class="sk-card" *ngFor="let i of skeletonArr">
+          <div class="sk-img"></div>
+          <div class="sk-body">
+            <div class="sk-line w-30"></div>
+            <div class="sk-line w-70"></div>
+            <div class="sk-line w-50"></div>
+          </div>
+          <div class="sk-footer"></div>
+        </div>
+      </div>
+
+      <!-- ── État vide ── -->
+      <div class="empty-state" *ngIf="isEmpty">
+        <div class="empty-icon">♡</div>
+        <h2>Aucun favori pour l'instant</h2>
+        <p>
+          Vous n'avez pas encore ajouté de produits à vos favoris.<br>
+          Explorez notre catalogue et cliquez sur le cœur pour sauvegarder.
+        </p>
+        <a class="btn-discover" routerLink="/produits">Découvrir des produits</a>
+      </div>
+
+      <!-- ── Grille favoris ── -->
+      <div class="favoris-grid" *ngIf="!isLoading && !isEmpty">
+        <div
+          class="fav-card"
+          *ngFor="let item of displayFavoris; trackBy: trackById"
+          [class.is-removing]="removingId === item.produit._id"
+        >
+          <!-- Image -->
+          <div class="card-img" (click)="navigateProduit(item.produit._id)">
+            <img
+              *ngIf="getFirstImage(item)"
+              [src]="getFirstImage(item)!"
+              [alt]="item.produit.nom"
+              class="card-img-el"
+            />
+            <div class="img-placeholder" *ngIf="!getFirstImage(item)"></div>
+
+            <!-- Ruban promo -->
+            <span class="promo-ribbon" *ngIf="isEnPromotion(item)">
+              PROMO -{{ getPromoPercent(item) }}%
+            </span>
+
+            <!-- Bouton cœur -->
+            <button
+              class="fav-btn"
+              type="button"
+              [class.removing]="removingId === item.produit._id"
+              [disabled]="removingId === item.produit._id"
+              (click)="$event.stopPropagation(); openModalRemove(item)"
+              title="Retirer des favoris"
+            >♥</button>
+          </div>
+
+          <!-- Body -->
+          <div class="card-body">
+            <div class="card-boutique">{{ getBoutiqueName(item) }}</div>
+            <div class="card-name" (click)="navigateProduit(item.produit._id)">
+              {{ item.produit.nom }}
+            </div>
+
+            <!-- Prix -->
+            <div class="card-price-row">
+              <ng-container *ngIf="isEnPromotion(item) && getPrixPromo(item); else normalPrice">
+                <span class="price-promo">{{ formatMontant(getPrixPromo(item)!) }}</span>
+                <span class="price-crossed">{{ formatMontant(getPrix(item)) }}</span>
+              </ng-container>
+              <ng-template #normalPrice>
+                <span class="price-normal">{{ formatMontant(getPrix(item)) }}</span>
+              </ng-template>
+            </div>
+
+            <!-- Stock -->
+            <span class="stock-badge" [ngClass]="getStockClass(item)">
+              <span class="s-dot"></span>{{ getStockLabel(item) }}
+            </span>
+          </div>
+
+          <!-- Footer -->
+          <div class="card-footer">
+            <button
+              class="btn-panier"
+              type="button"
+              *ngIf="getStock(item) > 0; else indispo"
+              [disabled]="addingCartId === item.produit._id"
+              [class.adding]="addingCartId === item.produit._id"
+              [class.success]="cartSuccessId === item.produit._id"
+              (click)="addToCart(item)"
+            >
+              <ng-container *ngIf="cartSuccessId === item.produit._id">✓ Ajouté !</ng-container>
+              <ng-container *ngIf="addingCartId === item.produit._id">
+                <span class="spinner-btn"></span>
+              </ng-container>
+              <ng-container *ngIf="cartSuccessId !== item.produit._id && addingCartId !== item.produit._id">
+                + Ajouter au panier
+              </ng-container>
+            </button>
+            <ng-template #indispo>
+              <button class="btn-panier" type="button" disabled>Indisponible</button>
+            </ng-template>
+
+            <button
+              class="btn-detail"
+              type="button"
+              (click)="navigateProduit(item.produit._id)"
+              title="Voir le produit"
+            >→</button>
+          </div>
+        </div>
+      </div>
+
+    </div><!-- /main-section -->
+  </div><!-- /page-body -->
+
+</div><!-- /page-wrapper -->
+
+<!-- ═══ MODAL CONFIRMATION SUPPRESSION ═══════════════════════════════════════ -->
+<div
+  class="modal-overlay"
+  [class.open]="modalOpen"
+  (click)="closeModal()"
+>
+  <div class="modal-box" (click)="$event.stopPropagation()">
+    <div class="modal-icon">♡</div>
+    <h3>Retirer des favoris</h3>
+    <p class="modal-desc">
+      Voulez-vous retirer
+      <strong>{{ pendingRemoveItem?.produit?.nom }}</strong>
+      de vos favoris ?
+    </p>
+    <div class="modal-btns">
+      <button class="btn-cancel-modal" type="button" (click)="closeModal()">Annuler</button>
+      <button class="btn-confirm-rm"   type="button" (click)="confirmRemove()">Retirer</button>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ TOAST ════════════════════════════════════════════════════════════════ -->
+<div
+  class="toast"
+  [class.show]="toast.visible"
+  [class.success]="toast.type === 'success'"
+  [class.removed]="toast.type === 'removed'"
+  [class.error]="toast.type === 'error'"
+>{{ toast.message }}</div>

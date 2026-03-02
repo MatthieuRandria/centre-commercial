@@ -1,4 +1,3 @@
-// src/services/dashboard.service.js
 const Boutique  = require('../models/Boutique');
 const Commande  = require('../models/Commande');
 const Produit   = require('../models/Produit');
