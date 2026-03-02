@@ -120,30 +120,38 @@ boutiqueSchema.virtual('url').get(function() {
 });
 
 boutiqueSchema.virtual('est_ouvert_maintenant').get(function() {
+
+   if (!this.horaires || !Array.isArray(this.horaires)) {
+      return false;
+   }
+
    const maintenant = new Date();
    const jourActuel = ['Dimanche', 'Lundi', 'Mardi', 'Mercredi', 'Jeudi', 'Vendredi', 'Samedi'][maintenant.getDay()];
    const heureActuelle = `${String(maintenant.getHours()).padStart(2, '0')}:${String(maintenant.getMinutes()).padStart(2, '0')}`;
-   
+
    const horaireJour = this.horaires.find(h => h.jour === jourActuel);
-   
-   if (!horaireJour || !horaireJour.ouvert) {
+
+   if (!horaireJour || !horaireJour.ouvert || !horaireJour.heures) {
       return false;
    }
-   
-   // Vérifier si l'heure actuelle est dans les horaires
-   const estDansHoraires = heureActuelle >= horaireJour.heures.ouverture && 
-                           heureActuelle <= horaireJour.heures.fermeture;
-   
-   // Vérifier la pause déjeuner
-   if (estDansHoraires && horaireJour.pause_dejeuner.actif) {
-      const estEnPause = heureActuelle >= horaireJour.pause_dejeuner.debut && 
-                        heureActuelle <= horaireJour.pause_dejeuner.fin;
+
+   if (!horaireJour.heures.ouverture || !horaireJour.heures.fermeture) {
+      return false;
+   }
+
+   const estDansHoraires =
+      heureActuelle >= horaireJour.heures.ouverture &&
+      heureActuelle <= horaireJour.heures.fermeture;
+
+   if (estDansHoraires && horaireJour.pause_dejeuner?.actif) {
+      const estEnPause =
+         heureActuelle >= horaireJour.pause_dejeuner.debut &&
+         heureActuelle <= horaireJour.pause_dejeuner.fin;
       return !estEnPause;
    }
-   
+
    return estDansHoraires;
 });
-
 // ===== MIDDLEWARE PRE-SAVE =====
 
 /**
@@ -320,6 +328,9 @@ boutiqueSchema.methods.estOuvertA = function(date = new Date()) {
    
    const horaireJour = this.horaires.find(h => h.jour === jour);
    
+   if (!this.horaires || !Array.isArray(this.horaires)) {
+      return false;
+   }
    if (!horaireJour || !horaireJour.ouvert) {
       return false;
    }
