@@ -6,6 +6,7 @@ const CentreCommercial = require('../models/CentreCommercial');
  */
 exports.createCentre = async (req, res) => {
    try {
+      await connectDB();
       const centre = new CentreCommercial(req.body);
       const savedCentre = await centre.save();
 
