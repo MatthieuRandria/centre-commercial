@@ -16,6 +16,7 @@ const commandeRoutes      = require('./routes/commande.routes');
 const avisRoutes          = require('./routes/avis.routes');
 const favorisRoutes       = require('./routes/favoris.routes');
 const dashboardRoutes     = require('./routes/dashboard.routes');
+const promotionRoutes     = require('./routes/promotion.routes')
 
 app.use('/api/auth',       authRoutes);
 app.use('/centres',        centreRoutes);
@@ -27,5 +28,6 @@ app.use('/commande',       commandeRoutes);
 app.use('/avis',           avisRoutes);
 app.use('/favoris',        favorisRoutes);
 app.use('/dashboard',      dashboardRoutes);
+app.use('/promotions',     promotionRoutes);
 
 module.exports = app;

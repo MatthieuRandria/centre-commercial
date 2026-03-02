@@ -7,20 +7,16 @@ const getAllBoutiques = async (req, res) => {
    try {
       const { centreId, categorieId, statut, page = 1, limit = 20, sort = 'nom', order = 'asc', search, etage, noteMin } = req.query;
 
-      // Construction de la query de filtrage
       const query = {};
 
-      // Filtre par centre commercial
       if (centreId) {
          query.centre_commercial = centreId;
       }
 
-      // Filtre par catégorie
       if (categorieId) {
          query.categorie = categorieId;
       }
 
-      // Filtre par statut
       if (statut) {
          query.statut = statut;
       } else {
@@ -28,17 +24,14 @@ const getAllBoutiques = async (req, res) => {
          query.statut = { $ne: 'fermee_definitivement' };
       }
 
-      // Filtre par étage
       if (etage) {
          query['localisation.etage'] = etage;
       }
 
-      // Filtre par note minimale
       if (noteMin) {
          query.note_moyenne = { $gte: parseFloat(noteMin) };
       }
 
-      // Recherche textuelle
       if (search) {
          query.$or = [
          { nom: { $regex: search, $options: 'i' } },
@@ -57,20 +50,17 @@ const getAllBoutiques = async (req, res) => {
       const limitNum = parseInt(limit);
       const skip = (pageNum - 1) * limitNum;
 
-      // Compter le total de documents
       const total = await Boutique.countDocuments(query);
 
-      // Récupérer les boutiques avec populate
       const boutiques = await Boutique.find(query)
          .populate('centre_commercial', 'nom adresse.ville adresse.code_postal slug')
          .populate('categorie', 'nom icone couleur slug')
          .sort(sortOptions)
          .limit(limitNum)
          .skip(skip)
-         .select('-metadata') // Exclure metadata pour alléger la réponse
-         .lean(); // Convertir en plain objects pour performance
+         .select('-metadata') // Exclure metadata
+         .lean(); // Convertir en plain objects
 
-      // Calculer le nombre de pages
       const totalPages = Math.ceil(total / limitNum);
 
       res.status(200).json({
@@ -102,7 +92,6 @@ const getBoutiqueById = async (req, res) => {
    try {
       const { id } = req.params;
 
-      // Vérifier la validité de l'ID
       if (!id.match(/^[0-9a-fA-F]{24}$/)) {
          return res.status(400).json({
          success: false,
@@ -110,7 +99,6 @@ const getBoutiqueById = async (req, res) => {
          });
       }
 
-      // Récupérer la boutique avec toutes les références
       const boutique = await Boutique.findById(id)
          .populate('centre_commercial')
          .populate('categorie');
@@ -122,10 +110,8 @@ const getBoutiqueById = async (req, res) => {
          });
       }
 
-      // Incrémenter le nombre de vues
       await boutique.incrementerVues();
 
-      // Récupérer les informations supplémentaires
       const data = {
          ...boutique.toObject(),
          est_ouvert_maintenant: boutique.est_ouvert_maintenant,
@@ -162,7 +148,6 @@ const getBoutiqueBySlug = async (req, res) => {
          });
       }
 
-      // Incrémenter le nombre de vues
       await boutique.incrementerVues();
 
       const data = {
@@ -190,7 +175,6 @@ const createBoutique = async (req, res) => {
    try {
       const { nom, centre_commercial, categorie, localisation, infos, horaires, statut, date_ouverture, tags } = req.body;
 
-      // Validation des champs requis
       if (!nom || !centre_commercial || !categorie || !localisation || !infos) {
          return res.status(400).json({
          success: false,
@@ -198,7 +182,6 @@ const createBoutique = async (req, res) => {
          });
       }
 
-      // Vérifier que le centre commercial existe
       const centreExists = await CentreCommercial.findById(centre_commercial);
       if (!centreExists) {
          return res.status(404).json({
@@ -207,7 +190,6 @@ const createBoutique = async (req, res) => {
          });
       }
 
-      // Vérifier que la catégorie existe
       const categorieExists = await BoutiqueCategorie.findById(categorie);
       if (!categorieExists) {
          return res.status(404).json({
@@ -241,7 +223,6 @@ const createBoutique = async (req, res) => {
          });
       }
 
-      // Créer la boutique
       const boutique = new Boutique({
          nom,
          centre_commercial,
@@ -259,13 +240,11 @@ const createBoutique = async (req, res) => {
       // Mettre à jour le compteur de la catégorie
       await BoutiqueCategorie.updateNombreBoutiques(categorie);
 
-      // Mettre à jour le compteur du centre commercial
       await CentreCommercial.findByIdAndUpdate(
          centre_commercial,
          { $inc: { nombre_boutiques: 1 } }
       );
 
-      // Récupérer la boutique avec populate
       const boutiqueComplete = await Boutique.findById(boutique._id)
          .populate('centre_commercial', 'nom adresse.ville')
          .populate('categorie', 'nom icone');
@@ -310,7 +289,6 @@ const updateBoutique = async (req, res) => {
       const { id } = req.params;
       const updateData = req.body;
 
-      // Vérifier la validité de l'ID
       if (!id.match(/^[0-9a-fA-F]{24}$/)) {
          return res.status(400).json({
          success: false,
@@ -318,7 +296,6 @@ const updateBoutique = async (req, res) => {
          });
       }
 
-      // Récupérer la boutique existante
       const boutique = await Boutique.findById(id);
       if (!boutique) {
          return res.status(404).json({
@@ -327,8 +304,6 @@ const updateBoutique = async (req, res) => {
          });
       }
 
-      // Vérifier les permissions (si middleware auth disponible)
-      // Note: À adapter selon votre système d'authentification
       if (req.user && req.user.role !== 'admin') {
          const hasPermission = await UserBoutique.aPermission(
          req.user.id,
@@ -344,7 +319,6 @@ const updateBoutique = async (req, res) => {
          }
       }
 
-      // Champs qui ne peuvent pas être modifiés directement
       delete updateData._id;
       delete updateData.createdAt;
       delete updateData.updatedAt;
@@ -401,7 +375,6 @@ const updateBoutique = async (req, res) => {
       Object.assign(boutique, updateData);
       await boutique.save();
 
-      // Récupérer la boutique mise à jour avec populate
       const boutiqueUpdated = await Boutique.findById(id)
          .populate('centre_commercial', 'nom adresse.ville')
          .populate('categorie', 'nom icone');
@@ -453,7 +426,6 @@ const patchBoutique = async (req, res) => {
          });
       }
 
-      // Vérifier les permissions pour les champs spécifiques
       if (req.user && req.user.role !== 'admin') {
          const permissionMap = {
          'horaires': 'modifier_horaires',
@@ -476,7 +448,6 @@ const patchBoutique = async (req, res) => {
          }
       }
 
-      // Appliquer la modification
       boutique[field] = value;
       await boutique.save();
 
@@ -512,7 +483,6 @@ const deleteBoutique = async (req, res) => {
       boutique.statut = 'fermee_definitivement';
       await boutique.save();
 
-      // Mettre à jour les compteurs
       await BoutiqueCategorie.updateNombreBoutiques(boutique.categorie);
       await CentreCommercial.findByIdAndUpdate(
          boutique.centre_commercial,
@@ -546,7 +516,6 @@ const getBoutiqueStats = async (req, res) => {
          });
       }
 
-      // Vérifier les permissions
       if (req.user && req.user.role !== 'admin') {
          const hasPermission = await UserBoutique.aPermission(
          req.user.id,
