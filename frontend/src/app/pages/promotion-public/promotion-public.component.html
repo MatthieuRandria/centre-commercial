@@ -1,0 +1,410 @@
+<!-- HERO -->
+<section class="hero-banner">
+  <div class="hero-deco-l"></div>
+  <div class="hero-deco-r"></div>
+  <span class="hero-tag">⚡ Offres en cours</span>
+  <h1 class="hero-title">Promotions du moment</h1>
+  <p class="hero-sub">Les meilleures offres de vos boutiques préférées au Galaxy Mall</p>
+  <div class="hero-stats">
+    <div class="hero-stat">
+      <div class="hero-stat-val">{{ loading ? '—' : activeCount }}</div>
+      <div class="hero-stat-label">Codes actifs</div>
+    </div>
+    <div class="hero-stat-sep"></div>
+    <div class="hero-stat">
+      <div class="hero-stat-val">{{ loading ? '—' : flashCount }}</div>
+      <div class="hero-stat-label">Offres flash</div>
+    </div>
+    <div class="hero-stat-sep"></div>
+    <div class="hero-stat">
+      <div class="hero-stat-val">{{ loading ? '—' : maxDiscount }}</div>
+      <div class="hero-stat-label">Réduction max</div>
+    </div>
+  </div>
+</section>
+
+<!-- CODES PROMO -->
+<section class="section">
+  <div class="container">
+    <div class="section-header">
+      <div>
+        <div class="section-title">Codes promotionnels</div>
+        <div class="section-sub">Copiez un code et utilisez-le lors de votre commande</div>
+      </div>
+      <div class="filter-tabs">
+        <button
+          *ngFor="let f of filters"
+          class="ftab"
+          [class.active]="activeFilter === f.key"
+          (click)="setFilter(f.key)">
+          {{ f.label }}
+        </button>
+      </div>
+    </div>
+
+    <!-- Loading -->
+    <div *ngIf="loading" class="loading-grid">
+      <div class="skeleton-card" *ngFor="let i of [1,2,3]"></div>
+    </div>
+
+    <!-- Empty -->
+    <div *ngIf="!loading && filtered.length === 0" class="empty-state">
+      <div class="ei">🎫</div>
+      <h2>Aucune promotion disponible</h2>
+      <p>Revenez bientôt pour découvrir de nouvelles offres.</p>
+    </div>
+
+    <!-- Grid -->
+    <div class="promo-grid" *ngIf="!loading && filtered.length > 0">
+      <div
+        class="promo-card"
+        *ngFor="let promo of filtered"
+        [class.expired]="getStatut(promo) === 'expiree'"
+        [class.suspended]="getStatut(promo) === 'suspendue'">
+
+        <div class="promo-card-top">
+          <!-- Urgent badge -->
+          <span class="urgent-badge" *ngIf="isFlash(promo)">⚡ Expire bientôt</span>
+
+          <!-- Type tag -->
+          <span class="promo-type-tag" [ngClass]="typeTagClass(promo)">{{ typeTagLabel(promo) }}</span>
+
+          <!-- Statut badge (a_venir / suspendue) -->
+          <span class="statut-pill" [ngClass]="statutClass(promo)"
+            *ngIf="getStatut(promo) !== 'active'">
+            {{ getStatut(promo) === 'a_venir' ? '🕐 À venir' :
+               getStatut(promo) === 'suspendue' ? '⏸ Suspendue' : '✗ Expirée' }}
+          </span>
+
+          <div class="promo-title-code">{{ promo.code }}</div>
+          <div class="promo-desc">{{ promo.description }}</div>
+
+          <!-- Valeur -->
+          <div class="promo-value-big" [class.small]="isFixe(promo)">{{ valueBig(promo) }}</div>
+          <div class="promo-value-label">
+            <span *ngIf="promo.montantMinCommande > 0">
+              Min. {{ promo.montantMinCommande | number:'1.0-0' }} Ar d'achat
+            </span>
+            <span *ngIf="promo.montantMinCommande === 0">Sur tous les articles</span>
+            <span *ngIf="promo.remiseMax"> · Max {{ promo.remiseMax | number:'1.0-0' }} Ar</span>
+          </div>
+
+          <!-- Code à copier -->
+          <div class="promo-code-block">
+            <span class="promo-code-text">{{ promo.code }}</span>
+            <button
+              class="btn-copy"
+              [class.copied]="copiedCodes.has(promo.code)"
+              (click)="copyCode(promo.code)">
+              {{ copiedCodes.has(promo.code) ? 'Copié !' : 'Copier' }}
+            </button>
+          </div>
+
+          <!-- Countdown si flash -->
+          <div class="countdown-row" *ngIf="isFlash(promo)">
+            <span class="countdown-label">Expire dans</span>
+            <div class="countdown-blocks">
+              <div class="cd-block">
+                <div class="cd-num">{{ countdown.h }}</div>
+                <div class="cd-unit">h</div>
+              </div>
+              <span class="cd-sep">:</span>
+              <div class="cd-block">
+                <div class="cd-num">{{ countdown.m }}</div>
+                <div class="cd-unit">min</div>
+              </div>
+              <span class="cd-sep">:</span>
+              <div class="cd-block">
+                <div class="cd-num">{{ countdown.s }}</div>
+                <div class="cd-unit">sec</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Date de fin (non-flash) -->
+          <div class="promo-expire" *ngIf="!isFlash(promo)">
+            Du {{ promo.dateDebut | date:'dd/MM/yyyy' }}
+            au {{ promo.dateFin  | date:'dd/MM/yyyy' }}
+          </div>
+
+          <!-- Barre d'utilisation -->
+          <ng-container *ngIf="promo.limiteUtilisation">
+            <div class="promo-used-bar">
+              <div class="promo-used-fill" [style.width.%]="usagePercent(promo)"></div>
+            </div>
+            <div class="promo-used-label">
+              <span>{{ usagePercent(promo) }}% utilisé</span>
+              <span>{{ usageRemaining(promo) }} / {{ promo.limiteUtilisation }} restants</span>
+            </div>
+          </ng-container>
+
+          <!-- Utilisations sans limite -->
+          <div class="promo-used-label" *ngIf="!promo.limiteUtilisation">
+            <span>{{ promo.nombreUtilisations }} utilisation(s)</span>
+            <span>Sans limite</span>
+          </div>
+        </div>
+
+        <!-- Overlay expiré -->
+        <div class="expired-label" *ngIf="getStatut(promo) === 'expiree'">Cette promotion est expirée</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- PRODUITS EN PROMO (statiques — à brancher sur un ProduitService) -->
+<!-- <section class="section alt">
+  <div class="container">
+    <div class="section-header">
+      <div>
+        <div class="section-title">Produits en promotion</div>
+        <div class="section-sub">48 produits en ce moment</div>
+      </div>
+      <a routerLink="/catalogue" [queryParams]="{promo: true}" class="btn-voir-tous">
+        Voir tous les produits
+      </a>
+    </div>
+
+    <div class="prods-grid">
+      <a class="prod-card" routerLink="/catalogue/produit">
+        <div class="prod-img">
+          <div class="prod-img-ph"></div>
+          <span class="promo-ribbon">-20%</span>
+          <button class="fav-btn" (click)="toggleFav('p1', $event)" [class.active]="favorites.has('p1')">
+            {{ favorites.has('p1') ? '♥' : '♡' }}
+          </button>
+        </div>
+        <div class="prod-body">
+          <div class="prod-boutique">Zara Madagascar</div>
+          <div class="prod-name">Robe Midi Fleurie</div>
+          <div class="price-row">
+            <span class="price-promo">75 000 Ar</span>
+            <span class="price-old">89 000 Ar</span>
+          </div>
+          <span class="price-save">Vous économisez 14 000 Ar</span>
+        </div>
+        <div class="prod-footer">
+          <button class="btn-add" (click)="$event.preventDefault(); showToast('Article ajouté au panier !', 'success')">
+            + Ajouter au panier
+          </button>
+        </div>
+      </a>
+
+      <a class="prod-card" routerLink="/catalogue/produit">
+        <div class="prod-img">
+          <div class="prod-img-ph"></div>
+          <span class="promo-ribbon">-20%</span>
+          <button class="fav-btn" (click)="toggleFav('p2', $event)" [class.active]="favorites.has('p2')">
+            {{ favorites.has('p2') ? '♥' : '♡' }}
+          </button>
+        </div>
+        <div class="prod-body">
+          <div class="prod-boutique">Nike Flagship</div>
+          <div class="prod-name">Air Max 2024</div>
+          <div class="price-row">
+            <span class="price-promo">304 000 Ar</span>
+            <span class="price-old">380 000 Ar</span>
+          </div>
+          <span class="price-save">Vous économisez 76 000 Ar</span>
+        </div>
+        <div class="prod-footer">
+          <button class="btn-add" (click)="$event.preventDefault(); showToast('Article ajouté au panier !', 'success')">
+            + Ajouter au panier
+          </button>
+        </div>
+      </a>
+
+      <a class="prod-card" routerLink="/catalogue/produit">
+        <div class="prod-img">
+          <div class="prod-img-ph"></div>
+          <span class="promo-ribbon">-24%</span>
+          <button class="fav-btn" (click)="toggleFav('p3', $event)" [class.active]="favorites.has('p3')">
+            {{ favorites.has('p3') ? '♥' : '♡' }}
+          </button>
+        </div>
+        <div class="prod-body">
+          <div class="prod-boutique">H&amp;M Collection</div>
+          <div class="prod-name">Pull Oversize Cachemire</div>
+          <div class="price-row">
+            <span class="price-promo">52 000 Ar</span>
+            <span class="price-old">68 000 Ar</span>
+          </div>
+          <span class="price-save">Vous économisez 16 000 Ar</span>
+        </div>
+        <div class="prod-footer">
+          <button class="btn-add" (click)="$event.preventDefault(); showToast('Article ajouté au panier !', 'success')">
+            + Ajouter au panier
+          </button>
+        </div>
+      </a>
+
+      <a class="prod-card" routerLink="/catalogue/produit">
+        <div class="prod-img">
+          <div class="prod-img-ph"></div>
+          <span class="promo-ribbon">-15%</span>
+          <button class="fav-btn" (click)="toggleFav('p4', $event)" [class.active]="favorites.has('p4')">
+            {{ favorites.has('p4') ? '♥' : '♡' }}
+          </button>
+        </div>
+        <div class="prod-body">
+          <div class="prod-boutique">L'Oreal Beauty</div>
+          <div class="prod-name">Parfum Lumière Intense 100ml</div>
+          <div class="price-row">
+            <span class="price-promo">119 000 Ar</span>
+            <span class="price-old">140 000 Ar</span>
+          </div>
+          <span class="price-save">Vous économisez 21 000 Ar</span>
+        </div>
+        <div class="prod-footer">
+          <button class="btn-add" (click)="$event.preventDefault(); showToast('Article ajouté au panier !', 'success')">
+            + Ajouter au panier
+          </button>
+        </div>
+      </a>
+
+      <a class="prod-card" routerLink="/catalogue/produit">
+        <div class="prod-img">
+          <div class="prod-img-ph"></div>
+          <span class="promo-ribbon">-25%</span>
+          <button class="fav-btn" (click)="toggleFav('p5', $event)" [class.active]="favorites.has('p5')">
+            {{ favorites.has('p5') ? '♥' : '♡' }}
+          </button>
+        </div>
+        <div class="prod-body">
+          <div class="prod-boutique">Nike Flagship</div>
+          <div class="prod-name">T-Shirt Dri-FIT Training</div>
+          <div class="price-row">
+            <span class="price-promo">37 000 Ar</span>
+            <span class="price-old">49 000 Ar</span>
+          </div>
+          <span class="price-save">Vous économisez 12 000 Ar</span>
+        </div>
+        <div class="prod-footer">
+          <button class="btn-add" (click)="$event.preventDefault(); showToast('Article ajouté au panier !', 'success')">
+            + Ajouter au panier
+          </button>
+        </div>
+      </a>
+
+      <a class="prod-card" routerLink="/catalogue/produit">
+        <div class="prod-img">
+          <div class="prod-img-ph"></div>
+          <span class="promo-ribbon">-30%</span>
+          <button class="fav-btn" (click)="toggleFav('p6', $event)" [class.active]="favorites.has('p6')">
+            {{ favorites.has('p6') ? '♥' : '♡' }}
+          </button>
+        </div>
+        <div class="prod-body">
+          <div class="prod-boutique">Zara Madagascar</div>
+          <div class="prod-name">Blazer Structure Femme</div>
+          <div class="price-row">
+            <span class="price-promo">84 000 Ar</span>
+            <span class="price-old">120 000 Ar</span>
+          </div>
+          <span class="price-save">Vous économisez 36 000 Ar</span>
+        </div>
+        <div class="prod-footer">
+          <button class="btn-add" (click)="$event.preventDefault(); showToast('Article ajouté au panier !', 'success')">
+            + Ajouter au panier
+          </button>
+        </div>
+      </a>
+
+      <a class="prod-card" routerLink="/catalogue/produit">
+        <div class="prod-img">
+          <div class="prod-img-ph"></div>
+          <span class="promo-ribbon">-10%</span>
+          <button class="fav-btn" (click)="toggleFav('p7', $event)" [class.active]="favorites.has('p7')">
+            {{ favorites.has('p7') ? '♥' : '♡' }}
+          </button>
+        </div>
+        <div class="prod-body">
+          <div class="prod-boutique">Apple Store</div>
+          <div class="prod-name">AirPods Pro 2ème gen</div>
+          <div class="price-row">
+            <span class="price-promo">559 000 Ar</span>
+            <span class="price-old">620 000 Ar</span>
+          </div>
+          <span class="price-save">Vous économisez 61 000 Ar</span>
+        </div>
+        <div class="prod-footer">
+          <button class="btn-add" (click)="$event.preventDefault(); showToast('Article ajouté au panier !', 'success')">
+            + Ajouter au panier
+          </button>
+        </div>
+      </a>
+
+      <a class="prod-card" routerLink="/catalogue/produit">
+        <div class="prod-img">
+          <div class="prod-img-ph"></div>
+          <span class="promo-ribbon">-16%</span>
+          <button class="fav-btn" (click)="toggleFav('p8', $event)" [class.active]="favorites.has('p8')">
+            {{ favorites.has('p8') ? '♥' : '♡' }}
+          </button>
+        </div>
+        <div class="prod-body">
+          <div class="prod-boutique">H&amp;M Collection</div>
+          <div class="prod-name">Jean Slim Femme</div>
+          <div class="price-row">
+            <span class="price-promo">42 000 Ar</span>
+            <span class="price-old">50 000 Ar</span>
+          </div>
+          <span class="price-save">Vous économisez 8 000 Ar</span>
+        </div>
+        <div class="prod-footer">
+          <button class="btn-add" (click)="$event.preventDefault(); showToast('Article ajouté au panier !', 'success')">
+            + Ajouter au panier
+          </button>
+        </div>
+      </a>
+    </div>
+  </div>
+</section> -->
+
+ <!-- ═══ FOOTER ════════════════════════════════════════════════════════════ -->
+  <footer class="footer">
+    <div class="footer-body">
+      <div class="footer-brand">
+        <div class="footer-logo">CentreShop</div>
+        <p class="footer-desc">La plateforme officielle du Galaxy Mall d'Antananarivo. Découvrez, comparez et achetez en Click & Collect.</p>
+        <div class="socials">
+          <a class="social-btn" href="#" title="Facebook">f</a>
+          <a class="social-btn" href="#" title="Instagram">◎</a>
+          <a class="social-btn" href="#" title="Twitter">✕</a>
+          <a class="social-btn" href="#" title="WhatsApp">💬</a>
+        </div>
+      </div>
+      <div class="footer-col">
+        <h3>Boutique</h3>
+        <a routerLink="/boutique">Nos boutiques</a>
+        <a routerLink="/produits">Catalogue</a>
+        <a routerLink="/produits" [queryParams]="{ promo: true }">Promotions</a>
+        <a routerLink="/produits" [queryParams]="{ sort: 'nouveautes' }">Nouveautés</a>
+      </div>
+      <div class="footer-col">
+        <h3>Mon compte</h3>
+        <a routerLink="/login">Connexion</a>
+        <a routerLink="/register">Inscription</a>
+        <a routerLink="/commandes">Mes commandes</a>
+        <a routerLink="/favoris">Mes favoris</a>
+        <a routerLink="/panier">Mon panier</a>
+      </div>
+      <div class="footer-col">
+        <h3>Aide</h3>
+        <a routerLink="/contact">Contact</a>
+        <a href="#">FAQ</a>
+        <a href="#">Livraison</a>
+        <a href="#">Retours</a>
+        <a href="#">CGV</a>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <span>© 2026 CentreShop — Galaxy Mall Antananarivo. Tous droits réservés.</span>
+      <span>Fait avec ❤ à Madagascar</span>
+    </div>
+  </footer>
+
+<!-- TOAST -->
+<div class="toast" [class.show]="toast" [class.success]="toast?.type === 'success'" *ngIf="toast">
+  {{ toast?.message }}
+</div>

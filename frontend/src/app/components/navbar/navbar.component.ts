@@ -61,14 +61,14 @@ export class NavbarComponent implements OnInit {
       this.navItems.splice(2, 0,
         { label: 'Panier', link: '/panier' },
         { label: 'Mes commandes', link: '/client/commandes' },
-        { label: 'Mes favoris', link: '/favoris' }
+        { label: 'Mes favoris', link: '/favoris' },
+        { label: 'Promotions', link: '/promotions' }
       );
     }
     // Liens visibles uniquement si connecté en tant qu'admin
     if (this.user?.role === 'admin') {
       this.navItems.splice(2, 0,
         { label: 'Admin', link: '/admin' },
-        { label: 'Gerer Boutique', link: '/admin/boutiques' },
       );
     }
   }

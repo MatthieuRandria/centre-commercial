@@ -201,7 +201,7 @@ export class PanierComponent implements OnInit,OnDestroy {
         this.commandeSuccess = true;
         const commandeId = res.data?._id ?? res._id;
         setTimeout(() => {
-          this.router.navigate(['/commandes', commandeId]);
+          this.router.navigate(['/client/commandes/confirm', commandeId]);
         }, 1200);
       }
     });
