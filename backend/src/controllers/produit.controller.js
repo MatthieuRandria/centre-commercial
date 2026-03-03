@@ -17,7 +17,7 @@ exports.getAllProduitsMahery = async (req, res, next) => {
       } = req.query;
 
       const filters = { actif: true };
-      if (boutiqueId) filters.boutique = boutiqueId;
+      // if (boutiqueId) filters.boutique = boutiqueId;
       if (categorie)  filters['categories.nom'] = categorie;
       if (prixMin || prixMax) {
          filters["variantes.prix"] = {};
