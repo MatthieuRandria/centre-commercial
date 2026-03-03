@@ -1,0 +1,311 @@
+$accent:              #2d4a3e;
+$accent-hover-bg:     rgba(255, 255, 255, 0.08);
+$accent-active-bg:    rgba(255, 255, 255, 0.13);
+$accent-bar:          #a8d5b8;
+$border-color:        #ddd9d0;
+$text-muted:          #5c5c57;
+$sidebar-w:           248px;
+$sidebar-collapsed-w: 64px;
+$ease:                0.32s cubic-bezier(0.4, 0, 0.2, 1);
+
+// ─── Host ────────────────────────────────────────────────────────────────────
+:host {
+  display: block;
+}
+
+// ─── Sidebar (position FIXED) ────────────────────────────────────────────────
+.sidebar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  bottom: 0;
+  z-index: 200;
+
+  width: $sidebar-w;
+  background: $accent;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  box-shadow: 4px 0 32px rgba(45, 74, 62, 0.20);
+  transition: width $ease;
+
+  &.collapsed {
+    width: $sidebar-collapsed-w;
+
+    .brand-text,
+    .nav-label,
+    .admin-text {
+      opacity: 0;
+      transform: translateX(-6px);
+      pointer-events: none;
+    }
+
+    .brand-text { transform: translateX(-8px); }
+
+    .nav-badge {
+      opacity: 0;
+      transform: scale(0.5);
+      pointer-events: none;
+    }
+
+    .nav-section-label { opacity: 0; }
+
+    .nav-item.active::after { display: none; }
+
+    // Tooltip au hover
+    .nav-item:hover::before {
+      content: attr(data-tip);
+      position: fixed;
+      left: calc(#{$sidebar-collapsed-w} + 10px);
+      background: #1a1a18;
+      color: #fff;
+      font-size: 12px;
+      font-weight: 600;
+      padding: 5px 12px;
+      border-radius: 7px;
+      white-space: nowrap;
+      pointer-events: none;
+      z-index: 9999;
+      box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
+    }
+  }
+}
+
+// ─── Toggle button — style Claude, coin supérieur droit ──────────────────────
+.toggle-btn {
+  position: absolute;
+  top: 14px;
+  right: 10px;
+  z-index: 10;
+
+  width: 30px;
+  height: 30px;
+  background: rgba(255, 255, 255, 0.08);
+  border: none;
+  border-radius: 7px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: rgba(255, 255, 255, 0.55);
+  transition: background 0.2s, color 0.2s;
+  flex-shrink: 0;
+
+  &:hover {
+    background: rgba(255, 255, 255, 0.16);
+    color: #fff;
+  }
+
+  svg {
+    display: block;
+    flex-shrink: 0;
+  }
+}
+
+// ─── Brand ───────────────────────────────────────────────────────────────────
+.sidebar-brand {
+  // Laisser de la place pour le bouton toggle (30px + 10px marge droite + 10px gauche)
+  padding: 50px 10px 16px 16px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-shrink: 0;
+  min-height: 60px;
+  overflow: hidden;
+}
+
+.brand-icon {
+  width: 32px;
+  height: 32px;
+  flex-shrink: 0;
+}
+
+.brand-text {
+  white-space: nowrap;
+  overflow: hidden;
+  transition: opacity $ease, transform $ease;
+}
+
+.sidebar-logo {
+  font-family: 'Syne', sans-serif;
+  font-size: 20px;
+  font-weight: 800;
+  color: #fff;
+  letter-spacing: -0.4px;
+  line-height: 1;
+}
+
+.sidebar-logo span{
+  opacity: 0.5;
+  font-weight: 400;
+}
+
+.sidebar-role {
+  font-size: 10px;
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.4);
+  text-transform: uppercase;
+  letter-spacing: 1.2px;
+  margin-top: 3px;
+}
+
+// ─── Nav ─────────────────────────────────────────────────────────────────────
+.sidebar-nav {
+  padding: 12px 10px;
+  flex: 1;
+  overflow-y: auto;
+  overflow-x: hidden;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(255, 255, 255, 0.1) transparent;
+}
+
+.nav-section-label {
+  font-size: 9.5px;
+  font-weight: 700;
+  color: rgba(255, 255, 255, 0.28);
+  text-transform: uppercase;
+  letter-spacing: 1.2px;
+  padding: 8px 14px 5px;
+  margin-top: 6px;
+  white-space: nowrap;
+  overflow: hidden;
+  transition: opacity $ease;
+}
+
+.nav-item {
+  display: flex;
+  align-items: center;
+  gap: 11px;
+  padding: 10px 7px;
+  border-radius: 9px;
+  color: rgba(255, 255, 255, 0.6);
+  font-size: 13px;
+  font-weight: 500;
+  text-decoration: none;
+  cursor: pointer;
+  margin-bottom: 1px;
+  position: relative;
+  white-space: nowrap;
+  transition: background 0.18s, color 0.18s;
+
+  &:hover {
+    background: $accent-hover-bg;
+    color: #fff;
+  }
+
+  &.active {
+    background: $accent-active-bg;
+    color: #fff;
+
+    &::after {
+      content: '';
+      position: absolute;
+      left: 0;
+      top: 50%;
+      transform: translateY(-50%);
+      width: 3px;
+      height: 55%;
+      background: $accent-bar;
+      border-radius: 0 3px 3px 0;
+    }
+  }
+}
+
+.nav-icon {
+  width: 20px;
+  height: 20px;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.nav-label {
+  flex: 1;
+  overflow: hidden;
+  transition: opacity $ease, transform $ease;
+}
+
+.nav-badge {
+  margin-left: auto;
+  background: #ef4444;
+  color: #fff;
+  border-radius: 10px;
+  padding: 1px 7px;
+  font-size: 10px;
+  font-weight: 700;
+  flex-shrink: 0;
+  transition: opacity $ease, transform $ease;
+}
+
+.nav-divider {
+  height: 1px;
+  background: rgba(255, 255, 255, 0.07);
+  margin: 8px 10px;
+}
+
+// ─── Footer ──────────────────────────────────────────────────────────────────
+.sidebar-footer {
+  padding: 12px 10px;
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+  flex-shrink: 0;
+}
+
+.admin-info {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 12px;
+  border-radius: 9px;
+  white-space: nowrap;
+  overflow: hidden;
+  cursor: pointer;
+  transition: background 0.18s;
+
+  &:hover { background: rgba(255, 255, 255, 0.06); }
+}
+
+.admin-av {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.14);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  font-family: 'Syne', sans-serif;
+  font-weight: 800;
+  color: #fff;
+  font-size: 13px;
+  border: 1.5px solid rgba(255, 255, 255, 0.2);
+}
+
+.admin-text {
+  overflow: hidden;
+  white-space: nowrap;
+  transition: opacity $ease, transform $ease;
+}
+
+.admin-name {
+  font-size: 12px;
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.88);
+}
+
+.admin-sub {
+  font-size: 10px;
+  color: rgba(255, 255, 255, 0.38);
+  margin-top: 1px;
+}
+
+.logout-item {
+  color: rgba(255, 255, 255, 0.4);
+  margin-top: 2px;
+
+  &:hover {
+    color: #fca5a5;
+    background: rgba(239, 68, 68, 0.08);
+  }
+}

@@ -20,7 +20,11 @@
     <div class="header-actions">
       <button class="btn-secondary" type="button" (click)="goBack()">Annuler</button>
       <button class="btn-primary" type="button" (click)="onSubmit()" [disabled]="isSubmitting">
-        <span *ngIf="!isSubmitting">💾 Enregistrer</span>
+        <span *ngIf="!isSubmitting">
+          <svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline;vertical-align:middle;margin-right:6px">
+            <path d="M13 2H5L2 5v9h12V2z"/><rect x="5" y="9" width="6" height="5"/><rect x="6" y="2" width="4" height="3"/>
+          </svg>
+          Enregistrer</span>
         <span *ngIf="isSubmitting" class="spinner-inline"></span>
         <span *ngIf="isSubmitting">Enregistrement...</span>
       </button>
@@ -52,7 +56,6 @@
         <span class="tab-number" [class.done]="activeTab > i">
           {{ activeTab > i ? '✓' : tab.number }}
         </span>
-        <span class="tab-icon">{{ tab.icon }}</span>
         <span class="tab-label">{{ tab.label }}</span>
       </button>
     </div>
@@ -141,7 +144,12 @@
             <div class="upload-zone" (click)="logoInput.click()">
               <input #logoInput type="file" accept="image/*" style="display:none" (change)="onLogoChange($event)" />
               <ng-container *ngIf="!logoPreview">
-                <div class="upload-icon">🖼️</div>
+                <div class="upload-icon">
+                  <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                    <rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/>
+                    <polyline points="21,15 16,10 5,21"/>
+                  </svg>
+                </div>
                 <div class="upload-text">Cliquer pour choisir</div>
                 <div class="upload-hint">PNG, JPG — max 2 Mo — 200×200px</div>
               </ng-container>
@@ -158,7 +166,12 @@
             <div class="upload-zone" (click)="bannerInput.click()">
               <input #bannerInput type="file" accept="image/*" style="display:none" (change)="onBannerChange($event)" />
               <ng-container *ngIf="!bannerPreview">
-                <div class="upload-icon">🖼️</div>
+                <div class="upload-icon">
+                  <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                    <rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/>
+                    <polyline points="21,15 16,10 5,21"/>
+                  </svg>
+                </div>
                 <div class="upload-text">Cliquer pour choisir</div>
                 <div class="upload-hint">PNG, JPG — max 5 Mo — 1200×400px</div>
               </ng-container>
@@ -290,10 +303,17 @@
           <span class="badge-optional">Optionnel</span>
         </div>
         <div class="map-placeholder">
-          <div class="map-icon">🗺️</div>
+          <div class="map-icon">
+            <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+              <polygon points="1,6 1,22 8,18 16,22 23,18 23,2 16,6 8,2"/><line x1="8" y1="2" x2="8" y2="18"/><line x1="16" y1="6" x2="16" y2="22"/>
+            </svg>
+          </div>
           <p>Renseignez latitude et longitude pour positionner la boutique</p>
           <small *ngIf="form.get('latitude')?.value && form.get('longitude')?.value">
-            📍 {{ form.get('latitude')?.value }}, {{ form.get('longitude')?.value }}
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor" style="display:inline;vertical-align:middle;color:#2d4a3e">
+              <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/>
+            </svg>
+            {{ form.get('latitude')?.value }}, {{ form.get('longitude')?.value }}
           </small>
         </div>
       </div>
@@ -402,7 +422,11 @@
       <div class="footer-actions">
         <button class="btn-secondary" type="button" (click)="goBack()">Annuler</button>
         <button class="btn-primary" type="button" (click)="onSubmit()" [disabled]="isSubmitting">
-          <span *ngIf="!isSubmitting">💾 Enregistrer la boutique</span>
+          <span *ngIf="!isSubmitting">
+            <svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline;vertical-align:middle;margin-right:6px">
+              <path d="M13 2H5L2 5v9h12V2z"/><rect x="5" y="9" width="6" height="5"/><rect x="6" y="2" width="4" height="3"/>
+            </svg>
+            Enregistrer la boutique</span>
           <span *ngIf="isSubmitting">
             <span class="spinner-inline"></span> Enregistrement...
           </span>

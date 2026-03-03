@@ -1,0 +1,125 @@
+<aside class="sidebar" [class.collapsed]="collapsed">
+
+  <!-- ── Toggle — style Claude, en haut à droite ── -->
+  <button class="toggle-btn" (click)="toggleCollapse()" [title]="collapsed ? 'Ouvrir la barre latérale' : 'Fermer la barre latérale'">
+    <!-- Double chevron gauche quand ouvert, double chevron droit quand fermé -->
+    <svg *ngIf="!collapsed" width="16" height="16" viewBox="0 0 16 16" fill="none"
+        stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <polyline points="10,3 6,8 10,13"/>
+      <polyline points="6,3 2,8 6,13"/>
+    </svg>
+    <svg *ngIf="collapsed" width="16" height="16" viewBox="0 0 16 16" fill="none"
+        stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <polyline points="6,3 10,8 6,13"/>
+      <polyline points="10,3 14,8 10,13"/>
+    </svg>
+  </button>
+
+  <!-- ── Brand ── -->
+  <div class="sidebar-brand">
+    <div class="brand-icon">
+      <svg width="32" height="32" viewBox="0 0 32 32" fill="none">
+        <rect width="32" height="32" rx="8" fill="rgba(255,255,255,0.12)"/>
+        <path d="M8 13 L16 8 L24 13 L24 21 L16 26 L8 21 Z"
+              stroke="#fff" stroke-width="1.5" fill="none" stroke-linejoin="round"/>
+        <path d="M8 13 L16 18 L24 13"
+              stroke="#a8d5b8" stroke-width="1.5" fill="none" stroke-linecap="round"/>
+        <line x1="16" y1="18" x2="16" y2="26"
+              stroke="#a8d5b8" stroke-width="1.5" stroke-linecap="round"/>
+      </svg>
+    </div>
+    <div class="brand-text">
+      <div class="sidebar-logo">Hyper<span>Magasin</span></div>
+      <div class="sidebar-role">Administration</div>
+    </div>
+  </div>
+
+  <!-- ── Nav ── -->
+  <nav class="sidebar-nav">
+    <ng-container *ngFor="let section of sections; let first = first">
+      <div *ngIf="!first" class="nav-divider"></div>
+      <div class="nav-section-label">{{ section.label }}</div>
+
+      <a *ngFor="let item of section.items"
+        class="nav-item"
+        [attr.data-tip]="item.tip"
+        [routerLink]="item.link"
+        routerLinkActive="active"
+        [routerLinkActiveOptions]="{ exact: item.link === '/admin' }">
+
+        <span class="nav-icon">
+          <svg *ngIf="item.icon==='dashboard'" width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+            <rect x="1" y="1" width="6" height="6" rx="1.5"/>
+            <rect x="9" y="1" width="6" height="6" rx="1.5"/>
+            <rect x="1" y="9" width="6" height="6" rx="1.5"/>
+            <rect x="9" y="9" width="6" height="6" rx="1.5"/>
+          </svg>
+          <svg *ngIf="item.icon==='boutique'" width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M2 7 L8 2 L14 7 L14 13.5 C14 13.78 13.78 14 13.5 14 H2.5 C2.22 14 2 13.78 2 13.5 Z"/>
+            <rect x="6" y="9" width="4" height="5" rx="0.5"/>
+          </svg>
+          <svg *ngIf="item.icon==='produit'" width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M2.5 3.5 H13.5 L12 11.5 H4 Z"/>
+            <circle cx="5.5" cy="14" r="1"/>
+            <circle cx="11" cy="14" r="1"/>
+            <line x1="1" y1="1" x2="2.5" y2="3.5"/>
+          </svg>
+          <svg *ngIf="item.icon==='commande'" width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+            <rect x="2" y="1.5" width="12" height="13" rx="1.5"/>
+            <line x1="5" y1="6" x2="11" y2="6"/>
+            <line x1="5" y1="9" x2="11" y2="9"/>
+            <line x1="5" y1="12" x2="8" y2="12"/>
+          </svg>
+          <svg *ngIf="item.icon==='user'" width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="8" cy="5.5" r="3"/>
+            <path d="M1.5 14.5 C1.5 11.5 4.5 9 8 9 C11.5 9 14.5 11.5 14.5 14.5"/>
+          </svg>
+          <svg *ngIf="item.icon==='evenement'" width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+            <rect x="2" y="3" width="12" height="11" rx="1.5"/>
+            <line x1="5" y1="1.5" x2="5" y2="4.5"/>
+            <line x1="11" y1="1.5" x2="11" y2="4.5"/>
+            <line x1="2" y1="7" x2="14" y2="7"/>
+          </svg>
+          <svg *ngIf="item.icon==='promotion'" width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="5" cy="5" r="1.5"/>
+            <circle cx="11" cy="11" r="1.5"/>
+            <line x1="3" y1="13" x2="13" y2="3"/>
+          </svg>
+          <svg *ngIf="item.icon==='parametre'" width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="8" cy="8" r="2.5"/>
+            <path d="M8 1.5 L8 3.5 M8 12.5 L8 14.5 M1.5 8 L3.5 8 M12.5 8 L14.5 8 M3.4 3.4 L4.8 4.8 M11.2 11.2 L12.6 12.6 M12.6 3.4 L11.2 4.8 M4.8 11.2 L3.4 12.6"/>
+          </svg>
+          <svg *ngIf="item.icon==='stats'" width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+            <polyline points="1.5,12.5 5,8.5 8,10.5 11,5.5 14.5,7.5"/>
+            <line x1="1.5" y1="14.5" x2="14.5" y2="14.5"/>
+          </svg>
+        </span>
+
+        <span class="nav-label">{{ item.label }}</span>
+        <span *ngIf="item.badge && item.badge > 0" class="nav-badge">{{ item.badge }}</span>
+      </a>
+    </ng-container>
+  </nav>
+
+  <!-- ── Footer ── -->
+  <div class="sidebar-footer">
+    <div class="admin-info">
+      <div class="admin-av">{{ initials }}</div>
+      <div class="admin-text">
+        <div class="admin-name">{{ shortName }}</div>
+        <div class="admin-sub">{{ role }}</div>
+      </div>
+    </div>
+    <a class="nav-item logout-item" data-tip="Deconnexion" (click)="logout()">
+      <span class="nav-icon">
+        <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M6 2.5 H3 C2.45 2.5 2 2.95 2 3.5 V12.5 C2 13.05 2.45 13.5 3 13.5 H6"/>
+          <polyline points="10.5,5 14,8 10.5,11"/>
+          <line x1="14" y1="8" x2="6" y2="8"/>
+        </svg>
+      </span>
+      <span class="nav-label">Deconnexion</span>
+    </a>
+  </div>
+
+</aside>

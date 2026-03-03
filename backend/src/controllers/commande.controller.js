@@ -1,4 +1,5 @@
 const commandeService = require('../services/commande.service');
+const Commande = require('../models/Commande');
 
 exports.createCommande = async (req, res) => {
   try {
@@ -10,17 +11,13 @@ exports.createCommande = async (req, res) => {
   }
 };
 
-
 exports.getMyCommandes = async (req, res) => {
   try {
-    const userId = req.user.id ; // depuis middleware JWT
-    const page   = Math.max(1, parseInt(req.query.page)  || 1);
-    const limit  = Math.min(50, parseInt(req.query.limit) || 8);
-
-    // Filtre optionnel sur statuts (liste CSV)
+    const userId     = req.user.id;
+    const page       = Math.max(1, parseInt(req.query.page)  || 1);
+    const limit      = Math.min(50, parseInt(req.query.limit) || 8);
     const statutsRaw = req.query.statuts;
     const statuts    = statutsRaw ? statutsRaw.split(',').map(s => s.trim()) : [];
-
     const result = await commandeService.getMyCommandes(userId, { page, limit, statuts });
     res.json(result);
   } catch (error) {
@@ -45,5 +42,44 @@ exports.updateStatut = async (req, res) => {
     res.json(commande);
   } catch (error) {
     res.status(400).json({ message: error.message });
+  }
+};
+
+// ── NOUVELLE ROUTE : commandes par boutique (pour le manager) ─────────────
+exports.getCommandesByBoutique = async (req, res) => {
+  try {
+    const { boutiqueId } = req.params;
+    const page   = Math.max(1, parseInt(req.query.page)  || 1);
+    const limit  = Math.min(50, parseInt(req.query.limit) || 10);
+    const statut = req.query.statut  || null;
+    const search = req.query.search  || null;
+    const order  = req.query.order === 'asc' ? 1 : -1;
+
+    const query = { 'articles.boutique': boutiqueId };
+    if (statut) query.statut = statut;
+
+    // Recherche sur numéro de commande
+    if (search) {
+      query.numeroCommande = { $regex: search, $options: 'i' };
+    }
+
+    const [commandes, total] = await Promise.all([
+      Commande.find(query)
+        .populate('acheteur', 'nom prenom email telephone')
+        .sort({ createdAt: order })
+        .skip((page - 1) * limit)
+        .limit(limit)
+        .lean(),
+      Commande.countDocuments(query)
+    ]);
+
+    res.json({
+      commandes,
+      total,
+      page,
+      totalPages: Math.max(1, Math.ceil(total / limit))
+    });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
   }
 };

@@ -13,3 +13,6 @@ Ao fa anandrana hi-merge zah zao !!!!
 =======
 Ao fa anandrana hi-merge zah zao !!!!
 >>>>>>> Stashed changes
+
+
+  box-sizing: border-box;

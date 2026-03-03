@@ -17,22 +17,23 @@ export interface Boutique {
 
 export interface ProduitCategorie {
   _id?: string;
-  nom:  string;
+  nom: string;
 }
 
 /* ===============================
    Produit
 =============================== */
 export interface Produit {
-  _id:          string;
-  nom:          string;
+  _id: string;
+  nom: string;
   description?: string;
-  prix:         number;
-  boutique:     string | Boutique;
-  categories:   ProduitCategorie[];
-  images:       string[];
-  variantes:    Variante[];
-  actif:        boolean;
-  createdAt?:   string;
-  updatedAt?:   string;
+  prix: number;
+  stock: number;
+  boutique: string | Boutique;
+  categories: ProduitCategorie[];
+  images: string[];
+  variantes: Variante[];
+  actif: boolean;
+  createdAt?: string;
+  updatedAt?: string;
 }
