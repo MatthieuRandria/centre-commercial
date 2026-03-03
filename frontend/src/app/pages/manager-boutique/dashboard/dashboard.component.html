@@ -1,0 +1,312 @@
+<div class="dashboard-wrap">
+
+  <!-- TOPBAR -->
+  <div class="topbar">
+    <span class="topbar-title">{{ boutiqueName || 'Tableau de bord' }}</span>
+    <div class="topbar-right">
+      <span class="today-badge">
+        {{ today | date:'EEEE d MMM yyyy' : '' : 'fr' }}
+      </span>
+      <button class="notif-btn" aria-label="Notifications">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/>
+          <path d="M13.73 21a2 2 0 0 1-3.46 0"/>
+        </svg>
+        <span class="notif-dot" *ngIf="kpi.commandesEnAttente > 0"></span>
+      </button>
+    </div>
+  </div>
+
+  <!-- SKELETON -->
+  <div class="page-content" *ngIf="isLoading">
+    <div class="skeleton-header"></div>
+    <div class="kpi-grid">
+      <div class="skeleton-kpi" *ngFor="let i of [1,2,3,4,5,6]"></div>
+    </div>
+    <div class="skeleton-chart"></div>
+  </div>
+
+  <!-- CONTENT -->
+  <div class="page-content" *ngIf="!isLoading">
+
+    <!-- HEADER -->
+    <div class="page-header">
+      <div>
+        <h1>{{ greeting }}, {{ userName }}
+          <svg width="22" height="22" viewBox="0 0 36 36" fill="none" class="wave-icon">
+            <text y="28" font-size="28">👋</text>
+          </svg>
+        </h1>
+        <p>Voici l'aperçu de votre boutique aujourd'hui</p>
+      </div>
+      <button class="btn-primary" (click)="navigateTo('/boutique/produits/ajouter')">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+        Nouveau produit
+      </button>
+    </div>
+
+    <!-- KPI GRID -->
+    <div class="kpi-grid">
+
+      <!-- Commandes en cours -->
+      <div class="kpi-card">
+        <div class="kpi-top">
+          <div class="kpi-label">Commandes en cours</div>
+          <div class="kpi-icon orange">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M9 5H7a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2h-2"/>
+              <rect x="9" y="3" width="6" height="4" rx="1" ry="1"/>
+              <line x1="9" y1="12" x2="15" y2="12"/><line x1="9" y1="16" x2="13" y2="16"/>
+            </svg>
+          </div>
+        </div>
+        <div class="kpi-value">{{ kpi.commandesEnCours }}</div>
+        <div class="kpi-sub">{{ kpi.commandesEnAttente }} en attente</div>
+      </div>
+
+      <!-- Produits en rupture -->
+      <div class="kpi-card" [class.alert]="kpi.produitsRupture > 0">
+        <div class="kpi-top">
+          <div class="kpi-label">Ruptures de stock</div>
+          <div class="kpi-icon red">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/>
+              <line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/>
+            </svg>
+          </div>
+        </div>
+        <div class="kpi-value" [class.red-alert]="kpi.produitsRupture > 0">{{ kpi.produitsRupture }}</div>
+        <div class="kpi-sub">
+          <span class="kpi-rupture-badge" *ngIf="kpi.produitsRupture > 0">
+            <svg width="9" height="9" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2L1 21h22L12 2z"/></svg>
+            Action requise
+          </span>
+          <span *ngIf="kpi.produitsRupture === 0">Tout est en stock</span>
+        </div>
+      </div>
+
+      <!-- Stock total -->
+      <div class="kpi-card">
+        <div class="kpi-top">
+          <div class="kpi-label">Stock total</div>
+          <div class="kpi-icon gray">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/>
+              <polyline points="3.27 6.96 12 12.01 20.73 6.96"/><line x1="12" y1="22.08" x2="12" y2="12"/>
+            </svg>
+          </div>
+        </div>
+        <div class="kpi-value">{{ kpi.stockTotal | number }}</div>
+        <div class="kpi-sub">Sur {{ kpi.totalProduits }} produits actifs</div>
+      </div>
+
+      <!-- Produits actifs -->
+      <div class="kpi-card">
+        <div class="kpi-top">
+          <div class="kpi-label">Produits actifs</div>
+          <div class="kpi-icon green">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"/>
+              <line x1="7" y1="7" x2="7.01" y2="7"/>
+            </svg>
+          </div>
+        </div>
+        <div class="kpi-value">{{ kpi.totalProduits }}</div>
+        <div class="kpi-sub">Dans votre catalogue</div>
+      </div>
+
+      <!-- Commandes livrées -->
+      <div class="kpi-card">
+        <div class="kpi-top">
+          <div class="kpi-label">Total commandes</div>
+          <div class="kpi-icon blue">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <polyline points="20 12 20 22 4 22 4 12"/>
+              <rect x="2" y="7" width="20" height="5"/>
+              <line x1="12" y1="22" x2="12" y2="7"/>
+              <path d="M12 7H7.5a2.5 2.5 0 0 1 0-5C11 2 12 7 12 7z"/>
+              <path d="M12 7h4.5a2.5 2.5 0 0 0 0-5C13 2 12 7 12 7z"/>
+            </svg>
+          </div>
+        </div>
+        <div class="kpi-value">{{ kpi.commandesEnCours }}</div>
+        <div class="kpi-sub">Toutes commandes confondues</div>
+      </div>
+
+      <!-- Boutique status -->
+      <div class="kpi-card">
+        <div class="kpi-top">
+          <div class="kpi-label">Statut boutique</div>
+          <div class="kpi-icon violet">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/>
+              <polyline points="9 22 9 12 15 12 15 22"/>
+            </svg>
+          </div>
+        </div>
+        <div class="kpi-value kpi-value--sm">Active</div>
+        <div class="kpi-sub"><span class="status-dot-green"></span> En ligne</div>
+      </div>
+
+    </div>
+
+    <!-- CHART VENTES -->
+    <div class="chart-card">
+      <div class="chart-head">
+        <div>
+          <div class="chart-title">Activité des 30 derniers jours</div>
+          <div class="chart-sub">Tendance des commandes (données simulées)</div>
+        </div>
+        <div class="chart-legend">
+          <span class="legend-dot"></span> CA quotidien
+        </div>
+      </div>
+      <div class="chart-wrap">
+        <svg [attr.viewBox]="'0 0 ' + chartWidth + ' ' + chartHeight" width="100%" [attr.height]="chartHeight" preserveAspectRatio="none" class="chart-svg">
+          <!-- Grid lines -->
+          <line x1="10" [attr.y1]="chartHeight * 0.25" [attr.x2]="chartWidth - 10" [attr.y2]="chartHeight * 0.25" stroke="#f0ede8" stroke-width="1"/>
+          <line x1="10" [attr.y1]="chartHeight * 0.5"  [attr.x2]="chartWidth - 10" [attr.y2]="chartHeight * 0.5"  stroke="#f0ede8" stroke-width="1"/>
+          <line x1="10" [attr.y1]="chartHeight * 0.75" [attr.x2]="chartWidth - 10" [attr.y2]="chartHeight * 0.75" stroke="#f0ede8" stroke-width="1"/>
+          <!-- Fill -->
+          <defs>
+            <linearGradient id="chartGrad" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0%" stop-color="#2d4a3e" stop-opacity="0.15"/>
+              <stop offset="100%" stop-color="#2d4a3e" stop-opacity="0"/>
+            </linearGradient>
+          </defs>
+          <path [attr.d]="chartFill" fill="url(#chartGrad)"/>
+          <!-- Line -->
+          <path [attr.d]="chartPath" fill="none" stroke="#2d4a3e" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+          <!-- Points -->
+          <circle *ngFor="let pt of chartPoints; let i = index"
+            [attr.cx]="pt.x" [attr.cy]="pt.y" r="3"
+            fill="#2d4a3e" stroke="#fff" stroke-width="1.5"
+            class="chart-dot"
+            [class.chart-dot--last]="i === chartPoints.length - 1">
+          </circle>
+        </svg>
+        <!-- X labels -->
+        <div class="chart-x-labels">
+          <span *ngFor="let pt of chartPoints; let i = index" [class.visible]="i % 5 === 0 || i === chartPoints.length - 1">
+            {{ pt.date }}
+          </span>
+        </div>
+      </div>
+    </div>
+
+    <!-- RUPTURE ALERTE -->
+    <div class="rupture-card" *ngIf="produitsRupture.length > 0">
+      <div class="rupture-head">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#991b1b" stroke-width="2.5" stroke-linecap="round">
+          <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/>
+          <line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/>
+        </svg>
+        <h2>Produits en rupture de stock</h2>
+        <span class="rupture-badge">{{ produitsRupture.length }} produit{{ produitsRupture.length > 1 ? 's' : '' }}</span>
+      </div>
+      <div class="rupture-item" *ngFor="let p of produitsRupture">
+        <div>
+          <div class="rupture-prod-name">{{ p.nom }}</div>
+          <div class="rupture-prod-cat">{{ p.categories?.[0]?.nom || 'Sans catégorie' }}</div>
+        </div>
+        <button class="btn-reappro" (click)="navigateTo('/boutique/produits/' + p._id + '/modifier')">
+          Réapprovisionner
+        </button>
+      </div>
+    </div>
+
+    <!-- TWO COLUMNS -->
+    <div class="two-col">
+
+      <!-- DERNIÈRES COMMANDES -->
+      <div class="table-card">
+        <div class="tc-head">
+          <h2>Dernières commandes</h2>
+          <a class="tc-link" routerLink="/boutique/commandes">Voir toutes</a>
+        </div>
+        <div class="empty-state-sm" *ngIf="commandesRecentes.length === 0">
+          <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#ddd9d0" stroke-width="1.5">
+            <path d="M9 5H7a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2h-2"/>
+            <rect x="9" y="3" width="6" height="4" rx="1"/>
+          </svg>
+          <span>Aucune commande</span>
+        </div>
+        <table class="data-table" *ngIf="commandesRecentes.length > 0">
+          <thead>
+            <tr>
+              <th>N°</th>
+              <th>Client</th>
+              <th>Montant</th>
+              <th>Statut</th>
+              <th></th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let c of commandesRecentes">
+              <td class="cmd-num">{{ c.numeroCommande }}</td>
+              <td>{{ getClientName(c) }}</td>
+              <td class="cmd-montant">{{ c.total | number }} Ar</td>
+              <td>
+                <span class="statut-badge" [ngClass]="'s-' + c.statut">
+                  <span class="statut-dot"></span>
+                  {{ statutLabels[c.statut] || c.statut }}
+                </span>
+              </td>
+              <td>
+                <button class="btn-sm" (click)="navigateTo('/boutique/commandes')">Voir</button>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- TOP PRODUITS -->
+      <div class="table-card">
+        <div class="tc-head">
+          <h2>Catalogue produits</h2>
+          <a class="tc-link" routerLink="/boutique/produits">Voir tous</a>
+        </div>
+        <div class="empty-state-sm" *ngIf="topProduits.length === 0">
+          <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#ddd9d0" stroke-width="1.5">
+            <path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"/>
+            <line x1="7" y1="7" x2="7.01" y2="7"/>
+          </svg>
+          <span>Aucun produit</span>
+        </div>
+        <table class="data-table" *ngIf="topProduits.length > 0">
+          <thead>
+            <tr>
+              <th></th>
+              <th>Produit</th>
+              <th>Stock</th>
+              <th></th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let p of topProduits">
+              <td>
+                <div class="prod-thumb">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#ddd9d0" stroke-width="1.5">
+                    <rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/>
+                    <polyline points="21 15 16 10 5 21"/>
+                  </svg>
+                </div>
+              </td>
+              <td class="prod-name">{{ p.nom }}</td>
+              <td>
+                <span class="stock-pill" [ngClass]="p.stock > 5 ? 'stock-ok' : 'stock-low'">
+                  {{ p.stock }}
+                </span>
+              </td>
+              <td>
+                <button class="btn-sm" (click)="navigateTo('/boutique/produits/' + p._id + '/modifier')">Éditer</button>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+    </div><!-- /two-col -->
+
+  </div><!-- /page-content -->
+</div>

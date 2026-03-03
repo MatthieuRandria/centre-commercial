@@ -40,6 +40,7 @@ export class SidebarComponent implements OnInit {
             // { label: 'Produits', link: '/admin/produits', tip: 'Produits', icon: 'produit' },
             // { label: 'Commandes', link: '/admin/commandes', tip: 'Commandes', icon: 'commande', badge: 0 },
          ]
+<<<<<<< Updated upstream
       },
       {
          label: 'Gestion',
@@ -55,6 +56,23 @@ export class SidebarComponent implements OnInit {
             { label: 'Parametres', link: '/admin/parametres', tip: 'Parametres', icon: 'parametre' },
             { label: 'Statistiques', link: '/admin/statistiques', tip: 'Statistiques', icon: 'stats' },
          ]
+=======
+         // },
+         //{
+         // label: 'Gestion',
+         // items: [
+         // { label: 'Utilisateurs', link: '/admin/utilisateurs', tip: 'Utilisateurs', icon: 'user' },
+         // { label: 'Evenements', link: '/admin/evenements', tip: 'Evenements', icon: 'evenement' },
+         // { label: 'Promotions', link: '/admin/promotions', tip: 'Promotions', icon: 'promotion' },
+         // ]
+         //},
+         //{
+         // label: 'Systeme',
+         // items: [
+         // { label: 'Parametres', link: '/admin/parametres', tip: 'Parametres', icon: 'parametre' },
+         // { label: 'Statistiques', link: '/admin/statistiques', tip: 'Statistiques', icon: 'stats' },
+         // ]
+>>>>>>> Stashed changes
       }
    ];
 

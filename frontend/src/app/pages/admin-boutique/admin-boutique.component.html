@@ -7,14 +7,50 @@
       <p class="subtitle">{{ pagination.total }} boutique(s) au total</p>
     </div>
     <div class="header-actions">
+<<<<<<< Updated upstream
       <button class="btn-export" (click)="exportCsv()" [disabled]="isLoading">&#8681; Exporter CSV</button>
       <button class="btn-primary" (click)="openAddModal()">+ Ajouter</button>
+=======
+      <button class="btn-export" (click)="exportCsv()" [disabled]="isLoading">
+        <!-- ↙ download arrow -->
+        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none"
+          stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+          <polyline points="7 10 12 15 17 10"/>
+          <line x1="12" y1="15" x2="12" y2="3"/>
+        </svg>
+        Exporter CSV
+      </button>
+      <button class="btn-primary" (click)="openAddModal()">
+        <!-- + plus -->
+        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none"
+          stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <line x1="12" y1="5" x2="12" y2="19"/>
+          <line x1="5" y1="12" x2="19" y2="12"/>
+        </svg>
+        Ajouter
+      </button>
+>>>>>>> Stashed changes
     </div>
   </div>
 
   <!-- BANNER ERREUR GLOBAL -->
   <div class="error-banner" *ngIf="errorMessage">
+<<<<<<< Updated upstream
     <span>⚠ {{ errorMessage }}</span>
+=======
+    <span>
+      <!-- ⚠ warning triangle -->
+      <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none"
+        stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+        style="vertical-align: middle; margin-right: 6px;">
+        <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/>
+        <line x1="12" y1="9" x2="12" y2="13"/>
+        <line x1="12" y1="17" x2="12.01" y2="17"/>
+      </svg>
+      {{ errorMessage }}
+    </span>
+>>>>>>> Stashed changes
     <button class="btn-retry" (click)="loadBoutiques()">Réessayer</button>
   </div>
 
@@ -43,7 +79,16 @@
         <div class="filter-group">
           <label>
             Centre Commercial
+<<<<<<< Updated upstream
             <span class="label-loading" *ngIf="isLoadingRefs">⏳</span>
+=======
+            <!-- ⏳ loading spinner (animated via CSS) -->
+            <svg *ngIf="isLoadingRefs" class="label-loading" xmlns="http://www.w3.org/2000/svg"
+              width="14" height="14" viewBox="0 0 24 24" fill="none"
+              stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M21 12a9 9 0 1 1-6.219-8.56"/>
+            </svg>
+>>>>>>> Stashed changes
           </label>
           <select class="filter-select" formControlName="centreId">
             <option value="">Tous les centres</option>
@@ -55,12 +100,23 @@
         <div class="filter-group">
           <label>
             Catégorie
+<<<<<<< Updated upstream
             <span class="label-loading" *ngIf="isLoadingRefs">⏳</span>
+=======
+            <svg *ngIf="isLoadingRefs" class="label-loading" xmlns="http://www.w3.org/2000/svg"
+              width="14" height="14" viewBox="0 0 24 24" fill="none"
+              stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M21 12a9 9 0 1 1-6.219-8.56"/>
+            </svg>
+>>>>>>> Stashed changes
           </label>
           <select class="filter-select" formControlName="categorieId">
             <option value="">Toutes les catégories</option>
             <option *ngFor="let cat of categories" [value]="cat._id">
+<<<<<<< Updated upstream
               <!-- {{ cat.icone }} -->
+=======
+>>>>>>> Stashed changes
               {{ cat.nom }}
             </option>
           </select>
@@ -150,7 +206,23 @@
               <!-- Empty state -->
               <tr *ngIf="boutiques.length === 0">
                 <td colspan="8" class="empty-state">
+<<<<<<< Updated upstream
                   <div class="empty-icon">🏪</div>
+=======
+                  <div class="empty-icon">
+                    <!-- 🏪 store -->
+                    <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24"
+                      fill="none" stroke="currentColor" stroke-width="1.5"
+                      stroke-linecap="round" stroke-linejoin="round">
+                      <path d="M3 9l1-5h16l1 5"/>
+                      <path d="M3 9a2 2 0 0 0 2 2 2 2 0 0 0 2-2 2 2 0 0 0 2 2 2 2 0 0 0 2-2 2 2 0 0 0 2 2 2 2 0 0 0 2-2"/>
+                      <path d="M5 20V11"/>
+                      <path d="M19 20V11"/>
+                      <rect x="9" y="14" width="6" height="6"/>
+                      <line x1="3" y1="20" x2="21" y2="20"/>
+                    </svg>
+                  </div>
+>>>>>>> Stashed changes
                   <p>Aucune boutique trouvée</p>
                   <button class="btn-reset" type="button" (click)="resetFilters()">
                     Réinitialiser les filtres
@@ -186,7 +258,17 @@
                       {{ b.localisation.etage }} · Local {{ b.localisation.numero_local }}
                       <span *ngIf="b.localisation.zone"> · {{ b.localisation.zone }}</span>
                     </small>
+<<<<<<< Updated upstream
                     <span class="open-now-badge" *ngIf="b.est_ouvert_maintenant">● Ouvert</span>
+=======
+                    <!-- ● Ouvert — cercle vert SVG -->
+                    <span class="open-now-badge" *ngIf="b.est_ouvert_maintenant">
+                      <svg xmlns="http://www.w3.org/2000/svg" width="8" height="8" viewBox="0 0 8 8">
+                        <circle cx="4" cy="4" r="4" fill="currentColor"/>
+                      </svg>
+                      Ouvert
+                    </span>
+>>>>>>> Stashed changes
                   </div>
                 </td>
 
@@ -232,9 +314,45 @@
                 <!-- Actions -->
                 <td>
                   <div class="action-buttons">
+<<<<<<< Updated upstream
                     <button class="btn-action btn-view"   (click)="viewBoutique(b)">Détails</button>
                     <button class="btn-action btn-edit"   (click)="editBoutique(b)">Modifier</button>
                     <button class="btn-action btn-delete" (click)="openDeleteModal(b)">Supprimer</button>
+=======
+                    <button class="btn-action btn-view" (click)="viewBoutique(b)" title="Détails">
+                      <!-- eye -->
+                      <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24"
+                        fill="none" stroke="currentColor" stroke-width="2"
+                        stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
+                        <circle cx="12" cy="12" r="3"/>
+                      </svg>
+                      Détails
+                    </button>
+                    <button class="btn-action btn-edit" (click)="editBoutique(b)" title="Modifier">
+                      <!-- pencil -->
+                      <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24"
+                        fill="none" stroke="currentColor" stroke-width="2"
+                        stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/>
+                        <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/>
+                      </svg>
+                      Modifier
+                    </button>
+                    <button class="btn-action btn-delete" (click)="openDeleteModal(b)" title="Supprimer">
+                      <!-- trash -->
+                      <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24"
+                        fill="none" stroke="currentColor" stroke-width="2"
+                        stroke-linecap="round" stroke-linejoin="round">
+                        <polyline points="3 6 5 6 21 6"/>
+                        <path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/>
+                        <path d="M10 11v6"/>
+                        <path d="M14 11v6"/>
+                        <path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/>
+                      </svg>
+                      Supprimer
+                    </button>
+>>>>>>> Stashed changes
                   </div>
                 </td>
 
@@ -247,7 +365,23 @@
         <div class="mobile-cards">
 
           <div class="empty-state" *ngIf="boutiques.length === 0">
+<<<<<<< Updated upstream
             <div class="empty-icon">🏪</div>
+=======
+            <div class="empty-icon">
+              <!-- 🏪 store -->
+              <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24"
+                fill="none" stroke="currentColor" stroke-width="1.5"
+                stroke-linecap="round" stroke-linejoin="round">
+                <path d="M3 9l1-5h16l1 5"/>
+                <path d="M3 9a2 2 0 0 0 2 2 2 2 0 0 0 2-2 2 2 0 0 0 2 2 2 2 0 0 0 2-2 2 2 0 0 0 2 2 2 2 0 0 0 2-2"/>
+                <path d="M5 20V11"/>
+                <path d="M19 20V11"/>
+                <rect x="9" y="14" width="6" height="6"/>
+                <line x1="3" y1="20" x2="21" y2="20"/>
+              </svg>
+            </div>
+>>>>>>> Stashed changes
             <p>Aucune boutique trouvée</p>
             <button class="btn-reset" type="button" (click)="resetFilters()">
               Réinitialiser les filtres
@@ -283,20 +417,73 @@
                 [style.color]="b.categorie.couleur"
               >{{ b.categorie.icone }} {{ b.categorie.nom }}</span>
               <span class="card-centre">{{ b.centre_commercial.nom }}</span>
+<<<<<<< Updated upstream
               <span class="open-now-badge" *ngIf="b.est_ouvert_maintenant">● Ouvert</span>
+=======
+              <!-- ● Ouvert -->
+              <span class="open-now-badge" *ngIf="b.est_ouvert_maintenant">
+                <svg xmlns="http://www.w3.org/2000/svg" width="8" height="8" viewBox="0 0 8 8">
+                  <circle cx="4" cy="4" r="4" fill="currentColor"/>
+                </svg>
+                Ouvert
+              </span>
+>>>>>>> Stashed changes
             </div>
 
             <div class="card-note">
               <span class="stars">{{ renderStars(b.note_moyenne) }}</span>
               <span class="note-count">
+<<<<<<< Updated upstream
                 {{ b.note_moyenne | number:'1.1-1' }} · {{ b.nombre_avis }} avis · {{ b.nombre_favoris }} ♥
+=======
+                {{ b.note_moyenne | number:'1.1-1' }} · {{ b.nombre_avis }} avis ·
+                <!-- ♥ heart -->
+                <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24"
+                  fill="currentColor" stroke="none" style="vertical-align: middle;">
+                  <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/>
+                </svg>
+                {{ b.nombre_favoris }}
+>>>>>>> Stashed changes
               </span>
             </div>
 
             <div class="card-actions">
+<<<<<<< Updated upstream
               <button class="btn-action btn-view"   (click)="viewBoutique(b)">Détails</button>
               <button class="btn-action btn-edit"   (click)="editBoutique(b)">Modifier</button>
               <button class="btn-action btn-delete" (click)="openDeleteModal(b)">Supprimer</button>
+=======
+              <button class="btn-action btn-view" (click)="viewBoutique(b)" title="Détails">
+                <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24"
+                  fill="none" stroke="currentColor" stroke-width="2"
+                  stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
+                  <circle cx="12" cy="12" r="3"/>
+                </svg>
+                Détails
+              </button>
+              <button class="btn-action btn-edit" (click)="editBoutique(b)" title="Modifier">
+                <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24"
+                  fill="none" stroke="currentColor" stroke-width="2"
+                  stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/>
+                  <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/>
+                </svg>
+                Modifier
+              </button>
+              <button class="btn-action btn-delete" (click)="openDeleteModal(b)" title="Supprimer">
+                <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24"
+                  fill="none" stroke="currentColor" stroke-width="2"
+                  stroke-linecap="round" stroke-linejoin="round">
+                  <polyline points="3 6 5 6 21 6"/>
+                  <path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/>
+                  <path d="M10 11v6"/>
+                  <path d="M14 11v6"/>
+                  <path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/>
+                </svg>
+                Supprimer
+              </button>
+>>>>>>> Stashed changes
             </div>
           </div>
         </div>
@@ -307,7 +494,19 @@
             class="pagination-btn"
             [disabled]="!pagination.hasPrevPage"
             (click)="goToPage(pagination.page - 1)"
+<<<<<<< Updated upstream
           >← Préc.</button>
+=======
+          >
+            <!-- ← arrow left -->
+            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24"
+              fill="none" stroke="currentColor" stroke-width="2"
+              stroke-linecap="round" stroke-linejoin="round">
+              <polyline points="15 18 9 12 15 6"/>
+            </svg>
+            Préc.
+          </button>
+>>>>>>> Stashed changes
 
           <div class="pagination-pages">
             <button
@@ -322,7 +521,19 @@
             class="pagination-btn"
             [disabled]="!pagination.hasNextPage"
             (click)="goToPage(pagination.page + 1)"
+<<<<<<< Updated upstream
           >Suiv. →</button>
+=======
+          >
+            Suiv.
+            <!-- → arrow right -->
+            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24"
+              fill="none" stroke="currentColor" stroke-width="2"
+              stroke-linecap="round" stroke-linejoin="round">
+              <polyline points="9 18 15 12 9 6"/>
+            </svg>
+          </button>
+>>>>>>> Stashed changes
         </div>
 
         <div class="pagination-info">
@@ -339,7 +550,19 @@
   <div class="modal-content" (click)="$event.stopPropagation()">
     <div class="modal-header">
       <h2>Confirmation de suppression</h2>
+<<<<<<< Updated upstream
       <button class="modal-close" type="button" (click)="closeDeleteModal()">✕</button>
+=======
+      <button class="modal-close" type="button" (click)="closeDeleteModal()" title="Fermer">
+        <!-- ✕ close -->
+        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24"
+          fill="none" stroke="currentColor" stroke-width="2"
+          stroke-linecap="round" stroke-linejoin="round">
+          <line x1="18" y1="6" x2="6" y2="18"/>
+          <line x1="6" y1="6" x2="18" y2="18"/>
+        </svg>
+      </button>
+>>>>>>> Stashed changes
     </div>
     <div class="modal-body">
       <p>Êtes-vous sûr de vouloir supprimer la boutique :</p>
@@ -353,6 +576,19 @@
     <div class="modal-footer">
       <button class="btn-cancel" type="button" (click)="closeDeleteModal()">Annuler</button>
       <button class="btn-confirm-delete" type="button" (click)="confirmDelete()">
+<<<<<<< Updated upstream
+=======
+        <!-- trash -->
+        <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24"
+          fill="none" stroke="currentColor" stroke-width="2"
+          stroke-linecap="round" stroke-linejoin="round">
+          <polyline points="3 6 5 6 21 6"/>
+          <path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/>
+          <path d="M10 11v6"/>
+          <path d="M14 11v6"/>
+          <path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/>
+        </svg>
+>>>>>>> Stashed changes
         Confirmer la suppression
       </button>
     </div>

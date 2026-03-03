@@ -66,6 +66,27 @@ export const routes: Routes = [
         .then(m => m.ManagerCommandesListComponent),
   },
 
+<<<<<<< Updated upstream
+=======
+  {
+    path: 'boutique/dashboard',
+    canActivate: [AuthGuard, RoleGuard],
+    data: { role: 'boutique' },
+    loadComponent: () =>
+      import('./pages/manager-boutique/dashboard/dashboard.component')
+        .then(m => m.ManagerDashboardComponent),
+  },
+
+  {
+    path: 'boutique/promotions',
+    canActivate: [AuthGuard, RoleGuard],
+    data: { role: 'boutique' },
+    loadComponent: () =>
+      import('./pages/manager-boutique/promotion/promotion.component')
+        .then(m => m.ManagerPromotionsComponent),
+  },
+
+>>>>>>> Stashed changes
   // ───────────── Boutique (Public) ─────────────
 
   {
@@ -194,11 +215,19 @@ export const routes: Routes = [
   },
 
   {
+<<<<<<< Updated upstream
     path: 'promotion',
     canActivate: [AuthGuard],
     loadComponent: () =>
       import('./pages/promotion-public/promotion-public.component')
         .then(m => m.PromotionPublicComponent),
+=======
+    path: 'dashboard',
+    canActivate: [AuthGuard],
+    loadComponent: () =>
+      import('./pages/dashboard/dashboard.component')
+        .then(m => m.DashboardComponent),
+>>>>>>> Stashed changes
   },
 
   // ───────────── 404 ─────────────
