@@ -83,7 +83,7 @@ export class NavbarComponent implements OnInit {
         { label: 'Panier', link: '/panier' },
         { label: 'Mes commandes', link: '/client/commandes' },
         { label: 'Mes favoris', link: '/client/favoris' },
-        { label: 'Promotions', link: '/promotions' }
+        { label: 'Promotions', link: '/promotion' }
       );
     }
 
