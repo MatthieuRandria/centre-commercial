@@ -9,17 +9,7 @@ import { Boutique, BoutiqueFilters } from '../../models/boutique.model';
 @Component({
   selector: 'app-boutiques',
   standalone: true,
-  imports: [CommonModule, RouterModule],
-<<<<<<< Updated upstream
-<<<<<<< Updated upstream
-<<<<<<< Updated upstream
-  providers:[DecimalPipe],
-=======
->>>>>>> Stashed changes
-=======
->>>>>>> Stashed changes
-=======
->>>>>>> Stashed changes
+  imports: [CommonModule, RouterModule, DecimalPipe],
   templateUrl: './boutique.component.html',
   styleUrls: ['./boutique.component.scss']
 })

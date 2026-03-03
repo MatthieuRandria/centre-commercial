@@ -1,10 +1,5 @@
 const Produit = require('../models/Produit');
 
-/**
- * @desc    GET tous les produits
- * @route   GET /api/produits
- * @access  Public
- */
 exports.getAllProduits = async (req, res, next) => {
    try {
       const {

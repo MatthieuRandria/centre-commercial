@@ -79,18 +79,6 @@ export class ClientCommandeComponent implements OnInit, OnDestroy {
       if (stored) {
         const u = JSON.parse(stored);
         this.user = {
-<<<<<<< Updated upstream
-<<<<<<< Updated upstream
-<<<<<<< Updated upstream
-          nom:      u.nom     ?? '',
-          prenom:   u.prenom  ?? '',
-          email:    u.email   ?? '',
-          initiale: (u.prenom?.[0] ?? '').toUpperCase() || '?'
-=======
-=======
->>>>>>> Stashed changes
-=======
->>>>>>> Stashed changes
           nom: u.nom ?? '',
           prenom: u.prenom ?? '',
           email: u.email ?? '',

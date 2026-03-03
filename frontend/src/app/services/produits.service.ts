@@ -1,36 +1,15 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
-<<<<<<< Updated upstream
-<<<<<<< Updated upstream
-<<<<<<< Updated upstream
-import { environment } from '../../environments/environment';
-=======
-import { map } from 'rxjs/operators';
->>>>>>> Stashed changes
-=======
-import { map } from 'rxjs/operators';
->>>>>>> Stashed changes
-=======
-import { map } from 'rxjs/operators';
->>>>>>> Stashed changes
 import { Produit } from '../shared/produit.model';
 
 @Injectable({ providedIn: 'root' })
 export class ProduitsService {
-<<<<<<< Updated upstream
-<<<<<<< Updated upstream
-<<<<<<< Updated upstream
-  private apiUrl = `${environment.apiUrl}/produits`;
-=======
-=======
->>>>>>> Stashed changes
-=======
->>>>>>> Stashed changes
+  // private apiUrl = `${environment.apiUrl}/produits`;
   private apiUrl = `http://localhost:3000/produits`;
 >>>>>>> Stashed changes
 
-  constructor(private http: HttpClient) {}
+  constructor(private http: HttpClient) { }
 
   getProduits(filters: any): Observable<{ total: number; page: number; pages: number; data: Produit[] }> {
     let params = new HttpParams();
@@ -58,31 +37,9 @@ export class ProduitsService {
     );
   }
 
-  updateProduit(id: string, formData: FormData): Observable<any> {
-    return this.http.put<any>(`${this.apiUrl}/${id}`, formData).pipe(
-      map(r => r.data ?? r)
-    );
+  updateProduit(id: string, formData: FormData): Observable<Produit> {
+    return this.http.put<Produit>(`${this.apiUrl}/${id}`, formData);
   }
-<<<<<<< Updated upstream
-<<<<<<< Updated upstream
-<<<<<<< Updated upstream
-}
-=======
-=======
->>>>>>> Stashed changes
-=======
->>>>>>> Stashed changes
 
-  deleteProduit(id: string): Observable<any> {
-    return this.http.delete<any>(`${this.apiUrl}/${id}`);
-  }
-<<<<<<< Updated upstream
-<<<<<<< Updated upstream
+
 }
->>>>>>> Stashed changes
-=======
-}
->>>>>>> Stashed changes
-=======
-}
->>>>>>> Stashed changes

@@ -1,16 +1,4 @@
-<<<<<<< Updated upstream
-<<<<<<< Updated upstream
-<<<<<<< Updated upstream:frontend/src/app/services/commandes.services.ts
-import { environment } from '../../environments/environment';
-=======
-// services/commandes.service.ts
->>>>>>> Stashed changes:frontend/src/app/services/commandes.service.ts
-=======
-// services/commandes.service.ts
->>>>>>> Stashed changes
-=======
-// services/commandes.service.ts
->>>>>>> Stashed changes
+// services/mes-commandes.service.ts
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
