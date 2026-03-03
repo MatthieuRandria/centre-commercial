@@ -50,7 +50,7 @@ export class CatalogueService {
     if (filters.boutiques?.length)  params = params.set('boutiqueId', filters.boutiques[0]);
     if (filters.categories?.length) params = params.set('categorie',  filters.categories[0]);
 
-    return this.http.get<ProduitPage>(`${this.base}/produits`, { params });
+    return this.http.get<ProduitPage>(`${this.base}/produits/m/`, { params });
   }
 
   getBoutiques(): Observable<Boutique[]> {
