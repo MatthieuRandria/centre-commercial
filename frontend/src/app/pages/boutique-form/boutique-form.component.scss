@@ -321,6 +321,7 @@ input[type="time"],
 textarea,
 select {
   width: 100%;
+  box-sizing: border-box;
   padding: 11px 14px;
   border: 1.5px solid var(--border);
   border-radius: 8px;
@@ -698,4 +699,46 @@ select { cursor: pointer; }
   // Horaires en mode condensé : masquer la colonne pause
   .horaires-table thead th:nth-child(4),
   .horaires-table tbody td:nth-child(4) { display: none; }
+}
+
+// ─── UPLOAD ICON SVG ──────────────────────────────────────────────────────
+.upload-zone {
+  .upload-icon {
+    color: var(--text2);
+    opacity: 0.5;
+    margin-bottom: 8px;
+    svg { display: block; }
+  }
+  &:hover .upload-icon { opacity: 0.8; color: var(--accent); }
+}
+
+// ─── MAP ICON SVG ─────────────────────────────────────────────────────────
+.map-placeholder {
+  .map-icon {
+    color: var(--text2);
+    opacity: 0.4;
+    svg { display: block; }
+  }
+}
+
+// ─── COLOR PICKER FIX ─────────────────────────────────────────────────────
+.color-picker-group {
+  .color-hex-input {
+    flex: 1;
+    min-width: 0; // ← empêche le débordement dans le flex container
+  }
+}
+
+// ─── FORM GRID FIX ────────────────────────────────────────────────────────
+.form-grid {
+  .form-group {
+    min-width: 0; // ← empêche les enfants de déborder hors du grid
+  }
+}
+
+.tab-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  svg { display: block; }
 }

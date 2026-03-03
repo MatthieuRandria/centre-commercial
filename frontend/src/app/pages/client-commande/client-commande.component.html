@@ -87,7 +87,7 @@
                 <td>
                   <span class="statut-badge" [ngClass]="statutClass(cmd.statut)">
                     <span class="statut-dot"></span>
-                    {{ statutLabels[cmd.statut] ?? cmd.statut }}
+                    {{ statutLabels[cmd.statut] || cmd.statut }}  
                   </span>
                 </td>
                 <td (click)="$event.stopPropagation()">

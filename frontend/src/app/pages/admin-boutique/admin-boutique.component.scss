@@ -203,6 +203,10 @@
   &:focus { border-color: var(--accent); }
 }
 
+.filter-input {
+  width: 88%;
+}
+
 .filter-stats {
   margin-top: 22px;
   padding-top: 18px;
@@ -250,14 +254,14 @@
 .boutiques-table {
   width: 100%;
   border-collapse: collapse;
-  font-size: 14px;
+  font-size: 13px;
 
   thead {
     background: var(--bg);
     border-bottom: 2px solid var(--border);
 
     th {
-      padding: 13px 12px;
+      padding: 11px 8px;
       text-align: left;
       font-family: 'Syne', sans-serif;
       font-size: 11px;
@@ -278,7 +282,7 @@
     }
 
     td {
-      padding: 15px 12px;
+      padding: 12px 8px;
       vertical-align: middle;
     }
   }
@@ -303,8 +307,8 @@
 
 // ─── LOGO ──────────────────────────────────────────────────────────────────
 .logo-container {
-  width: 42px;
-  height: 42px;
+  width: 36px;
+  height: 36px;
   border-radius: 8px;
   display: flex;
   align-items: center;
@@ -378,11 +382,12 @@
 // ─── ACTIONS ───────────────────────────────────────────────────────────────
 .action-buttons {
   display: flex;
+  flex-direction: column;
   gap: 7px;
 }
 
 .btn-action {
-  padding: 6px 12px;
+  padding: 5px 8px;
   border: none;
   border-radius: 7px;
   cursor: pointer;
