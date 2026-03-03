@@ -7,10 +7,7 @@ import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Subject, debounceTime, distinctUntilChanged, takeUntil } from 'rxjs';
 import { AuthService } from '../../../../services/auth.service';
 import { BoutiqueService } from '../../../../services/boutique.service';
-<<<<<<< Updated upstream
 import { environment } from '../../../../../environments/environment';
-=======
->>>>>>> Stashed changes
 
 interface Article {
    produit: string;
@@ -55,11 +52,7 @@ interface Pagination {
 })
 export class ManagerCommandesListComponent implements OnInit, OnDestroy {
 
-<<<<<<< Updated upstream
    private readonly API = environment.apiUrl;
-=======
-   private readonly API = 'http://localhost:3000';
->>>>>>> Stashed changes
    private destroy$ = new Subject<void>();
 
    commandes: Commande[] = [];

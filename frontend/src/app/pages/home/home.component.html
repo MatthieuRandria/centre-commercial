@@ -1,8 +1,4 @@
-<<<<<<< Updated upstream
-<!-- home.component.html -->
-=======
 <<!-- home.component.html -->
->>>>>>> Stashed changes
 <div class="page-wrapper">
 
   <!-- ═══ HERO CAROUSEL ════════════════════════════════════════════════════ -->
@@ -38,10 +34,6 @@
     </div>
 
     <!-- Flèches -->
-<<<<<<< Updated upstream
-    <button class="carousel-arrow prev" type="button" (click)="prevSlide()">←</button>
-    <button class="carousel-arrow next" type="button" (click)="nextSlide()">→</button>
-=======
     <button class="carousel-arrow prev" type="button" (click)="prevSlide()">
       <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
         <polyline points="15 18 9 12 15 6"></polyline>
@@ -52,7 +44,6 @@
         <polyline points="9 18 15 12 9 6"></polyline>
       </svg>
     </button>
->>>>>>> Stashed changes
 
     <!-- Dots -->
     <div class="carousel-dots">
@@ -147,34 +138,11 @@
     </div>
   </section>
 
-<<<<<<< Updated upstream
-  <!-- ═══ PROMOS ════════════════════════════════════════════════════════════ -->
-=======
   <!-- ═══ BOUTIQUES ════════════════════════════════════════════════════════ -->
->>>>>>> Stashed changes
   <section class="section">
     <div class="container">
       <div class="section-header">
         <div>
-<<<<<<< Updated upstream
-          <div class="section-title">Promotions du moment</div>
-          <div class="section-subtitle">Offres à durée limitée</div>
-        </div>
-      </div>
-      <div class="promo-grid">
-        <a
-          class="promo-banner"
-          *ngFor="let b of promoBanners; let i = index"
-          [ngClass]="b.bgClass"
-          [routerLink]="b.link.split('?')[0]"
-          [queryParams]="parseQueryParams(b.link)"
-        >
-          <div class="promo-deco"></div>
-          <span class="promo-pct">{{ b.pct }}</span>
-          <span class="promo-tag-label">{{ b.tagLabel }}</span>
-          <div class="promo-title" [innerHTML]="b.title"></div>
-          <div class="promo-sub">{{ b.subtitle }}</div>
-=======
           <div class="section-title">Nos boutiques partenaires</div>
           <div class="section-subtitle">{{ boutiques.length }} boutiques au Galaxy Mall</div>
         </div>
@@ -203,7 +171,6 @@
             <div class="boutique-prods" *ngIf="b.nombre_produits">{{ b.nombre_produits }} produits</div>
           </div>
           <div class="boutique-active-dot" *ngIf="b.actif"></div>
->>>>>>> Stashed changes
         </a>
       </div>
     </div>
@@ -243,121 +210,6 @@
     </div>
   </section>
 
-<<<<<<< Updated upstream
-  <!-- ═══ BOUTIQUES ════════════════════════════════════════════════════════ -->
-  <section class="section">
-    <div class="container">
-      <div class="section-header">
-        <div>
-          <div class="section-title">Nos boutiques partenaires</div>
-          <div class="section-subtitle">{{ boutiques.length }} boutiques au Galaxy Mall</div>
-        </div>
-        <a class="see-all" routerLink="/boutique">Voir toutes les boutiques</a>
-      </div>
-
-      <!-- Skeleton -->
-      <div class="boutiques-grid" *ngIf="isLoading">
-        <div class="sk-boutique" *ngFor="let i of [1,2,3,4,5,6]"></div>
-      </div>
-
-      <!-- Grille boutiques -->
-      <div class="boutiques-grid" *ngIf="!isLoading">
-        <a
-          class="boutique-card"
-          *ngFor="let b of boutiques; trackBy: trackById"
-          [routerLink]="['/boutique', b.slug ?? b._id]"
-        >
-          <div class="boutique-av"
-            [style.background]="b.couleurBg"
-            [style.color]="b.couleurTx"
-          >{{ b.initiale }}</div>
-          <div class="boutique-info">
-            <div class="boutique-name">{{ b.nom }}</div>
-            <div class="boutique-cat">{{ getCategorieNom(b) }}{{ b.etage ? ' — ' + b.etage : '' }}</div>
-            <div class="boutique-prods" *ngIf="b.nombre_produits">{{ b.nombre_produits }} produits</div>
-          </div>
-          <div class="boutique-active-dot" *ngIf="b.actif"></div>
-        </a>
-      </div>
-    </div>
-  </section>
-
-  <!-- ═══ ÉVÉNEMENTS ════════════════════════════════════════════════════════ -->
-  <section class="section alt">
-    <div class="container">
-      <div class="section-header">
-        <div>
-          <div class="section-title">Événements à venir</div>
-          <div class="section-subtitle">Ne manquez pas nos prochains événements</div>
-        </div>
-        <a class="see-all" routerLink="/evenements">Voir tous les événements</a>
-      </div>
-      <div class="events-grid">
-        <div class="event-card" *ngFor="let ev of events">
-          <div class="event-img" [style.background]="ev.bgGrad">
-            {{ ev.emoji }}
-            <div class="event-date-badge">
-              <div class="event-day">{{ ev.day }}</div>
-              <div class="event-month">{{ ev.month }}</div>
-            </div>
-          </div>
-          <div class="event-body">
-            <div class="event-type">{{ ev.type }}</div>
-            <div class="event-title">{{ ev.title }}</div>
-            <div class="event-desc">{{ ev.desc }}</div>
-            <div class="event-meta">
-              <span>🕐 {{ ev.time }}</span>
-              <span>•</span>
-              <span>📍 {{ ev.lieu }}</span>
-              <button class="btn-event" type="button">{{ ev.btnLabel }}</button>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- ═══ FOOTER ════════════════════════════════════════════════════════════ -->
-  <footer class="footer">
-    <div class="footer-body">
-      <div class="footer-brand">
-        <div class="footer-logo">CentreShop</div>
-        <p class="footer-desc">La plateforme officielle du Galaxy Mall d'Antananarivo. Découvrez, comparez et achetez en Click & Collect.</p>
-        <div class="socials">
-          <a class="social-btn" href="#" title="Facebook">f</a>
-          <a class="social-btn" href="#" title="Instagram">◎</a>
-          <a class="social-btn" href="#" title="Twitter">✕</a>
-          <a class="social-btn" href="#" title="WhatsApp">💬</a>
-        </div>
-      </div>
-      <div class="footer-col">
-        <h3>Boutique</h3>
-        <a routerLink="/boutique">Nos boutiques</a>
-        <a routerLink="/produits">Catalogue</a>
-        <a routerLink="/produits" [queryParams]="{ promo: true }">Promotions</a>
-        <a routerLink="/produits" [queryParams]="{ sort: 'nouveautes' }">Nouveautés</a>
-      </div>
-      <div class="footer-col">
-        <h3>Mon compte</h3>
-        <a routerLink="/login">Connexion</a>
-        <a routerLink="/register">Inscription</a>
-        <a routerLink="/commandes">Mes commandes</a>
-        <a routerLink="/favoris">Mes favoris</a>
-        <a routerLink="/panier">Mon panier</a>
-      </div>
-      <div class="footer-col">
-        <h3>Aide</h3>
-        <a routerLink="/contact">Contact</a>
-        <a href="#">FAQ</a>
-        <a href="#">Livraison</a>
-        <a href="#">Retours</a>
-        <a href="#">CGV</a>
-      </div>
-    </div>
-    <div class="footer-bottom">
-      <span>© 2026 CentreShop — Galaxy Mall Antananarivo. Tous droits réservés.</span>
-      <span>Fait avec ❤ à Madagascar</span>
-=======
   <!-- ═══ FOOTER ════════════════════════════════════════════════════════════ -->
   <footer class="footer">
     <div class="footer-body">
@@ -425,7 +277,6 @@
         </svg>
         à Madagascar
       </span>
->>>>>>> Stashed changes
     </div>
   </footer>
 
@@ -439,16 +290,12 @@
       <div class="prod-img-ph" *ngIf="!getFirstImage(p)"></div>
 
       <!-- Tags -->
-<<<<<<< Updated upstream
-      <span class="vedette-tag" *ngIf="isVedette && !isEnPromotion(p)">⭐ Vedette</span>
-=======
       <span class="vedette-tag" *ngIf="isVedette && !isEnPromotion(p)">
         <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="currentColor" style="display:inline;vertical-align:middle;margin-right:3px">
           <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/>
         </svg>
         Vedette
       </span>
->>>>>>> Stashed changes
       <span class="promo-tag"   *ngIf="isEnPromotion(p)">-{{ getPromoPercent(p) }}%</span>
       <span class="new-tag"     *ngIf="isNew">NOUVEAU</span>
 
@@ -459,9 +306,6 @@
         [class.active]="isFavori(p._id)"
         (click)="toggleFavori($event, p)"
         [title]="isFavori(p._id) ? 'Retirer des favoris' : 'Ajouter aux favoris'"
-<<<<<<< Updated upstream
-      >{{ isFavori(p._id) ? '♥' : '♡' }}</button>
-=======
       >
         <!-- Filled heart (active) -->
         <svg *ngIf="isFavori(p._id)" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
@@ -472,7 +316,6 @@
           <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/>
         </svg>
       </button>
->>>>>>> Stashed changes
     </div>
 
     <div class="prod-body">
@@ -499,11 +342,6 @@
         [class.success]="cartSuccessId === p._id"
         (click)="addToCart($event, p)"
       >
-<<<<<<< Updated upstream
-        <span class="spinner-btn" *ngIf="addingCartId === p._id"></span>
-        <span *ngIf="cartSuccessId === p._id">✓ Ajouté !</span>
-        <span *ngIf="addingCartId !== p._id && cartSuccessId !== p._id">+ Ajouter au panier</span>
-=======
         <!-- Spinner -->
         <svg *ngIf="addingCartId === p._id" class="spinner-btn" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round">
           <path d="M21 12a9 9 0 1 1-6.219-8.56"/>
@@ -523,7 +361,6 @@
           </svg>
           Ajouter au panier
         </ng-container>
->>>>>>> Stashed changes
       </button>
       <ng-template #indispo>
         <button class="btn-add-cart" type="button" disabled>Indisponible</button>
@@ -535,8 +372,4 @@
 <!-- ═══ TOAST ════════════════════════════════════════════════════════════════ -->
 <div class="toast" [class.show]="toastVisible" [class.success]="toastType === 'success'">
   {{ toastMsg }}
-<<<<<<< Updated upstream
-</div>
-=======
 </div>>
->>>>>>> Stashed changes

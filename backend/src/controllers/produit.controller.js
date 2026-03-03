@@ -9,7 +9,6 @@ exports.getProduitCategories = async (req, res) => {
   }
 };
 
-<<<<<<< Updated upstream
 exports.getAllProduits = async (req, res) => {
   try {
     const {
@@ -83,34 +82,6 @@ exports.getAllProduits = async (req, res) => {
   } catch (err) {
     res.status(500).json({ success: false, message: err.message });
   }
-=======
-exports.getAllProduits = async (req, res, next) => {
-   try {
-      const {
-         boutiqueId, categorie, prixMin, prixMax,
-         sortBy = "date", order = "desc", page = 1, limit = 10
-      } = req.query;
-
-      const filters = { actif: true };
-      if (boutiqueId) filters.boutique = boutiqueId;
-      if (categorie)  filters['categories.nom'] = categorie;
-      if (prixMin || prixMax) {
-         filters["variantes.prix"] = {};
-         if (prixMin) filters["variantes.prix"].$gte = Number(prixMin);
-         if (prixMax) filters["variantes.prix"].$lte = Number(prixMax);
-      }
-
-      const sortFields = { prix: "variantes.prix", date: "createdAt", vues: "vues" };
-      const sortOptions = { [sortFields[sortBy] || "createdAt"]: order === "asc" ? 1 : -1 };
-      const skip = (Number(page) - 1) * Number(limit);
-
-      const produits = await Produit.find(filters)
-         .populate("boutique").sort(sortOptions).skip(skip).limit(Number(limit));
-      const total = await Produit.countDocuments(filters);
-
-      res.json({ total, page: Number(page), pages: Math.ceil(total / Number(limit)), data: produits });
-   } catch (err) { next(err); }
->>>>>>> Stashed changes
 };
 
 exports.getProduitById = async (req, res) => {

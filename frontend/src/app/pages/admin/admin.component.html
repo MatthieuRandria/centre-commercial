@@ -4,13 +4,7 @@
   <!-- ─── OVERLAY mobile ────────────────────────────────────────────────── -->
   <div class="sidebar-overlay" (click)="closeOnOverlay()"></div>
 
-<<<<<<< Updated upstream
-  <!-- ═══════════════════════════════════════════════════════════════════════
-       MAIN
-  ════════════════════════════════════════════════════════════════════════ -->
-=======
   <!-- MAIN -->
->>>>>>> Stashed changes
   <div class="main">
 
     <!-- TOPBAR -->
@@ -23,10 +17,6 @@
       </div>
       <div class="topbar-right">
         <span class="today-date">{{ today | date:'EEEE d MMMM yyyy':'' }}</span>
-<<<<<<< Updated upstream
-        <button class="notif-btn" type="button">
-          🔔
-=======
         <button class="notif-btn" type="button" aria-label="Notifications">
           <!-- bell -->
           <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24"
@@ -35,7 +25,6 @@
             <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/>
             <path d="M13.73 21a2 2 0 0 1-3.46 0"/>
           </svg>
->>>>>>> Stashed changes
           <span class="notif-dot" *ngIf="commandeBadge > 0"></span>
         </button>
       </div>
@@ -46,9 +35,6 @@
 
       <!-- Error banner -->
       <div class="error-banner" *ngIf="errorMessage">
-<<<<<<< Updated upstream
-        ⚠ {{ errorMessage }}
-=======
         <!-- warning triangle -->
         <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24"
           fill="none" stroke="currentColor" stroke-width="2"
@@ -59,7 +45,6 @@
           <line x1="12" y1="17" x2="12.01" y2="17"/>
         </svg>
         {{ errorMessage }}
->>>>>>> Stashed changes
         <button class="btn-retry" type="button" (click)="loadAll()">Réessayer</button>
       </div>
 
@@ -68,39 +53,18 @@
         <p>Vue d'ensemble de votre centre commercial</p>
       </div>
 
-<<<<<<< Updated upstream
-      <!-- ─── KPI CARDS ──────────────────────────────────────────────────── -->
-      <div class="kpi-grid">
-        <!-- Skeletons -->
-=======
       <!-- KPI CARDS -->
       <div class="kpi-grid">
->>>>>>> Stashed changes
         <ng-container *ngIf="loadingKpis">
           <div class="kpi-skeleton" *ngFor="let i of skeletonRows(4)"></div>
         </ng-container>
 
-<<<<<<< Updated upstream
-        <!-- Vraies données -->
-=======
->>>>>>> Stashed changes
         <ng-container *ngIf="!loadingKpis">
           <div class="kpi-card" *ngFor="let kpi of kpis">
             <div class="kpi-info">
               <div class="kpi-label">{{ kpi.label }}</div>
               <div class="kpi-value">{{ kpi.value }}</div>
               <div class="kpi-sub">
-<<<<<<< Updated upstream
-                <span [class]="kpi.trendUp ? 'kpi-trend-up' : 'kpi-trend-down'">
-                  {{ kpi.trendUp ? '▲' : '▼' }}
-                </span>
-                <!-- ✅ Corrigé : kpi.trend → kpi.trendValue -->
-                {{ kpi.trendValue }}
-              </div>
-            </div>
-            <!-- ✅ Corrigé : kpi.iconClass et kpi.icon existent maintenant dans KpiCard -->
-            <div class="kpi-icon" [ngClass]="kpi.iconClass">{{ kpi.icon }}</div>
-=======
                 <!-- trend up arrow -->
                 <svg *ngIf="kpi.trendUp" xmlns="http://www.w3.org/2000/svg" width="12" height="12"
                   viewBox="0 0 24 24" fill="currentColor" stroke="none"
@@ -117,22 +81,14 @@
               </div>
             </div>
             <!-- <div class="kpi-icon" [ngClass]="kpi.iconClass">{{ kpi.icon }}</div> -->
->>>>>>> Stashed changes
           </div>
         </ng-container>
       </div>
 
-<<<<<<< Updated upstream
-      <!-- ─── CHART CA ────────────────────────────────────────────────────── -->
-      <div class="chart-card">
-        <div class="chart-head">
-          <span class="chart-title">Évolution du chiffre d'affaires</span>
-=======
       <!-- CHART CA -->
       <div class="chart-card">
         <div class="chart-head">
           <span class="chart-title">Evolution du chiffre d'affaires</span>
->>>>>>> Stashed changes
           <div class="chart-period-btns">
             <button class="period-btn" [class.active]="activePeriod==='6m'"  type="button" (click)="setPeriod('6m')">6 mois</button>
             <button class="period-btn" [class.active]="activePeriod==='12m'" type="button" (click)="setPeriod('12m')">12 mois</button>
@@ -144,11 +100,7 @@
         </div>
       </div>
 
-<<<<<<< Updated upstream
-      <!-- ─── TOP TABLES ──────────────────────────────────────────────────── -->
-=======
       <!-- TOP TABLES -->
->>>>>>> Stashed changes
       <div class="tables-row">
 
         <!-- Top Boutiques -->

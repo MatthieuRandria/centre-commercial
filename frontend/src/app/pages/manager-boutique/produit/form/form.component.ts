@@ -6,10 +6,7 @@ import { HttpClient } from '@angular/common/http';
 import { FormBuilder, FormGroup, FormArray, Validators, ReactiveFormsModule } from '@angular/forms';
 import { BoutiqueService } from '../../../../services/boutique.service';
 import { AuthService } from '../../../../services/auth.service';
-<<<<<<< Updated upstream
 import { environment } from '../../../../../environments/environment';
-=======
->>>>>>> Stashed changes
 
 @Component({
    selector: 'app-manager-produit-form',
@@ -20,11 +17,7 @@ import { environment } from '../../../../../environments/environment';
 })
 export class ManagerProduitFormComponent implements OnInit {
 
-<<<<<<< Updated upstream
    private readonly API = `${environment.apiUrl}produits`;
-=======
-   private readonly API = 'http://localhost:3000/produits';
->>>>>>> Stashed changes
 
    form!: FormGroup;
    isLoading = false;

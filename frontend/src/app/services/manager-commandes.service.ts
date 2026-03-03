@@ -4,10 +4,7 @@ import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
 import { AuthService } from './auth.service';
-<<<<<<< Updated upstream
 import { environment } from '../../environments/environment';
-=======
->>>>>>> Stashed changes
 
 export type CommandeStatut =
    | 'en_attente'
@@ -65,12 +62,8 @@ const FILTRE_TO_STATUTS: Record<ManagerFiltreStatut, CommandeStatut[]> = {
 
 @Injectable({ providedIn: 'root' })
 export class ManagerCommandesService {
-<<<<<<< Updated upstream
    private base = environment.apiUrl;
    
-=======
-   private base = 'http://localhost:3000';
->>>>>>> Stashed changes
 
    constructor(private http: HttpClient, private authServ: AuthService) { }
 
