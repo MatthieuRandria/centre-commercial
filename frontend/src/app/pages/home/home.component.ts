@@ -24,28 +24,28 @@ export class HomeComponent implements OnInit, OnDestroy, AfterViewInit {
   private destroy$ = new Subject<void>();
 
   // ─── Données ───────────────────────────────────────────────────────────────
-  vedettes:   Produit[]      = [];
-  nouveautes: Produit[]      = [];
-  boutiques:  BoutiqueHome[] = [];
+  vedettes: Produit[] = [];
+  nouveautes: Produit[] = [];
+  boutiques: BoutiqueHome[] = [];
 
-  heroSlides:    HeroSlide[]    = [];
-  promoBanners:  PromoBanner[]  = [];
-  events:        EventItem[]    = [];
-  searchTags:    { label: string; q: string }[] = [];
-  categories:    { emoji: string; label: string; slug: string }[] = [];
+  heroSlides: HeroSlide[] = [];
+  promoBanners: PromoBanner[] = [];
+  events: EventItem[] = [];
+  searchTags: { label: string; q: string }[] = [];
+  categories: { emoji: string; label: string; slug: string }[] = [];
 
   // ─── Chargement ────────────────────────────────────────────────────────────
   isLoading = true;
 
   // ─── Carousel ──────────────────────────────────────────────────────────────
-  currentSlide  = 0;
+  currentSlide = 0;
   private autoplayTimer: any;
 
   // ─── Panier & favoris ──────────────────────────────────────────────────────
-  addingCartId:  string | null = null;
+  addingCartId: string | null = null;
   cartSuccessId: string | null = null;
-  favSet         = new Set<string>();
-  panierCount    = 0;
+  favSet = new Set<string>();
+  panierCount = 0;
 
   // ─── Recherche ────────────────────────────────────────────────────────────
   searchQuery = '';
@@ -54,7 +54,7 @@ export class HomeComponent implements OnInit, OnDestroy, AfterViewInit {
   isLoggedIn = false;
 
   // Toast
-  toastMsg     = '';
+  toastMsg = '';
   toastVisible = false;
   toastType: 'success' | 'info' = 'success';
   private toastTimer: any;
@@ -63,12 +63,12 @@ export class HomeComponent implements OnInit, OnDestroy, AfterViewInit {
   readonly skeletonArr4 = Array(4).fill(0);
 
   constructor(
-    private homeService:    HomeService,
-    private panierService:  PanierFullService,
+    private homeService: HomeService,
+    private panierService: PanierFullService,
     private favorisService: FavorisService,
-    private http:           HttpClient,
-    private router:         Router,
-    private zone:           NgZone
+    private http: HttpClient,
+    private router: Router,
+    private zone: NgZone
   ) {
     this.apiUrl = environment.apiUrl;
   }
@@ -77,11 +77,11 @@ export class HomeComponent implements OnInit, OnDestroy, AfterViewInit {
 
   ngOnInit(): void {
     this.checkAuth();
-    this.heroSlides   = this.homeService.getHeroSlides();
+    this.heroSlides = this.homeService.getHeroSlides();
     this.promoBanners = this.homeService.getPromoBanners();
-    this.events       = this.homeService.getEvents();
-    this.searchTags   = this.homeService.getSearchTags();
-    this.categories   = this.homeService.getCategoriesStatic();
+    this.events = this.homeService.getEvents();
+    this.searchTags = this.homeService.getSearchTags();
+    this.categories = this.homeService.getCategoriesStatic();
     this.loadData();
 
     // Badge panier
@@ -116,10 +116,9 @@ export class HomeComponent implements OnInit, OnDestroy, AfterViewInit {
       finalize(() => this.isLoading = false),
       catchError(() => of({ vedettes: [], nouveautes: [], boutiques: [], categories: [] }))
     ).subscribe((data: HomeData) => {
-      // console.log("data",data);
-      this.vedettes   = data.vedettes;
+      this.vedettes = data.vedettes;
       this.nouveautes = data.nouveautes;
-      this.boutiques  = data.boutiques;
+      this.boutiques = data.boutiques;
     });
   }
 
@@ -166,17 +165,17 @@ export class HomeComponent implements OnInit, OnDestroy, AfterViewInit {
   }
 
   // ─── Helpers produit ──────────────────────────────────────────────────────
-  getPrix(p: Produit):         number        { return this.homeService.getPrix(p); }
-  getPrixPromo(p: Produit):    number | null { return this.homeService.getPrixPromo(p); }
-  isEnPromotion(p: Produit):   boolean       { return this.homeService.isEnPromotion(p); }
-  getPromoPercent(p: Produit): number        { return this.homeService.getPromoPercent(p); }
-  getStock(p: Produit):        number        { return this.homeService.getStock(p); }
-  getStockClass(p: Produit):   string        { return this.homeService.getStockClass(p); }
-  getStockLabel(p: Produit):   string        { return this.homeService.getStockLabel(p); }
-  getBoutiqueName(p: Produit): string        { return this.homeService.getBoutiqueName(p); }
-  getFirstImage(p: Produit):   string | null { return this.homeService.getFirstImage(p); }
-  formatMontant(n: number):    string        { return this.homeService.formatMontant(n); }
-  getCategorieNom(b: BoutiqueHome): string   { return this.homeService.getCategorieNom(b); }
+  getPrix(p: Produit): number { return this.homeService.getPrix(p); }
+  getPrixPromo(p: Produit): number | null { return this.homeService.getPrixPromo(p); }
+  isEnPromotion(p: Produit): boolean { return this.homeService.isEnPromotion(p); }
+  getPromoPercent(p: Produit): number { return this.homeService.getPromoPercent(p); }
+  getStock(p: Produit): number { return this.homeService.getStock(p); }
+  getStockClass(p: Produit): string { return this.homeService.getStockClass(p); }
+  getStockLabel(p: Produit): string { return this.homeService.getStockLabel(p); }
+  getBoutiqueName(p: Produit): string { return this.homeService.getBoutiqueName(p); }
+  getFirstImage(p: Produit): string | null { return this.homeService.getFirstImage(p); }
+  formatMontant(n: number): string { return this.homeService.formatMontant(n); }
+  getCategorieNom(b: BoutiqueHome): string { return this.homeService.getCategorieNom(b); }
 
   // ─── Panier ───────────────────────────────────────────────────────────────
   addToCart(event: Event, p: Produit): void {
@@ -219,7 +218,7 @@ export class HomeComponent implements OnInit, OnDestroy, AfterViewInit {
         { produitId: p._id },
         { headers }
       ).pipe(takeUntil(this.destroy$), catchError(() => of(null)))
-       .subscribe(res => { if (res !== null) this.favSet.add(p._id); });
+        .subscribe(res => { if (res !== null) this.favSet.add(p._id); });
     } else {
       this.favorisService.removeFavori(p._id)
         .pipe(takeUntil(this.destroy$), catchError(() => of(null)))

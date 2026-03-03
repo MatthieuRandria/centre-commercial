@@ -49,7 +49,17 @@ export class NavbarComponent implements OnInit {
   }
 
   buildNavItems(): void {
-    // Liens toujours visibles
+    if (this.user?.role === 'boutique') {
+      this.navItems = [
+        { label: 'Dashboard', link: '/boutique/dashboard' },
+        { label: 'Mes produits', link: '/boutique/produits' },
+        { label: 'Mes commandes', link: '/boutique/commandes' },
+        { label: 'Mes promotions', link: '/boutique/promotions' },
+      ];
+      return;
+    }
+
+    // Liens publics (visiteur / client)
     this.navItems = [
       { label: 'Accueil', link: '/' },
       { label: 'Boutiques', link: '/boutique' },
@@ -76,7 +86,7 @@ export class NavbarComponent implements OnInit {
         { label: 'Promotions', link: '/promotions' }
       );
     }
-    // Liens visibles uniquement si connecté en tant qu'admin
+
     if (this.user?.role === 'admin') {
       this.navItems.splice(2, 0,
         { label: 'Admin', link: '/admin' },

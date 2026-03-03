@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute, RouterModule } from '@angular/router';
-import { CommandeClient, CommandesService } from '../../services/commandes.services';
+import { CommandeClient, CommandesService } from '../../services/commandes.service';
 
 @Component({
   selector: 'app-commande-confirmation',
@@ -18,7 +18,7 @@ export class CommandeConfirmationComponent implements OnInit {
   constructor(
     private route: ActivatedRoute,
     private commandesService: CommandesService
-  ) {}
+  ) { }
 
   ngOnInit(): void {
     const id = this.route.snapshot.paramMap.get('id');
@@ -43,11 +43,11 @@ export class CommandeConfirmationComponent implements OnInit {
   get statutLabel(): string {
     const labels: Record<CommandeClient['statut'], string> = {
       en_attente: 'En attente',
-      validee:    'Validée',
-      preparee:   'Préparée',
-      expediee:   'Expédiée',
-      livree:     'Livrée',
-      annulee:    'Annulée'
+      validee: 'Validée',
+      preparee: 'Préparée',
+      expediee: 'Expédiée',
+      livree: 'Livrée',
+      annulee: 'Annulée'
     };
     return this.commande ? labels[this.commande.statut] : '';
   }

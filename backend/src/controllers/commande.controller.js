@@ -1,4 +1,5 @@
 const commandeService = require('../services/commande.service');
+const Commande = require('../models/Commande');
 
 exports.createCommande = async (req, res) => {
   try {
@@ -10,17 +11,13 @@ exports.createCommande = async (req, res) => {
   }
 };
 
-
 exports.getMyCommandes = async (req, res) => {
   try {
-    const userId = req.user.id ; // depuis middleware JWT
-    const page   = Math.max(1, parseInt(req.query.page)  || 1);
-    const limit  = Math.min(50, parseInt(req.query.limit) || 8);
-
-    // Filtre optionnel sur statuts (liste CSV)
+    const userId     = req.user.id;
+    const page       = Math.max(1, parseInt(req.query.page)  || 1);
+    const limit      = Math.min(50, parseInt(req.query.limit) || 8);
     const statutsRaw = req.query.statuts;
     const statuts    = statutsRaw ? statutsRaw.split(',').map(s => s.trim()) : [];
-
     const result = await commandeService.getMyCommandes(userId, { page, limit, statuts });
     res.json(result);
   } catch (error) {
