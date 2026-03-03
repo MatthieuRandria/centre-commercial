@@ -15,7 +15,6 @@ import {
   DashboardKpis, CaPoint,
   TopBoutiqueApi, TopProduitApi, CommandeRecente
 } from '../../services/admin.service';
-import { SidebarComponent } from '../../components/sidebar/sidebar.component';
 
 // ─── View-model interfaces ────────────────────────────────────────────────────
 
@@ -26,9 +25,25 @@ export interface KpiCard {
   trendLabel: string;
   trendUp: boolean;
   iconKey: 'boutique' | 'produit' | 'commande' | 'ca';
+  // ✅ Ajout des propriétés manquantes référencées dans le HTML
+  icon: string;
+  iconClass: string;
   color: string;
   bgColor: string;
   strokeColor: string;
+}
+
+export interface NavItem {
+  label: string;
+  icon: string;
+  route: string;
+  active?: boolean;
+  badge?: number;
+}
+
+export interface NavSection {
+  label: string;
+  items: NavItem[];
 }
 
 export interface TopBoutiqueVM {
@@ -78,6 +93,28 @@ export class AdminComponent implements OnInit, AfterViewInit, OnDestroy {
   commandeBadge = 0;
   errorMessage = '';
 
+  // ✅ Ajout de sidebarOpen manquant
+  sidebarOpen = false;
+
+  // ✅ Ajout de navSections manquant
+  navSections: NavSection[] = [
+    {
+      label: 'GÉNÉRAL',
+      items: [
+        { label: 'Tableau de bord', icon: '◉', route: '/admin', active: true },
+      ]
+    },
+    {
+      label: 'GESTION',
+      items: [
+        { label: 'Boutiques', icon: '🏪', route: '/admin/boutiques' },
+        { label: 'Produits', icon: '📦', route: '/admin/produits' },
+        { label: 'Commandes', icon: '🧾', route: '/admin/commandes' },
+        { label: 'Utilisateurs', icon: '👤', route: '/admin/utilisateurs' },
+      ]
+    }
+  ];
+
   // ─── Data ──────────────────────────────────────────────────────────────────
   kpis: KpiCard[] = [];
   topBoutiques: TopBoutiqueVM[] = [];
@@ -102,11 +139,11 @@ export class AdminComponent implements OnInit, AfterViewInit, OnDestroy {
   };
 
   // ─── KPI colour palette ────────────────────────────────────────────────────
-  private readonly kpiPalette: Record<KpiCard['iconKey'], Pick<KpiCard, 'color' | 'bgColor' | 'strokeColor'>> = {
-    boutique: { color: '#10b981', bgColor: '#d1fae5', strokeColor: '#059669' },
-    produit: { color: '#f59e0b', bgColor: '#fef3c7', strokeColor: '#d97706' },
-    commande: { color: '#3b82f6', bgColor: '#dbeafe', strokeColor: '#2563eb' },
-    ca: { color: '#8b5cf6', bgColor: '#f3e8ff', strokeColor: '#7c3aed' },
+  private readonly kpiPalette: Record<KpiCard['iconKey'], Pick<KpiCard, 'color' | 'bgColor' | 'strokeColor' | 'icon' | 'iconClass'>> = {
+    boutique: { color: '#10b981', bgColor: '#d1fae5', strokeColor: '#059669', icon: '🏪', iconClass: 'icon-boutique' },
+    produit: { color: '#f59e0b', bgColor: '#fef3c7', strokeColor: '#d97706', icon: '📦', iconClass: 'icon-produit' },
+    commande: { color: '#3b82f6', bgColor: '#dbeafe', strokeColor: '#2563eb', icon: '🧾', iconClass: 'icon-commande' },
+    ca: { color: '#8b5cf6', bgColor: '#f3e8ff', strokeColor: '#7c3aed', icon: '💰', iconClass: 'icon-ca' },
   };
 
   constructor(
@@ -129,6 +166,18 @@ export class AdminComponent implements OnInit, AfterViewInit, OnDestroy {
     this.destroy$.next();
     this.destroy$.complete();
     this.chart?.destroy();
+  }
+
+  // ─── Sidebar ───────────────────────────────────────────────────────────────
+
+  // ✅ Ajout de toggleSidebar manquant
+  toggleSidebar(): void {
+    this.sidebarOpen = !this.sidebarOpen;
+  }
+
+  // ✅ Ajout de closeOnOverlay manquant
+  closeOnOverlay(): void {
+    this.sidebarOpen = false;
   }
 
   // ─── Data loading ──────────────────────────────────────────────────────────

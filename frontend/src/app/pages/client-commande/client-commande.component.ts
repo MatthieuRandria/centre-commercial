@@ -83,7 +83,6 @@ export class ClientCommandeComponent implements OnInit, OnDestroy {
           prenom: u.prenom ?? '',
           email: u.email ?? '',
           initiale: ((u.prenom?.[0] ?? '') + (u.nom?.[0] ?? '')).toUpperCase() || '?'
->>>>>>> Stashed changes
         };
       }
     } catch { /* ignore */ }
