@@ -11,7 +11,10 @@ import { Boutique, BoutiqueFilters } from '../../models/boutique.model';
   standalone: true,
   imports: [CommonModule, RouterModule],
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
   providers:[DecimalPipe],
+=======
+>>>>>>> Stashed changes
 =======
 >>>>>>> Stashed changes
   templateUrl: './boutique.component.html',

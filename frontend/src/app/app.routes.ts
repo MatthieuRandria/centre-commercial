@@ -7,7 +7,13 @@ import { ManagerProduitsListComponent } from './pages/manager-boutique/produit/l
 import { ManagerCommandesListComponent } from './pages/manager-boutique/commandes/list/list.component';
 import { ManagerCommandeDetailComponent } from './pages/manager-boutique/commandes/details/details.component';
 
+import { ManagerProduitFormComponent } from './pages/manager-boutique/produit/form/form.component';
+import { ManagerProduitsListComponent } from './pages/manager-boutique/produit/list/list.component';
+import { ManagerCommandesListComponent } from './pages/manager-boutique/commandes/list/list.component';
+import { ManagerCommandeDetailComponent } from './pages/manager-boutique/commandes/details/details.component';
+
 export const routes: Routes = [
+<<<<<<< Updated upstream
 <<<<<<< Updated upstream
   {
     path: '',
@@ -21,6 +27,8 @@ export const routes: Routes = [
       import('./pages/login/login.component').then(m => m.LoginComponent),
   },
 =======
+=======
+>>>>>>> Stashed changes
     { path: '', component: HomeComponent },
     { path: 'login', component: LoginComponent },
     { path: 'signup', component: SignupComponent },
@@ -36,6 +44,9 @@ export const routes: Routes = [
     // ── Boutique publique ── (route dynamique EN DERNIER)
     { path: 'boutique', component: BoutiquesComponent },
     { path: 'boutique/:slug', component: BoutiqueDetailComponent },
+<<<<<<< Updated upstream
+>>>>>>> Stashed changes
+=======
 >>>>>>> Stashed changes
 
   {

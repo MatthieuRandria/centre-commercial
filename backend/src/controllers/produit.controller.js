@@ -86,6 +86,7 @@ exports.getAllProduits = async (req, res) => {
   }
 };
 
+<<<<<<< Updated upstream
 /**
  * @desc    GET produit par ID
  * @route   GET /produits/:id
@@ -176,6 +177,8 @@ exports.deleteProduit = async (req, res) => {
     res.status(500).json({ success: false, message: err.message });
   }
 =======
+=======
+>>>>>>> Stashed changes
 exports.getAllProduits = async (req, res, next) => {
    try {
       const {

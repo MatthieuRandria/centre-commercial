@@ -10,6 +10,7 @@
       <span class="today-date">{{ today | date:'EEEE d MMMM yyyy':'':'fr' }}</span>
 
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
   <!-- ═══════════════════════════════════════════════════════════════════════
        SIDEBAR
   ════════════════════════════════════════════════════════════════════════ -->
@@ -19,6 +20,8 @@
       <div class="sidebar-role">Administration</div>
       <button class="sidebar-close" type="button" (click)="toggleSidebar()">✕</button>
 =======
+=======
+>>>>>>> Stashed changes
       <button class="icon-btn" type="button">
         <svg width="16" height="16" viewBox="0 0 16 16" fill="none"
              stroke="currentColor" stroke-width="1.8"
@@ -55,6 +58,9 @@
       </svg>
       {{ errorMessage }}
       <button class="btn-retry" type="button" (click)="loadAll()">Réessayer</button>
+<<<<<<< Updated upstream
+>>>>>>> Stashed changes
+=======
 >>>>>>> Stashed changes
     </div>
 
@@ -63,6 +69,7 @@
       <h1>Tableau de bord</h1>
       <p>Vue d'ensemble de votre centre commercial</p>
     </div>
+<<<<<<< Updated upstream
 
     <!-- ── KPI CARDS ──────────────────────────────────────────────────────── -->
     <div class="kpi-grid">
@@ -142,6 +149,15 @@
                 {{ kpi.trend }}
               </div>
 =======
+=======
+
+    <!-- ── KPI CARDS ──────────────────────────────────────────────────────── -->
+    <div class="kpi-grid">
+      <ng-container *ngIf="loadingKpis">
+        <div class="kpi-skeleton" *ngFor="let i of skeletonRows(4)"></div>
+      </ng-container>
+
+>>>>>>> Stashed changes
       <ng-container *ngIf="!loadingKpis">
         <div class="kpi-card" *ngFor="let kpi of kpis"
              [style.--kpi-color]="kpi.color"
@@ -176,6 +192,9 @@
                          C11.5 9.88 6.5 8.5 6.5 11 C6.5 12.12 7.38 12.5 9 12.5
                          C10.62 12.5 11.5 11.88 11.5 11"/>
               </svg>
+<<<<<<< Updated upstream
+>>>>>>> Stashed changes
+=======
 >>>>>>> Stashed changes
             </div>
           </div>
