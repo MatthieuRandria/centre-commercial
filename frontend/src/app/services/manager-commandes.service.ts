@@ -4,6 +4,7 @@ import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
 import { AuthService } from './auth.service';
+import { environment } from '../../environments/environment';
 
 export type CommandeStatut =
    | 'en_attente'
@@ -61,7 +62,8 @@ const FILTRE_TO_STATUTS: Record<ManagerFiltreStatut, CommandeStatut[]> = {
 
 @Injectable({ providedIn: 'root' })
 export class ManagerCommandesService {
-   private base = 'http://localhost:3000';
+   private base = environment.apiUrl;
+   
 
    constructor(private http: HttpClient, private authServ: AuthService) { }
 
