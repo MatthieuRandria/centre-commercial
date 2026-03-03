@@ -1,4 +1,8 @@
+<<<<<<< Updated upstream
 <!-- home.component.html -->
+=======
+<<!-- home.component.html -->
+>>>>>>> Stashed changes
 <div class="page-wrapper">
 
   <!-- ═══ HERO CAROUSEL ════════════════════════════════════════════════════ -->
@@ -34,8 +38,21 @@
     </div>
 
     <!-- Flèches -->
+<<<<<<< Updated upstream
     <button class="carousel-arrow prev" type="button" (click)="prevSlide()">←</button>
     <button class="carousel-arrow next" type="button" (click)="nextSlide()">→</button>
+=======
+    <button class="carousel-arrow prev" type="button" (click)="prevSlide()">
+      <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+        <polyline points="15 18 9 12 15 6"></polyline>
+      </svg>
+    </button>
+    <button class="carousel-arrow next" type="button" (click)="nextSlide()">
+      <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+        <polyline points="9 18 15 12 9 6"></polyline>
+      </svg>
+    </button>
+>>>>>>> Stashed changes
 
     <!-- Dots -->
     <div class="carousel-dots">
@@ -130,11 +147,16 @@
     </div>
   </section>
 
+<<<<<<< Updated upstream
   <!-- ═══ PROMOS ════════════════════════════════════════════════════════════ -->
+=======
+  <!-- ═══ BOUTIQUES ════════════════════════════════════════════════════════ -->
+>>>>>>> Stashed changes
   <section class="section">
     <div class="container">
       <div class="section-header">
         <div>
+<<<<<<< Updated upstream
           <div class="section-title">Promotions du moment</div>
           <div class="section-subtitle">Offres à durée limitée</div>
         </div>
@@ -152,6 +174,36 @@
           <span class="promo-tag-label">{{ b.tagLabel }}</span>
           <div class="promo-title" [innerHTML]="b.title"></div>
           <div class="promo-sub">{{ b.subtitle }}</div>
+=======
+          <div class="section-title">Nos boutiques partenaires</div>
+          <div class="section-subtitle">{{ boutiques.length }} boutiques au Galaxy Mall</div>
+        </div>
+        <a class="see-all" routerLink="/boutique">Voir toutes les boutiques</a>
+      </div>
+
+      <!-- Skeleton -->
+      <div class="boutiques-grid" *ngIf="isLoading">
+        <div class="sk-boutique" *ngFor="let i of [1,2,3,4,5,6]"></div>
+      </div>
+
+      <!-- Grille boutiques -->
+      <div class="boutiques-grid" *ngIf="!isLoading">
+        <a
+          class="boutique-card"
+          *ngFor="let b of boutiques; trackBy: trackById"
+          [routerLink]="['/boutique', b.slug ?? b._id]"
+        >
+          <div class="boutique-av"
+            [style.background]="b.couleurBg"
+            [style.color]="b.couleurTx"
+          >{{ b.initiale }}</div>
+          <div class="boutique-info">
+            <div class="boutique-name">{{ b.nom }}</div>
+            <div class="boutique-cat">{{ getCategorieNom(b) }}{{ b.etage ? ' — ' + b.etage : '' }}</div>
+            <div class="boutique-prods" *ngIf="b.nombre_produits">{{ b.nombre_produits }} produits</div>
+          </div>
+          <div class="boutique-active-dot" *ngIf="b.actif"></div>
+>>>>>>> Stashed changes
         </a>
       </div>
     </div>
@@ -191,6 +243,7 @@
     </div>
   </section>
 
+<<<<<<< Updated upstream
   <!-- ═══ BOUTIQUES ════════════════════════════════════════════════════════ -->
   <section class="section">
     <div class="container">
@@ -304,6 +357,75 @@
     <div class="footer-bottom">
       <span>© 2026 CentreShop — Galaxy Mall Antananarivo. Tous droits réservés.</span>
       <span>Fait avec ❤ à Madagascar</span>
+=======
+  <!-- ═══ FOOTER ════════════════════════════════════════════════════════════ -->
+  <footer class="footer">
+    <div class="footer-body">
+      <div class="footer-brand">
+        <div class="footer-logo">CentreShop</div>
+        <p class="footer-desc">La plateforme officielle du Galaxy Mall d'Antananarivo. Découvrez, comparez et achetez en Click &amp; Collect.</p>
+        <div class="socials">
+          <!-- Facebook -->
+          <a class="social-btn" href="#" title="Facebook">
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+              <path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"/>
+            </svg>
+          </a>
+          <!-- Instagram -->
+          <a class="social-btn" href="#" title="Instagram">
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <rect x="2" y="2" width="20" height="20" rx="5" ry="5"/>
+              <circle cx="12" cy="12" r="4"/>
+              <circle cx="17.5" cy="6.5" r="1" fill="currentColor" stroke="none"/>
+            </svg>
+          </a>
+          <!-- Twitter / X -->
+          <a class="social-btn" href="#" title="Twitter">
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+              <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/>
+            </svg>
+          </a>
+          <!-- WhatsApp -->
+          <a class="social-btn" href="#" title="WhatsApp">
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+              <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 0 1-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 0 1-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 0 1 2.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0 0 12.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 0 0 5.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 0 0-3.48-8.413z"/>
+            </svg>
+          </a>
+        </div>
+      </div>
+      <div class="footer-col">
+        <h3>Boutique</h3>
+        <a routerLink="/boutique">Nos boutiques</a>
+        <a routerLink="/produits">Catalogue</a>
+        <a routerLink="/produits" [queryParams]="{ promo: true }">Promotions</a>
+        <a routerLink="/produits" [queryParams]="{ sort: 'nouveautes' }">Nouveautés</a>
+      </div>
+      <div class="footer-col">
+        <h3>Mon compte</h3>
+        <a routerLink="/login">Connexion</a>
+        <a routerLink="/register">Inscription</a>
+        <a routerLink="/commandes">Mes commandes</a>
+        <a routerLink="/favoris">Mes favoris</a>
+        <a routerLink="/panier">Mon panier</a>
+      </div>
+      <div class="footer-col">
+        <h3>Aide</h3>
+        <a routerLink="/contact">Contact</a>
+        <a href="#">FAQ</a>
+        <a href="#">Livraison</a>
+        <a href="#">Retours</a>
+        <a href="#">CGV</a>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <span>© 2026 CentreShop — Galaxy Mall Antananarivo. Tous droits réservés.</span>
+      <span>Fait avec
+        <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="currentColor" style="display:inline;vertical-align:middle;color:#e53e3e">
+          <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/>
+        </svg>
+        à Madagascar
+      </span>
+>>>>>>> Stashed changes
     </div>
   </footer>
 
@@ -317,7 +439,16 @@
       <div class="prod-img-ph" *ngIf="!getFirstImage(p)"></div>
 
       <!-- Tags -->
+<<<<<<< Updated upstream
       <span class="vedette-tag" *ngIf="isVedette && !isEnPromotion(p)">⭐ Vedette</span>
+=======
+      <span class="vedette-tag" *ngIf="isVedette && !isEnPromotion(p)">
+        <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="currentColor" style="display:inline;vertical-align:middle;margin-right:3px">
+          <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/>
+        </svg>
+        Vedette
+      </span>
+>>>>>>> Stashed changes
       <span class="promo-tag"   *ngIf="isEnPromotion(p)">-{{ getPromoPercent(p) }}%</span>
       <span class="new-tag"     *ngIf="isNew">NOUVEAU</span>
 
@@ -328,7 +459,20 @@
         [class.active]="isFavori(p._id)"
         (click)="toggleFavori($event, p)"
         [title]="isFavori(p._id) ? 'Retirer des favoris' : 'Ajouter aux favoris'"
+<<<<<<< Updated upstream
       >{{ isFavori(p._id) ? '♥' : '♡' }}</button>
+=======
+      >
+        <!-- Filled heart (active) -->
+        <svg *ngIf="isFavori(p._id)" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+          <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/>
+        </svg>
+        <!-- Outline heart (inactive) -->
+        <svg *ngIf="!isFavori(p._id)" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/>
+        </svg>
+      </button>
+>>>>>>> Stashed changes
     </div>
 
     <div class="prod-body">
@@ -355,9 +499,31 @@
         [class.success]="cartSuccessId === p._id"
         (click)="addToCart($event, p)"
       >
+<<<<<<< Updated upstream
         <span class="spinner-btn" *ngIf="addingCartId === p._id"></span>
         <span *ngIf="cartSuccessId === p._id">✓ Ajouté !</span>
         <span *ngIf="addingCartId !== p._id && cartSuccessId !== p._id">+ Ajouter au panier</span>
+=======
+        <!-- Spinner -->
+        <svg *ngIf="addingCartId === p._id" class="spinner-btn" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round">
+          <path d="M21 12a9 9 0 1 1-6.219-8.56"/>
+        </svg>
+        <!-- Success checkmark -->
+        <ng-container *ngIf="cartSuccessId === p._id">
+          <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" style="display:inline;vertical-align:middle;margin-right:4px">
+            <polyline points="20 6 9 17 4 12"/>
+          </svg>
+          Ajouté !
+        </ng-container>
+        <!-- Default label -->
+        <ng-container *ngIf="addingCartId !== p._id && cartSuccessId !== p._id">
+          <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="display:inline;vertical-align:middle;margin-right:4px">
+            <line x1="12" y1="5" x2="12" y2="19"/>
+            <line x1="5" y1="12" x2="19" y2="12"/>
+          </svg>
+          Ajouter au panier
+        </ng-container>
+>>>>>>> Stashed changes
       </button>
       <ng-template #indispo>
         <button class="btn-add-cart" type="button" disabled>Indisponible</button>
@@ -369,4 +535,8 @@
 <!-- ═══ TOAST ════════════════════════════════════════════════════════════════ -->
 <div class="toast" [class.show]="toastVisible" [class.success]="toastType === 'success'">
   {{ toastMsg }}
+<<<<<<< Updated upstream
 </div>
+=======
+</div>>
+>>>>>>> Stashed changes

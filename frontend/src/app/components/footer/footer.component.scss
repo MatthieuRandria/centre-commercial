@@ -1,0 +1,63 @@
+:host { display: block; }
+
+.project-credits-bar {
+   display: flex;
+   align-items: center;
+   justify-content: center;
+   flex-wrap: wrap;
+   gap: 10px 18px;
+   padding: 11px 24px;
+   background: #1a2e27;
+   border-top: 1px solid rgba(111, 207, 151, 0.15);
+   font-family: 'DM Sans', sans-serif;
+}
+
+.pcb-label {
+   font-family: 'Syne', sans-serif;
+   font-size: 10px;
+   font-weight: 700;
+   text-transform: uppercase;
+   letter-spacing: 1.3px;
+   color: #6fcf97;
+   background: rgba(111, 207, 151, 0.12);
+   border: 1px solid rgba(111, 207, 151, 0.22);
+   border-radius: 20px;
+   padding: 2px 10px;
+   white-space: nowrap;
+}
+
+.pcb-team {
+   display: flex;
+   align-items: center;
+   flex-wrap: wrap;
+   gap: 6px 10px;
+}
+
+.pcb-name {
+   font-size: 11px;
+   color: rgba(255, 255, 255, 0.55);
+   white-space: nowrap;
+}
+
+.pcb-id {
+   font-family: 'Syne', sans-serif;
+   font-size: 10px;
+   font-weight: 700;
+   color: rgba(111, 207, 151, 0.75);
+   background: rgba(111, 207, 151, 0.09);
+   border: 1px solid rgba(111, 207, 151, 0.18);
+   border-radius: 4px;
+   padding: 1px 7px;
+   white-space: nowrap;
+}
+
+.pcb-dot {
+   color: rgba(255, 255, 255, 0.2);
+   font-size: 15px;
+   line-height: 1;
+}
+
+@media (max-width: 600px) {
+   .project-credits-bar { flex-direction: column; gap: 6px; text-align: center; padding: 12px 16px; }
+   .pcb-team { justify-content: center; }
+}

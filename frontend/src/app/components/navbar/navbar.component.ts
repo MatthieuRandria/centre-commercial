@@ -82,7 +82,11 @@ export class NavbarComponent implements OnInit {
       this.navItems.splice(2, 0,
         { label: 'Panier', link: '/panier' },
         { label: 'Mes commandes', link: '/client/commandes' },
+<<<<<<< Updated upstream
         { label: 'Mes favoris', link: '/client/favoris' },
+=======
+        { label: 'Mes favoris', link: '/favoris' },
+>>>>>>> Stashed changes
         { label: 'Promotions', link: '/promotions' }
       );
     }

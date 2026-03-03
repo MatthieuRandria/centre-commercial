@@ -1,0 +1,410 @@
+<div class="promo-page">
+
+  <!-- TOPBAR -->
+  <div class="topbar">
+    <span class="tb-title">Gestion des promotions</span>
+    <button class="btn-primary" (click)="openCreateModal()">
+      <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
+        <path d="M7 1v12M1 7h12" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+      </svg>
+      Créer une promotion
+    </button>
+  </div>
+
+  <div class="page-content">
+
+    <div class="page-header">
+      <div>
+        <h1>Mes promotions</h1>
+        <p>Gérez les codes promo et offres de votre boutique</p>
+      </div>
+    </div>
+
+    <!-- KPI -->
+    <div class="kpi-row">
+      <div class="kpi-chip">
+        <div class="kpi-chip-label">Total Promotions</div>
+        <div class="kpi-chip-val">{{ kpi.total }}</div>
+      </div>
+      <div class="kpi-chip">
+        <div class="kpi-chip-label">Actives</div>
+        <div class="kpi-chip-val green">{{ kpi.actives }}</div>
+      </div>
+      <div class="kpi-chip">
+        <div class="kpi-chip-label">A venir</div>
+        <div class="kpi-chip-val blue">{{ kpi.futures }}</div>
+      </div>
+      <div class="kpi-chip">
+        <div class="kpi-chip-label">Expirées</div>
+        <div class="kpi-chip-val red">{{ kpi.expirees }}</div>
+      </div>
+    </div>
+
+    <!-- FILTERS -->
+    <div class="filters-row">
+      <div class="filter-tabs">
+        <button
+          *ngFor="let tab of filterTabs; let i = index"
+          class="ftab"
+          [class.active]="activeTab === i"
+          (click)="selectTab(i)">
+          {{ tab.label }} <span class="tab-cnt">{{ tabCount(tab) }}</span>
+        </button>
+      </div>
+      <div class="search-wrap">
+        <svg class="search-ico" width="14" height="14" viewBox="0 0 16 16" fill="none">
+          <circle cx="7" cy="7" r="5" stroke="#b0aba4" stroke-width="1.8"/>
+          <path d="M11 11l3 3" stroke="#b0aba4" stroke-width="1.8" stroke-linecap="round"/>
+        </svg>
+        <input
+          type="text"
+          class="search-input-f"
+          placeholder="Rechercher un code..."
+          [(ngModel)]="searchTerm"
+          (ngModelChange)="onSearch()" />
+      </div>
+    </div>
+
+    <!-- TABLE CARD -->
+    <div class="table-card">
+
+      <div *ngIf="loading" class="state-block">
+        <div class="spinner"></div>
+        <span>Chargement...</span>
+      </div>
+
+      <div *ngIf="!loading && filteredPromotions.length === 0" class="state-block">
+        <div class="empty-icon">
+          <svg width="40" height="40" viewBox="0 0 40 40" fill="none">
+            <rect x="4" y="8" width="32" height="24" rx="3" stroke="#c5c0b8" stroke-width="2"/>
+            <path d="M4 14h32" stroke="#c5c0b8" stroke-width="2"/>
+            <path d="M14 20h12M14 25h8" stroke="#c5c0b8" stroke-width="2" stroke-linecap="round"/>
+          </svg>
+        </div>
+        <p>Aucune promotion trouvée</p>
+        <button class="btn-primary" (click)="openCreateModal()">Créer ma première promo</button>
+      </div>
+
+      <table class="data-table" *ngIf="!loading && filteredPromotions.length > 0">
+        <thead>
+          <tr>
+            <th>Code</th>
+            <th>Type</th>
+            <th>Valeur</th>
+            <th>Date début</th>
+            <th>Date fin</th>
+            <th>Statut</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr
+            *ngFor="let p of filteredPromotions"
+            [class.row-expired]="getStatut(p) === 'expiree'">
+
+            <!-- Code -->
+            <td>
+              <span
+                class="code-badge"
+                [class.disabled]="getStatut(p) === 'expiree'"
+                (click)="getStatut(p) !== 'expiree' && copyCode(p.code)">
+                {{ p.code }}
+                <svg width="13" height="13" viewBox="0 0 16 16" fill="none" class="copy-svg">
+                  <rect x="5" y="5" width="9" height="9" rx="1.5" stroke="currentColor" stroke-width="1.5"/>
+                  <path d="M11 5V3.5A1.5 1.5 0 0 0 9.5 2h-6A1.5 1.5 0 0 0 2 3.5v6A1.5 1.5 0 0 0 3.5 11H5"
+                    stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+                </svg>
+              </span>
+            </td>
+
+            <!-- Type -->
+            <td>
+              <span class="type-badge" [ngClass]="'type-' + p.type">
+                <ng-container [ngSwitch]="p.type">
+                  <!-- Pourcentage -->
+                  <svg *ngSwitchCase="'pourcentage'" width="11" height="11" viewBox="0 0 12 12" fill="currentColor">
+                    <circle cx="2.5" cy="2.5" r="2"/>
+                    <circle cx="9.5" cy="9.5" r="2"/>
+                    <path d="M10 2L2 10" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+                  </svg>
+                  <!-- Flash -->
+                  <svg *ngSwitchCase="'flash'" width="11" height="11" viewBox="0 0 12 12" fill="currentColor">
+                    <path d="M7 1L3 7h4l-2 4 6-7H7L9 1z"/>
+                  </svg>
+                  <!-- Fixe / Montant -->
+                  <svg *ngSwitchDefault width="11" height="11" viewBox="0 0 12 12" fill="none">
+                    <rect x="1" y="3" width="10" height="7" rx="1" stroke="currentColor" stroke-width="1.5"/>
+                    <path d="M1 6h10" stroke="currentColor" stroke-width="1"/>
+                    <path d="M4 3V2M8 3V2" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+                  </svg>
+                </ng-container>
+                {{ typeLabel(p.type) }}
+              </span>
+            </td>
+
+            <!-- Valeur -->
+            <td>
+              <span class="val-display" [class.faded]="getStatut(p) === 'expiree'">
+                {{ valeurDisplay(p) }}
+              </span>
+            </td>
+
+            <!-- Date début -->
+            <td class="date-cell">{{ formatDate(p.dateDebut) }}</td>
+
+            <!-- Date fin -->
+            <td class="date-cell" [class.expiring-soon]="isExpiringSoon(p)">
+              {{ formatDate(p.dateFin) }}
+              <span *ngIf="isExpiringSoon(p)" class="expiry-warn">
+                <svg width="9" height="9" viewBox="0 0 12 12" fill="currentColor">
+                  <path d="M6 1L11.2 10H.8L6 1z" stroke="currentColor" stroke-width="1" stroke-linejoin="round"/>
+                  <path d="M6 5v2.5" stroke="white" stroke-width="1.2" stroke-linecap="round"/>
+                  <circle cx="6" cy="9" r="0.6" fill="white"/>
+                </svg>
+                bientôt
+              </span>
+            </td>
+
+            <!-- Statut -->
+            <td>
+              <span class="statut-badge" [ngClass]="'s-' + getStatut(p)">
+                <span class="statut-dot"></span>
+                {{ statutLabel(getStatut(p)) }}
+              </span>
+            </td>
+
+            <!-- Actions -->
+            <td>
+              <div class="actions-cell">
+
+                <button
+                  *ngIf="getStatut(p) !== 'expiree'"
+                  class="btn-icon"
+                  title="Modifier"
+                  (click)="openEditModal(p)">
+                  <svg width="14" height="14" viewBox="0 0 16 16" fill="none">
+                    <path d="M11.5 2.5a1.414 1.414 0 0 1 2 2L5 13H2v-3L11.5 2.5z"
+                      stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                  </svg>
+                </button>
+
+                <button
+                  *ngIf="getStatut(p) === 'active' || getStatut(p) === 'suspendue'"
+                  class="btn-toggle"
+                  [class.resume]="getStatut(p) === 'suspendue'"
+                  (click)="togglePause(p)">
+                  <svg *ngIf="getStatut(p) === 'active'" width="10" height="10" viewBox="0 0 10 10" fill="currentColor">
+                    <rect x="1" y="1" width="3" height="8" rx="1"/>
+                    <rect x="6" y="1" width="3" height="8" rx="1"/>
+                  </svg>
+                  <svg *ngIf="getStatut(p) === 'suspendue'" width="10" height="10" viewBox="0 0 10 10" fill="currentColor">
+                    <path d="M2 1.5l7 3.5-7 3.5V1.5z"/>
+                  </svg>
+                  {{ getStatut(p) === 'active' ? 'Pause' : 'Activer' }}
+                </button>
+
+                <button
+                  class="btn-icon danger"
+                  title="Supprimer"
+                  [disabled]="isDeleting(p._id)"
+                  (click)="confirmDelete(p._id)">
+                  <div *ngIf="isDeleting(p._id)" class="btn-spinner"></div>
+                  <svg *ngIf="!isDeleting(p._id)" width="14" height="14" viewBox="0 0 16 16" fill="none">
+                    <path d="M2 4h12M5 4V2.5A.5.5 0 0 1 5.5 2h5a.5.5 0 0 1 .5.5V4M6 7v5M10 7v5"
+                      stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+                    <rect x="3" y="4" width="10" height="10" rx="1.5" stroke="currentColor" stroke-width="1.5"/>
+                  </svg>
+                </button>
+
+              </div>
+            </td>
+
+          </tr>
+        </tbody>
+      </table>
+
+    </div>
+  </div>
+</div>
+
+<!-- ─── MODAL CRÉER / MODIFIER ─────────────────────────────────────────────── -->
+<div
+  class="modal-overlay"
+  [class.open]="modalOpen"
+  (click)="$event.target === $event.currentTarget && closeModal()">
+
+  <div class="modal-box">
+    <div class="modal-head">
+      <h2>{{ modalMode === 'create' ? 'Créer une promotion' : 'Modifier la promotion' }}</h2>
+      <button class="modal-close" (click)="closeModal()">
+        <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
+          <path d="M1 1l12 12M13 1L1 13" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+        </svg>
+      </button>
+    </div>
+
+    <div class="modal-body" [formGroup]="form">
+
+      <!-- Code -->
+      <div class="form-group">
+        <label class="form-label">Code promo <span class="req">*</span></label>
+        <div class="code-gen-row">
+          <input
+            type="text"
+            class="form-input-m"
+            [class.input-error]="f['code'].touched && f['code'].invalid"
+            placeholder="Ex: ZARA20"
+            formControlName="code"
+            (input)="onCodeInput($event)" />
+          <button class="btn-gen" type="button" (click)="generateCode()" [disabled]="modalMode === 'edit'">
+            <svg width="13" height="13" viewBox="0 0 14 14" fill="none">
+              <path d="M2 7a5 5 0 1 1 10 0" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+              <path d="M12 7l-2-2M12 7l-2 2" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+            Générer
+          </button>
+        </div>
+        <div class="form-hint err" *ngIf="f['code'].touched && f['code'].errors?.['pattern']">
+          Uniquement majuscules et chiffres, sans espaces
+        </div>
+        <div class="form-hint">Majuscules et chiffres recommandés. Doit être unique.</div>
+      </div>
+
+      <!-- Description -->
+      <div class="form-group">
+        <label class="form-label">Description <span class="req">*</span></label>
+        <input
+          type="text"
+          class="form-input-m"
+          [class.input-error]="f['description'].touched && f['description'].invalid"
+          placeholder="Ex: Promo printemps 2026"
+          formControlName="description" />
+      </div>
+
+      <!-- Type -->
+      <div class="form-group">
+        <label class="form-label">Type de réduction <span class="req">*</span></label>
+        <div class="type-cards">
+          <div
+            *ngFor="let t of typeOptions"
+            class="type-card"
+            [class.selected]="selectedType === t.value"
+            (click)="form.get('type')?.setValue(t.value)">
+            <div class="tc-icon">
+              <svg *ngIf="t.value === 'pourcentage'" width="22" height="22" viewBox="0 0 22 22" fill="none">
+                <circle cx="5" cy="5" r="3" stroke="currentColor" stroke-width="1.8"/>
+                <circle cx="17" cy="17" r="3" stroke="currentColor" stroke-width="1.8"/>
+                <path d="M18 4L4 18" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+              </svg>
+              <svg *ngIf="t.value === 'fixe'" width="22" height="22" viewBox="0 0 22 22" fill="none">
+                <rect x="2" y="6" width="18" height="12" rx="2" stroke="currentColor" stroke-width="1.8"/>
+                <path d="M2 11h18" stroke="currentColor" stroke-width="1.2"/>
+                <path d="M7 6V4M15 6V4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+              </svg>
+            </div>
+            <div class="tc-name">{{ t.label }}</div>
+            <div class="tc-desc">{{ t.desc }}</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Valeur -->
+      <div class="form-group">
+        <label class="form-label">Valeur <span class="req">*</span></label>
+        <div class="valeur-row" [class.error-border]="f['valeur'].touched && f['valeur'].invalid">
+          <input type="number" formControlName="valeur" placeholder="Ex: 20" min="1" />
+          <span class="valeur-suffix">{{ selectedType === 'pourcentage' ? '%' : 'Ar' }}</span>
+        </div>
+      </div>
+
+      <!-- Dates -->
+      <div class="form-row-2">
+        <div class="form-group">
+          <label class="form-label">Date début <span class="req">*</span></label>
+          <input
+            type="date"
+            class="form-input-m"
+            formControlName="dateDebut"
+            [class.input-error]="f['dateDebut'].touched && f['dateDebut'].invalid" />
+        </div>
+        <div class="form-group">
+          <label class="form-label">Date fin <span class="req">*</span></label>
+          <input
+            type="date"
+            class="form-input-m"
+            formControlName="dateFin"
+            [class.input-error]="f['dateFin'].touched && f['dateFin'].invalid" />
+        </div>
+      </div>
+
+      <!-- Options avancées -->
+      <div class="form-row-2">
+        <div class="form-group">
+          <label class="form-label">Montant min. commande</label>
+          <div class="valeur-row">
+            <input type="number" formControlName="montantMinCommande" placeholder="0" min="0" />
+            <span class="valeur-suffix">Ar</span>
+          </div>
+          <div class="form-hint">0 = aucun minimum</div>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Limite d'utilisation</label>
+          <input
+            type="number"
+            class="form-input-m"
+            formControlName="limiteUtilisation"
+            placeholder="Vide = illimité"
+            min="1" />
+          <div class="form-hint">Nombre max d'utilisations</div>
+        </div>
+      </div>
+
+      <!-- Remise max (pourcentage seulement) -->
+      <div class="form-group" *ngIf="selectedType === 'pourcentage'">
+        <label class="form-label">Remise maximum</label>
+        <div class="valeur-row">
+          <input type="number" formControlName="remiseMax" placeholder="Pas de plafond" min="0" />
+          <span class="valeur-suffix">Ar</span>
+        </div>
+        <div class="form-hint">Plafond de remise en Ariary</div>
+      </div>
+
+    </div>
+
+    <div class="modal-footer">
+      <button class="btn-cancel-m" (click)="closeModal()">Annuler</button>
+      <button class="btn-create-m" [disabled]="submitting" (click)="submitForm()">
+        <div *ngIf="submitting" class="btn-spinner white"></div>
+        {{ modalMode === 'create' ? 'Créer la promotion' : 'Enregistrer' }}
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- ─── MODAL CONFIRMATION SUPPRESSION ────────────────────────────────────── -->
+<div
+  class="modal-overlay"
+  [class.open]="confirmDeleteId !== null"
+  (click)="$event.target === $event.currentTarget && cancelDelete()">
+
+  <div class="modal-box confirm-box">
+    <div class="confirm-icon">
+      <svg width="48" height="48" viewBox="0 0 48 48" fill="none">
+        <circle cx="24" cy="24" r="20" stroke="#ef4444" stroke-width="2.5"/>
+        <path d="M16 18h16M20 18v-3h8v3M19 18l1.5 18h7L29 18"
+          stroke="#ef4444" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+    </div>
+    <h3>Supprimer cette promotion ?</h3>
+    <p>Cette action est irréversible.</p>
+    <div class="confirm-actions">
+      <button class="btn-cancel-m" (click)="cancelDelete()">Annuler</button>
+      <button class="btn-delete-confirm" (click)="doDelete()">Supprimer</button>
+    </div>
+  </div>
+</div>
+
+<!-- ─── TOAST ──────────────────────────────────────────────────────────────── -->
+<div class="toast" [class.show]="toastVisible" [ngClass]="'toast-' + toastType">
+  {{ toastMessage }}
+</div>
