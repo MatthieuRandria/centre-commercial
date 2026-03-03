@@ -194,11 +194,11 @@ export const routes: Routes = [
   },
 
   {
-    path: 'dashboard',
+    path: 'promotion',
     canActivate: [AuthGuard],
     loadComponent: () =>
-      import('./pages/dashboard/dashboard.component')
-        .then(m => m.DashboardComponent),
+      import('./pages/promotion-public/promotion-public.component')
+        .then(m => m.PromotionPublicComponent),
   },
 
   // ───────────── 404 ─────────────
