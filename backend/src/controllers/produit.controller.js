@@ -1,5 +1,14 @@
 const Produit = require('../models/Produit');
 
+exports.getProduitCategories = async (req, res) => {
+  try {
+    const categories = await Produit.distinct('categories', { actif: true });
+    res.json({ data: categories.filter(Boolean).sort() });
+  } catch (err) {
+    res.status(500).json({ success: false, message: err.message });
+  }
+};
+
 exports.getAllProduits = async (req, res, next) => {
    try {
       const {
