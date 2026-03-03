@@ -30,7 +30,7 @@ export const serverRoutes: ServerRoute[] = [
   {
     path: 'boutique/commandes/:id',
     renderMode: RenderMode.Client 
-  }
+  },
 
   // Everything else → prerender
   {
