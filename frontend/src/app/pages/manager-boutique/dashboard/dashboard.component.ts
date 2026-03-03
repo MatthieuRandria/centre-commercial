@@ -7,6 +7,7 @@ import { Subject, forkJoin, of } from 'rxjs';
 import { catchError, takeUntil } from 'rxjs/operators';
 import { AuthService } from '../../../services/auth.service';
 import { BoutiqueService } from '../../../services/boutique.service';
+import { environment } from '../../../../environments/environment';
 
 interface KpiData {
    commandesEnCours: number;
@@ -51,7 +52,7 @@ interface VentesPoint {
 })
 export class ManagerDashboardComponent implements OnInit, OnDestroy {
 
-   private readonly API = 'http://localhost:3000';
+   private readonly API = environment.apiUrl;
    private destroy$ = new Subject<void>();
 
    boutiqueId = '';
