@@ -1,11 +1,11 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
+import { map } from 'rxjs/operators';
 import { Produit } from '../shared/produit.model';
 
 @Injectable({ providedIn: 'root' })
 export class ProduitsService {
-  // private apiUrl = `${environment.apiUrl}/produits`;
   private apiUrl = `http://localhost:3000/produits`;
 >>>>>>> Stashed changes
 
@@ -37,9 +37,13 @@ export class ProduitsService {
     );
   }
 
-  updateProduit(id: string, formData: FormData): Observable<Produit> {
-    return this.http.put<Produit>(`${this.apiUrl}/${id}`, formData);
+  updateProduit(id: string, formData: FormData): Observable<any> {
+    return this.http.put<any>(`${this.apiUrl}/${id}`, formData).pipe(
+      map(r => r.data ?? r)
+    );
   }
 
-
+  deleteProduit(id: string): Observable<any> {
+    return this.http.delete<any>(`${this.apiUrl}/${id}`);
+  }
 }

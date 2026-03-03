@@ -9,7 +9,7 @@ import { Boutique, BoutiqueFilters } from '../../models/boutique.model';
 @Component({
   selector: 'app-boutiques',
   standalone: true,
-  imports: [CommonModule, RouterModule, DecimalPipe],
+  imports: [CommonModule, RouterModule],
   templateUrl: './boutique.component.html',
   styleUrls: ['./boutique.component.scss']
 })
