@@ -5,48 +5,6 @@
   <div class="sidebar-overlay" (click)="closeOnOverlay()"></div>
 
   <!-- ═══════════════════════════════════════════════════════════════════════
-       SIDEBAR
-  ════════════════════════════════════════════════════════════════════════ -->
-  <aside class="sidebar">
-    <div class="sidebar-brand">
-      <div class="sidebar-logo">HyperMagasin</div>
-      <div class="sidebar-role">Administration</div>
-      <button class="sidebar-close" type="button" (click)="toggleSidebar()">✕</button>
-    </div>
-
-    <nav class="sidebar-nav">
-      <ng-container *ngFor="let section of navSections">
-        <div class="nav-section-label">{{ section.label }}</div>
-        <a
-          class="nav-item"
-          *ngFor="let item of section.items"
-          [class.active]="item.active"
-          [routerLink]="item.route"
-          (click)="closeOnOverlay()"
-        >
-          <span class="ni">{{ item.icon }}</span>
-          <span class="nav-label">{{ item.label }}</span>
-          <span class="nav-badge" *ngIf="item.badge && item.badge > 0">{{ item.badge }}</span>
-        </a>
-      </ng-container>
-    </nav>
-
-    <div class="sidebar-footer">
-      <div class="admin-info">
-        <div class="admin-av">A</div>
-        <div>
-          <div class="admin-name">Admin</div>
-          <div class="admin-role">Super Admin</div>
-        </div>
-      </div>
-      <a class="nav-item deconnexion" routerLink="/login">
-        <span class="ni">→</span>
-        <span class="nav-label">Déconnexion</span>
-      </a>
-    </div>
-  </aside>
-
-  <!-- ═══════════════════════════════════════════════════════════════════════
        MAIN
   ════════════════════════════════════════════════════════════════════════ -->
   <div class="main">

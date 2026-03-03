@@ -39,7 +39,7 @@ exports.getProduitById = async (req, res) => {
 };
 
 exports.createProduit = async (req, res) => {
-   try {
+  try {
       const body = req.body || {};
 
       // variantes : tableau si JSON body, string si FormData — on gère les deux

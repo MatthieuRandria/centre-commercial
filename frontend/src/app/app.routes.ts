@@ -28,7 +28,7 @@ export const routes: Routes = [
       import('./pages/contact/contact.component').then(m => m.ContactComponent),
   },
 
-  // ───────────── Manager Boutique (IMPORTANT: AVANT boutique/:slug) ─────────────
+  // ───────────── Manager Boutique ─────────────
 
   {
     path: 'boutique/produits',

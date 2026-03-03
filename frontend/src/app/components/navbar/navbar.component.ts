@@ -66,6 +66,18 @@ export class NavbarComponent implements OnInit {
       { label: 'Contact', link: '/contact' },
     ];
 
+    // Liens pour Boutiques
+    if (this.user?.role === 'boutique') {
+      this.navItems = [
+        { label: 'Dashboard', link: '/boutique/dashboard' },
+        { label: 'Mes produits', link: '/boutique/produits' },
+        { label: 'Mes commandes', link: '/boutique/commandes' },
+        { label: 'Mes promotions', link: '/boutique/promotions' },
+      ];
+      return;
+    }
+
+    // Liens visibles uniquement si connecté en tant que client
     if (this.user?.role === 'client') {
       this.navItems.splice(2, 0,
         { label: 'Panier', link: '/panier' },

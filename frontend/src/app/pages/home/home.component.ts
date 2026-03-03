@@ -20,9 +20,7 @@ import { FavorisService } from '../../services/favoris.service';
 })
 export class HomeComponent implements OnInit, OnDestroy, AfterViewInit {
 
-  // ✅ Injection SSR-safe du PLATFORM_ID
   private platformId = inject(PLATFORM_ID);
-
   private destroy$ = new Subject<void>();
 
   // ─── Données ───────────────────────────────────────────────────────────────
@@ -92,7 +90,6 @@ export class HomeComponent implements OnInit, OnDestroy, AfterViewInit {
   }
 
   ngAfterViewInit(): void {
-    // ✅ L'autoplay ne démarre que dans le navigateur (setInterval non supporté SSR)
     if (isPlatformBrowser(this.platformId)) {
       this.startAutoplay();
     }
@@ -107,7 +104,6 @@ export class HomeComponent implements OnInit, OnDestroy, AfterViewInit {
 
   // ─── Auth ──────────────────────────────────────────────────────────────────
   private checkAuth(): void {
-    // ✅ localStorage n'existe pas côté serveur Node.js (SSR)
     if (!isPlatformBrowser(this.platformId)) return;
     this.isLoggedIn = !!localStorage.getItem('token');
   }
@@ -211,8 +207,6 @@ export class HomeComponent implements OnInit, OnDestroy, AfterViewInit {
     if (!this.isLoggedIn) { this.router.navigate(['/login']); return; }
 
     const isFav = this.favSet.has(p._id);
-
-    // ✅ localStorage protégé SSR
     const token = isPlatformBrowser(this.platformId)
       ? (localStorage.getItem('token') ?? '')
       : '';
