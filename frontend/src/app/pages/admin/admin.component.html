@@ -9,7 +9,7 @@
   ════════════════════════════════════════════════════════════════════════ -->
   <aside class="sidebar">
     <div class="sidebar-brand">
-      <div class="sidebar-logo">CentreShop</div>
+      <div class="sidebar-logo">HyperMagasin</div>
       <div class="sidebar-role">Administration</div>
       <button class="sidebar-close" type="button" (click)="toggleSidebar()">✕</button>
     </div>
@@ -35,7 +35,7 @@
       <div class="admin-info">
         <div class="admin-av">A</div>
         <div>
-          <div class="admin-name">Admin Rabe</div>
+          <div class="admin-name">Admin</div>
           <div class="admin-role">Super Admin</div>
         </div>
       </div>
@@ -51,63 +51,43 @@
   ════════════════════════════════════════════════════════════════════════ -->
   <div class="main">
 
-  <!-- TOPBAR -->
-  <div class="topbar">
-    <div class="topbar-left">
-      <span class="topbar-title">Tableau de bord</span>
-    </div>
-    <div class="topbar-right">
-      <span class="today-date">{{ today | date:'EEEE d MMMM yyyy':'':'fr' }}</span>
-
-      <button class="icon-btn" type="button">
-        <svg width="16" height="16" viewBox="0 0 16 16" fill="none"
-             stroke="currentColor" stroke-width="1.8"
-             stroke-linecap="round" stroke-linejoin="round">
-          <path d="M8 1.5 C5.24 1.5 3 3.74 3 6.5 C3 10.5 1.5 12 1.5 12
-                   H14.5 C14.5 12 13 10.5 13 6.5 C13 3.74 10.76 1.5 8 1.5 Z"/>
-          <path d="M6.5 12 C6.5 12.83 7.17 13.5 8 13.5 C8.83 13.5 9.5 12.83 9.5 12"/>
-        </svg>
-        <span class="notif-dot" *ngIf="commandeBadge > 0"></span>
-      </button>
-
-      <button class="icon-btn" type="button">
-        <svg width="16" height="16" viewBox="0 0 16 16" fill="none"
-             stroke="currentColor" stroke-width="1.8"
-             stroke-linecap="round" stroke-linejoin="round">
-          <circle cx="8" cy="5.5" r="3"/>
-          <path d="M1.5 14.5 C1.5 11.5 4.5 9 8 9 C11.5 9 14.5 11.5 14.5 14.5"/>
-        </svg>
-      </button>
-    </div>
-  </div>
-
-  <!-- PAGE CONTENT -->
-  <div class="page-content">
-
-    <!-- Error banner -->
-    <div class="error-banner" *ngIf="errorMessage">
-      <svg width="15" height="15" viewBox="0 0 16 16" fill="none"
-           stroke="currentColor" stroke-width="1.8"
-           stroke-linecap="round" stroke-linejoin="round">
-        <path d="M8 2 L14.5 13.5 H1.5 Z"/>
-        <line x1="8" y1="7" x2="8" y2="10"/>
-        <circle cx="8" cy="12" r="0.5" fill="currentColor"/>
-      </svg>
-      {{ errorMessage }}
-      <button class="btn-retry" type="button" (click)="loadAll()">Réessayer</button>
+    <!-- TOPBAR -->
+    <div class="topbar">
+      <div class="topbar-left">
+        <button class="hamburger" type="button" (click)="toggleSidebar()" aria-label="Menu">
+          <span></span><span></span><span></span>
+        </button>
+        <span class="topbar-title">Tableau de bord</span>
+      </div>
+      <div class="topbar-right">
+        <span class="today-date">{{ today | date:'EEEE d MMMM yyyy':'' }}</span>
+        <button class="notif-btn" type="button">
+          🔔
+          <span class="notif-dot" *ngIf="commandeBadge > 0"></span>
+        </button>
+      </div>
     </div>
 
-    <div class="page-header">
-      <div class="page-header-eyebrow">Vue générale</div>
-      <h1>Tableau de bord</h1>
-      <p>Vue d'ensemble de votre centre commercial</p>
-    </div>
+    <!-- PAGE CONTENT -->
+    <div class="page-content">
 
-    <!-- ── KPI CARDS ──────────────────────────────────────────────────────── -->
-    <div class="kpi-grid">
-      <ng-container *ngIf="loadingKpis">
-        <div class="kpi-skeleton" *ngFor="let i of skeletonRows(4)"></div>
-      </ng-container>
+      <!-- Error banner -->
+      <div class="error-banner" *ngIf="errorMessage">
+        ⚠ {{ errorMessage }}
+        <button class="btn-retry" type="button" (click)="loadAll()">Réessayer</button>
+      </div>
+
+      <div class="page-header">
+        <h1>Tableau de bord</h1>
+        <p>Vue d'ensemble de votre centre commercial</p>
+      </div>
+
+      <!-- ─── KPI CARDS ──────────────────────────────────────────────────── -->
+      <div class="kpi-grid">
+        <!-- Skeletons -->
+        <ng-container *ngIf="loadingKpis">
+          <div class="kpi-skeleton" *ngFor="let i of skeletonRows(4)"></div>
+        </ng-container>
 
         <!-- Vraies données -->
         <ng-container *ngIf="!loadingKpis">
@@ -119,9 +99,11 @@
                 <span [class]="kpi.trendUp ? 'kpi-trend-up' : 'kpi-trend-down'">
                   {{ kpi.trendUp ? '▲' : '▼' }}
                 </span>
-                {{ kpi.trend }}
+                <!-- ✅ Corrigé : kpi.trend → kpi.trendValue -->
+                {{ kpi.trendValue }}
               </div>
             </div>
+            <!-- ✅ Corrigé : kpi.iconClass et kpi.icon existent maintenant dans KpiCard -->
             <div class="kpi-icon" [ngClass]="kpi.iconClass">{{ kpi.icon }}</div>
           </div>
         </ng-container>
@@ -142,111 +124,114 @@
         </div>
       </div>
 
-    <!-- ── TOP TABLES ─────────────────────────────────────────────────────── -->
-    <div class="tables-row">
+      <!-- ─── TOP TABLES ──────────────────────────────────────────────────── -->
+      <div class="tables-row">
 
-      <!-- Top Boutiques -->
-      <div class="table-card">
-        <div class="tc-head">
-          <h2>Top 5 Boutiques</h2>
-          <a class="tc-link" routerLink="/admin/boutiques">Voir toutes</a>
+        <!-- Top Boutiques -->
+        <div class="table-card">
+          <div class="tc-head">
+            <h2>Top 5 Boutiques</h2>
+            <a class="tc-link" routerLink="/admin/boutiques">Voir toutes</a>
+          </div>
+          <div class="table-skeleton-wrap" *ngIf="loadingBoutiques">
+            <div class="row-skeleton" *ngFor="let i of skeletonRows(5)"></div>
+          </div>
+          <table class="data-table" *ngIf="!loadingBoutiques">
+            <thead><tr><th>#</th><th>Boutique</th><th>CA</th><th>Commandes</th></tr></thead>
+            <tbody>
+              <tr *ngFor="let b of topBoutiques">
+                <td><span class="rank-num" [class.top]="b.isTop">{{ b.rank }}</span></td>
+                <td><div class="boutique-cell-name">{{ b.nom }}</div></td>
+                <td><span class="ca-cell">{{ b.ca }}</span></td>
+                <td><span class="cmd-count">{{ b.commandes }}</span></td>
+              </tr>
+              <tr *ngIf="topBoutiques.length === 0">
+                <td colspan="4" class="empty-cell">Aucune donnée disponible</td>
+              </tr>
+            </tbody>
+          </table>
         </div>
-        <div class="table-skeleton-wrap" *ngIf="loadingBoutiques">
+
+        <!-- Top Produits -->
+        <div class="table-card">
+          <div class="tc-head">
+            <h2>Top 5 Produits</h2>
+            <a class="tc-link" routerLink="/admin/produits">Voir tous</a>
+          </div>
+          <div class="table-skeleton-wrap" *ngIf="loadingProduits">
+            <div class="row-skeleton" *ngFor="let i of skeletonRows(5)"></div>
+          </div>
+          <table class="data-table" *ngIf="!loadingProduits">
+            <thead><tr><th></th><th>Produit</th><th>Ventes</th></tr></thead>
+            <tbody>
+              <tr *ngFor="let p of topProduits">
+                <td><div class="prod-thumb"><div class="prod-ph"></div></div></td>
+                <td>
+                  <div class="prod-name-cell">{{ p.nom }}</div>
+                  <div class="prod-boutique-cell">{{ p.boutique }}</div>
+                </td>
+                <td>
+                  <div class="ventes-bar-wrap">
+                    <div class="ventes-bar" [style.width.%]="p.barPct"></div>
+                    <span class="ventes-num">{{ p.ventes }}</span>
+                  </div>
+                </td>
+              </tr>
+              <tr *ngIf="topProduits.length === 0">
+                <td colspan="3" class="empty-cell">Aucune donnée disponible</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+      </div>
+
+      <!-- ─── DERNIÈRES COMMANDES ─────────────────────────────────────────── -->
+      <div class="recent-orders-card">
+        <div class="tc-head">
+          <h2>Dernières commandes</h2>
+          <a class="tc-link" routerLink="/admin/commandes">Voir toutes</a>
+        </div>
+
+        <div class="table-skeleton-wrap" *ngIf="loadingCommandes">
           <div class="row-skeleton" *ngFor="let i of skeletonRows(5)"></div>
         </div>
-        <table class="data-table" *ngIf="!loadingBoutiques">
-          <thead><tr><th>#</th><th>Boutique</th><th>CA</th><th>Commandes</th></tr></thead>
-          <tbody>
-            <tr *ngFor="let b of topBoutiques">
-              <td><span class="rank-num" [class.top]="b.isTop">{{ b.rank }}</span></td>
-              <td><div class="boutique-cell-name">{{ b.nom }}</div></td>
-              <td><span class="ca-cell">{{ b.ca }}</span></td>
-              <td><span class="cmd-count">{{ b.commandes }}</span></td>
-            </tr>
-            <tr *ngIf="topBoutiques.length === 0">
-              <td colspan="4" class="empty-cell">Aucune donnée disponible</td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
 
-      <!-- Top Produits -->
-      <div class="table-card">
-        <div class="tc-head">
-          <h2>Top 5 Produits</h2>
-          <a class="tc-link" routerLink="/admin/produits">Voir tous</a>
+        <div class="orders-table-wrap" *ngIf="!loadingCommandes">
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>N° Commande</th>
+                <th>Date</th>
+                <th>Client</th>
+                <th class="hide-sm">Boutique</th>
+                <th>Montant</th>
+                <th>Statut</th>
+                <th></th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let cmd of recentCommandes">
+                <td class="cmd-numero">{{ cmd.numero }}</td>
+                <td class="cmd-date">{{ cmd.date }}</td>
+                <td>{{ cmd.client }}</td>
+                <td class="cmd-boutique hide-sm">{{ cmd.boutique }}</td>
+                <td class="cmd-montant">{{ cmd.montant }}</td>
+                <td>
+                  <span class="statut-badge" [ngClass]="statutClass(cmd.statut)">
+                    <span class="statut-dot"></span>{{ cmd.statutLabel }}
+                  </span>
+                </td>
+                <td><button class="btn-sm" type="button" (click)="viewCommande(cmd)">Voir</button></td>
+              </tr>
+              <tr *ngIf="recentCommandes.length === 0">
+                <td colspan="7" class="empty-cell">Aucune commande récente</td>
+              </tr>
+            </tbody>
+          </table>
         </div>
-        <div class="table-skeleton-wrap" *ngIf="loadingProduits">
-          <div class="row-skeleton" *ngFor="let i of skeletonRows(5)"></div>
-        </div>
-        <table class="data-table" *ngIf="!loadingProduits">
-          <thead><tr><th></th><th>Produit</th><th>Ventes</th></tr></thead>
-          <tbody>
-            <tr *ngFor="let p of topProduits">
-              <td><div class="prod-thumb"><div class="prod-ph"></div></div></td>
-              <td>
-                <div class="prod-name-cell">{{ p.nom }}</div>
-                <div class="prod-boutique-cell">{{ p.boutique }}</div>
-              </td>
-              <td>
-                <div class="ventes-bar-wrap">
-                  <div class="ventes-bar" [style.width.%]="p.barPct"></div>
-                  <span class="ventes-num">{{ p.ventes }}</span>
-                </div>
-              </td>
-            </tr>
-            <tr *ngIf="topProduits.length === 0">
-              <td colspan="3" class="empty-cell">Aucune donnée disponible</td>
-            </tr>
-          </tbody>
-        </table>
       </div>
 
-    </div>
-
-    <!-- ── DERNIÈRES COMMANDES ─────────────────────────────────────────────── -->
-    <div class="recent-orders-card">
-      <div class="tc-head">
-        <h2>Dernières commandes</h2>
-        <a class="tc-link" routerLink="/admin/commandes">Voir toutes</a>
-      </div>
-      <div class="table-skeleton-wrap" *ngIf="loadingCommandes">
-        <div class="row-skeleton" *ngFor="let i of skeletonRows(5)"></div>
-      </div>
-      <div class="orders-table-wrap" *ngIf="!loadingCommandes">
-        <table class="data-table">
-          <thead>
-            <tr>
-              <th>N° Commande</th>
-              <th>Date</th>
-              <th>Client</th>
-              <th class="hide-sm">Boutique</th>
-              <th>Montant</th>
-              <th>Statut</th>
-              <th></th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr *ngFor="let cmd of recentCommandes">
-              <td class="cmd-numero">{{ cmd.numero }}</td>
-              <td class="cmd-date">{{ cmd.date }}</td>
-              <td>{{ cmd.client }}</td>
-              <td class="cmd-boutique hide-sm">{{ cmd.boutique }}</td>
-              <td class="cmd-montant">{{ cmd.montant }}</td>
-              <td>
-                <span class="statut-badge" [ngClass]="statutClass(cmd.statut)">
-                  <span class="statut-dot"></span>{{ cmd.statutLabel }}
-                </span>
-              </td>
-              <td><button class="btn-sm" type="button" (click)="viewCommande(cmd)">Voir</button></td>
-            </tr>
-            <tr *ngIf="recentCommandes.length === 0">
-              <td colspan="7" class="empty-cell">Aucune commande récente</td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
-    </div>
-
-  </div><!-- /page-content -->
-</div><!-- /admin-page -->
+    </div><!-- /page-content -->
+  </div><!-- /main -->
+</div><!-- /dashboard-root -->

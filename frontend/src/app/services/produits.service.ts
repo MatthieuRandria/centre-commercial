@@ -7,7 +7,6 @@ import { Produit } from '../shared/produit.model';
 @Injectable({ providedIn: 'root' })
 export class ProduitsService {
   private apiUrl = `http://localhost:3000/produits`;
->>>>>>> Stashed changes
 
   constructor(private http: HttpClient) { }
 
