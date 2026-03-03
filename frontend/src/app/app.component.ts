@@ -5,13 +5,12 @@ import { filter } from 'rxjs';
 
 import { NavbarComponent } from './components/navbar/navbar.component';
 import { SidebarComponent } from './components/sidebar/sidebar.component';
-import { ProjectCreditsComponent } from './components/footer/footer.component';
 import { AuthService } from './services/auth.service';
 
 @Component({
   selector: 'app-root',
   standalone: true,
-  imports: [RouterOutlet, CommonModule, NavbarComponent, SidebarComponent, ProjectCreditsComponent],
+  imports: [RouterOutlet, CommonModule, NavbarComponent, SidebarComponent],
   template: `
     <!-- Navbar : visible partout SAUF sur les routes admin -->
     <app-navbar *ngIf="showNavbar"></app-navbar>
