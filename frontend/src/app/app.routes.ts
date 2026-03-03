@@ -12,7 +12,13 @@ import { ManagerProduitsListComponent } from './pages/manager-boutique/produit/l
 import { ManagerCommandesListComponent } from './pages/manager-boutique/commandes/list/list.component';
 import { ManagerCommandeDetailComponent } from './pages/manager-boutique/commandes/details/details.component';
 
+import { ManagerProduitFormComponent } from './pages/manager-boutique/produit/form/form.component';
+import { ManagerProduitsListComponent } from './pages/manager-boutique/produit/list/list.component';
+import { ManagerCommandesListComponent } from './pages/manager-boutique/commandes/list/list.component';
+import { ManagerCommandeDetailComponent } from './pages/manager-boutique/commandes/details/details.component';
+
 export const routes: Routes = [
+<<<<<<< Updated upstream
 <<<<<<< Updated upstream
 <<<<<<< Updated upstream
   {
@@ -27,6 +33,8 @@ export const routes: Routes = [
       import('./pages/login/login.component').then(m => m.LoginComponent),
   },
 =======
+=======
+>>>>>>> Stashed changes
 =======
 >>>>>>> Stashed changes
     { path: '', component: HomeComponent },
@@ -45,6 +53,9 @@ export const routes: Routes = [
     { path: 'boutique', component: BoutiquesComponent },
     { path: 'boutique/:slug', component: BoutiqueDetailComponent },
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
+>>>>>>> Stashed changes
+=======
 >>>>>>> Stashed changes
 =======
 >>>>>>> Stashed changes

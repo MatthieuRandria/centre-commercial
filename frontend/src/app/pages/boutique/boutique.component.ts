@@ -12,7 +12,10 @@ import { Boutique, BoutiqueFilters } from '../../models/boutique.model';
   imports: [CommonModule, RouterModule],
 <<<<<<< Updated upstream
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
   providers:[DecimalPipe],
+=======
+>>>>>>> Stashed changes
 =======
 >>>>>>> Stashed changes
 =======

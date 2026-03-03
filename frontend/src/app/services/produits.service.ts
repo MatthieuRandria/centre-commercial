@@ -3,7 +3,11 @@ import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
 <<<<<<< Updated upstream
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
 import { environment } from '../../environments/environment';
+=======
+import { map } from 'rxjs/operators';
+>>>>>>> Stashed changes
 =======
 import { map } from 'rxjs/operators';
 >>>>>>> Stashed changes
@@ -16,8 +20,11 @@ import { Produit } from '../shared/produit.model';
 export class ProduitsService {
 <<<<<<< Updated upstream
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
   private apiUrl = `${environment.apiUrl}/produits`;
 =======
+=======
+>>>>>>> Stashed changes
 =======
 >>>>>>> Stashed changes
   private apiUrl = `http://localhost:3000/produits`;
@@ -58,8 +65,11 @@ export class ProduitsService {
   }
 <<<<<<< Updated upstream
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
 }
 =======
+=======
+>>>>>>> Stashed changes
 =======
 >>>>>>> Stashed changes
 
@@ -67,6 +77,10 @@ export class ProduitsService {
     return this.http.delete<any>(`${this.apiUrl}/${id}`);
   }
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
+}
+>>>>>>> Stashed changes
+=======
 }
 >>>>>>> Stashed changes
 =======
