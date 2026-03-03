@@ -1,5 +1,5 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
-import { CommonModule, DecimalPipe } from '@angular/common';
+import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
 import { Subject } from 'rxjs';
 import { debounceTime, distinctUntilChanged, takeUntil } from 'rxjs/operators';
@@ -10,7 +10,6 @@ import { Boutique, BoutiqueFilters } from '../../models/boutique.model';
   selector: 'app-boutiques',
   standalone: true,
   imports: [CommonModule, RouterModule],
-  providers:[DecimalPipe],
   templateUrl: './boutique.component.html',
   styleUrls: ['./boutique.component.scss']
 })

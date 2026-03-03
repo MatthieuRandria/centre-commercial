@@ -203,6 +203,10 @@
   &:focus { border-color: var(--accent); }
 }
 
+.filter-input {
+  width: 88%;
+}
+
 .filter-stats {
   margin-top: 22px;
   padding-top: 18px;
@@ -378,6 +382,7 @@
 // ─── ACTIONS ───────────────────────────────────────────────────────────────
 .action-buttons {
   display: flex;
+  flex-direction: column;
   gap: 7px;
 }
 

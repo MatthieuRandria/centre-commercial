@@ -3,12 +3,12 @@ import { CommonModule } from '@angular/common';
 import { RouterModule, Router } from '@angular/router';
 import { Subject } from 'rxjs';
 import { takeUntil, finalize } from 'rxjs/operators';
-import { CommandeClient, CommandesFiltreStatut, CommandesService } from '../../services/commandes.services';
+import { CommandeClient, CommandesFiltreStatut, CommandesService } from '../../services/commandes.service';
 import { ReactiveFormsModule } from '@angular/forms';
 
 export interface FilterTab {
-  label:  string;
-  value:  CommandesFiltreStatut;
+  label: string;
+  value: CommandesFiltreStatut;
 }
 
 @Component({
@@ -30,21 +30,21 @@ export class ClientCommandeComponent implements OnInit, OnDestroy {
   filtreActif: CommandesFiltreStatut = 'toutes';
 
   filterTabs: FilterTab[] = [
-    { label: 'Toutes',    value: 'toutes'   },
-    { label: 'En cours',  value: 'en_cours' },
-    { label: 'Livrées',   value: 'livrees'  },
-    { label: 'Annulées',  value: 'annulees' },
+    { label: 'Toutes', value: 'toutes' },
+    { label: 'En cours', value: 'en_cours' },
+    { label: 'Livrées', value: 'livrees' },
+    { label: 'Annulées', value: 'annulees' },
   ];
 
   // ─── Pagination ───────────────────────────────────────────────────────────
-  page      = 1;
-  limit     = 8;
+  page = 1;
+  limit = 8;
   totalPages = 1;
 
   // ─── UI state ─────────────────────────────────────────────────────────────
-  isLoading     = false;
-  isAnnulation  = false; // spinner pendant annulation
-  errorMessage  = '';
+  isLoading = false;
+  isAnnulation = false; // spinner pendant annulation
+  errorMessage = '';
   confirmingId: string | null = null; // id de la commande en cours d'annulation
 
   // ─── Données utilisateur (depuis localStorage / AuthService) ──────────────
@@ -53,14 +53,14 @@ export class ClientCommandeComponent implements OnInit, OnDestroy {
   // Labels statuts → affichage
   readonly statutLabels: Record<string, string> = {
     en_attente: 'En attente', validee: 'Validée',
-    preparee:   'En préparation', expediee: 'Expédiée',
-    livree:     'Livrée',     annulee:  'Annulée'
+    preparee: 'En préparation', expediee: 'Expédiée',
+    livree: 'Livrée', annulee: 'Annulée'
   };
 
   constructor(
     private commandesService: CommandesService,
     private router: Router
-  ) {}
+  ) { }
 
   ngOnInit(): void {
     this.loadUser();
@@ -79,10 +79,10 @@ export class ClientCommandeComponent implements OnInit, OnDestroy {
       if (stored) {
         const u = JSON.parse(stored);
         this.user = {
-          nom:      u.nom     ?? '',
-          prenom:   u.prenom  ?? '',
-          email:    u.email   ?? '',
-          initiale: (u.prenom?.[0] ?? '').toUpperCase() || '?'
+          nom: u.nom ?? '',
+          prenom: u.prenom ?? '',
+          email: u.email ?? '',
+          initiale: ((u.prenom?.[0] ?? '') + (u.nom?.[0] ?? '')).toUpperCase() || '?'
         };
       }
     } catch { /* ignore */ }
@@ -95,16 +95,16 @@ export class ClientCommandeComponent implements OnInit, OnDestroy {
 
     this.commandesService.getMesCommandes({
       filtre: this.filtreActif,
-      page:   this.page,
-      limit:  this.limit
+      page: this.page,
+      limit: this.limit
     }).pipe(
       takeUntil(this.destroy$),
       finalize(() => this.isLoading = false)
     ).subscribe({
       next: ({ commandes, total, totalPages }) => {
-        this.commandes     = commandes;
+        this.commandes = commandes;
         this.totalCommandes = total;
-        this.totalPages    = totalPages;
+        this.totalPages = totalPages;
         this.updateTabCounts(total);
       },
       error: () => {

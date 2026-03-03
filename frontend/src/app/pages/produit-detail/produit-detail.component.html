@@ -298,7 +298,7 @@
               (click)="navigateSimilaire(s._id)"
             >
               <div class="sim-img">
-                <img *ngIf="s.images?.[0]" [src]="s.images[0]" [alt]="s.nom" />
+                <img alt="" *ngIf="s.images?.[0]" [src]="s.images[0]" [alt]="s.nom" />
                 <div class="sim-ph" *ngIf="!s.images?.[0]"></div>
               </div>
               <div class="sim-body">

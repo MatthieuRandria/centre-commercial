@@ -6,7 +6,7 @@ import { UserService } from '../../services/user.service';
 
 @Component({
   selector: 'app-me',
-  imports: [CommonModule,ReactiveFormsModule],
+  imports: [CommonModule, ReactiveFormsModule],
   templateUrl: './me.component.html',
   styleUrl: './me.component.scss'
 })
@@ -41,7 +41,7 @@ export class MeComponent implements OnInit {
   private toastTimer: any;
 
   constructor(private fb: FormBuilder, private accountService: UserService) {
-     // Initialisation immédiate pour éviter que *ngIf ou formGroup plante
+    // Initialisation immédiate pour éviter que *ngIf ou formGroup plante
     this.pwForm = this.fb.group({
       pwOld: [''],
       pwNew: [''],
