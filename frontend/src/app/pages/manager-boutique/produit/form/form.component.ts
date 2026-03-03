@@ -6,6 +6,7 @@ import { HttpClient } from '@angular/common/http';
 import { FormBuilder, FormGroup, FormArray, Validators, ReactiveFormsModule } from '@angular/forms';
 import { BoutiqueService } from '../../../../services/boutique.service';
 import { AuthService } from '../../../../services/auth.service';
+import { environment } from '../../../../../environments/environment';
 
 @Component({
    selector: 'app-manager-produit-form',
