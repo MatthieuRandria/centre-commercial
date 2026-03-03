@@ -9,32 +9,79 @@ exports.getProduitCategories = async (req, res) => {
   }
 };
 
-exports.getAllProduits = async (req, res, next) => {
-   try {
-      const {
-         boutiqueId, categorie, prixMin, prixMax,
-         sortBy = "date", order = "desc", page = 1, limit = 10
-      } = req.query;
+exports.getAllProduits = async (req, res) => {
+  try {
+    const {
+      q,
+      boutiqueId,
+      categorie,
+      prixMin,
+      prixMax,
+      enStock,
+      sortBy = 'date',
+      order  = 'desc',
+      page   = 1,
+      limit  = 12
+    } = req.query;
 
-      const filters = { actif: true };
-      if (boutiqueId) filters.boutique = boutiqueId;
-      if (categorie)  filters['categories.nom'] = categorie;
-      if (prixMin || prixMax) {
-         filters["variantes.prix"] = {};
-         if (prixMin) filters["variantes.prix"].$gte = Number(prixMin);
-         if (prixMax) filters["variantes.prix"].$lte = Number(prixMax);
-      }
+    const pageNum  = Math.max(1, Number(page));
+    const limitNum = Math.min(100, Math.max(1, Number(limit)));
 
-      const sortFields = { prix: "variantes.prix", date: "createdAt", vues: "vues" };
-      const sortOptions = { [sortFields[sortBy] || "createdAt"]: order === "asc" ? 1 : -1 };
-      const skip = (Number(page) - 1) * Number(limit);
+    // ── Filtres ────────────────────────────────────────────────────────────
+    const match = { actif: true };
 
-      const produits = await Produit.find(filters)
-         .populate("boutique").sort(sortOptions).skip(skip).limit(Number(limit));
-      const total = await Produit.countDocuments(filters);
+    if (q) {
+      match.$or = [
+        { nom:         { $regex: q, $options: 'i' } },
+        { description: { $regex: q, $options: 'i' } }
+      ];
+    }
 
-      res.json({ total, page: Number(page), pages: Math.ceil(total / Number(limit)), data: produits });
-   } catch (err) { next(err); }
+    if (boutiqueId && mongoose.Types.ObjectId.isValid(boutiqueId)) {
+      match.boutique = boutiqueId;
+    }
+
+    // categories est un array d'objets { nom } dans le modèle Produit
+    if (categorie) {
+      match['categories.nom'] = { $regex: categorie, $options: 'i' };
+    }
+
+    if (prixMin || prixMax) {
+      match['variantes.prix'] = {};
+      if (prixMin) match['variantes.prix'].$gte = Number(prixMin);
+      if (prixMax) match['variantes.prix'].$lte = Number(prixMax);
+    }
+
+    if (enStock === 'true') {
+      match['variantes.stock'] = { $gt: 0 };
+    }
+
+    // ── Tri ────────────────────────────────────────────────────────────────
+    const sortFields = { prix: 'variantes.prix', date: 'createdAt', vues: 'vues' };
+    const sortField   = sortFields[sortBy] ?? 'createdAt';
+    const sortOptions = { [sortField]: order === 'asc' ? 1 : -1 };
+
+    // ── Requête ────────────────────────────────────────────────────────────
+    const [produits, total] = await Promise.all([
+      Produit.find(match)
+        .populate('boutique', 'nom infos.logo_url')
+        .sort(sortOptions)
+        .skip((pageNum - 1) * limitNum)
+        .limit(limitNum)
+        .lean(),
+      Produit.countDocuments(match)
+    ]);
+
+    res.json({
+      total,
+      page:  pageNum,
+      pages: Math.ceil(total / limitNum),
+      data:  produits
+    });
+
+  } catch (err) {
+    res.status(500).json({ success: false, message: err.message });
+  }
 };
 
 exports.getProduitById = async (req, res) => {
