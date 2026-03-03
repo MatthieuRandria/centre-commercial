@@ -53,7 +53,7 @@ export class MeComponent implements OnInit {
     this.accountService.getUser().subscribe((user) => {
       this.user = user;
       this.fidelitePercent = this.accountService.fidelitePercent;
-      this.photoPreviewUrl = user.photoUrl ?? null;
+      this.photoPreviewUrl = user?.photoUrl ?? null;
       this.initProfilForm(user);
     });
   }

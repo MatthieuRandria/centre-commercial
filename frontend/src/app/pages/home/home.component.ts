@@ -20,6 +20,7 @@ import { FavorisService } from '../../services/favoris.service';
 })
 export class HomeComponent implements OnInit, OnDestroy, AfterViewInit {
 
+  private platformId = inject(PLATFORM_ID);
   private destroy$ = new Subject<void>();
 
   // ─── Données ───────────────────────────────────────────────────────────────
@@ -86,12 +87,12 @@ export class HomeComponent implements OnInit, OnDestroy, AfterViewInit {
     // Badge panier
     this.panierService.count$.pipe(takeUntil(this.destroy$))
       .subscribe(n => this.panierCount = n);
-    console.log("nouveautes",this.nouveautes);
-
   }
 
   ngAfterViewInit(): void {
-    this.startAutoplay();
+    if (isPlatformBrowser(this.platformId)) {
+      this.startAutoplay();
+    }
   }
 
   ngOnDestroy(): void {
@@ -103,6 +104,7 @@ export class HomeComponent implements OnInit, OnDestroy, AfterViewInit {
 
   // ─── Auth ──────────────────────────────────────────────────────────────────
   private checkAuth(): void {
+    if (!isPlatformBrowser(this.platformId)) return;
     this.isLoggedIn = !!localStorage.getItem('token');
   }
 
@@ -206,7 +208,9 @@ export class HomeComponent implements OnInit, OnDestroy, AfterViewInit {
     if (!this.isLoggedIn) { this.router.navigate(['/login']); return; }
 
     const isFav = this.favSet.has(p._id);
-    const token = localStorage.getItem('token') ?? '';
+    const token = isPlatformBrowser(this.platformId)
+      ? (localStorage.getItem('token') ?? '')
+      : '';
     const headers: any = token ? { Authorization: `Bearer ${token}` } : {};
 
     if (!isFav) {

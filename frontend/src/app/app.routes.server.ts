@@ -23,6 +23,10 @@ export const serverRoutes: ServerRoute[] = [
     path: 'client/commandes/confirm/:id',
     renderMode: RenderMode.Client
   },
+  {
+    path: 'boutique/produits/:id/modifier',
+    renderMode: RenderMode.Client 
+  },
 
   // Everything else → prerender
   {

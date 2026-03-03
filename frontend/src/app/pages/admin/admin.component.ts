@@ -1,8 +1,13 @@
 import { CommonModule, DatePipe } from '@angular/common';
-import { AfterViewInit, ChangeDetectorRef, Component, ElementRef, HostListener, OnDestroy, OnInit, ViewChild } from '@angular/core';
-import { NavigationEnd, Router, RouterModule } from '@angular/router';
+import {
+  AfterViewInit, ChangeDetectorRef,
+  Component, ElementRef,
+  OnDestroy, OnInit,
+  ViewChild
+} from '@angular/core';
+import { Router, RouterModule } from '@angular/router';
 import { Chart, registerables } from 'chart.js';
-import { filter, finalize, Subject, takeUntil } from 'rxjs';
+import { finalize, Subject, takeUntil } from 'rxjs';
 Chart.register(...registerables);
 
 import {
@@ -11,32 +16,67 @@ import {
   TopBoutiqueApi, TopProduitApi, CommandeRecente
 } from '../../services/admin.service';
 
-// ─── Interfaces VM (ViewModel) ────────────────────────────────────────────
+// ─── View-model interfaces ────────────────────────────────────────────────────
+
 export interface KpiCard {
-  label: string; value: string; trend: string;
-  trendUp: boolean; icon: string; iconClass: string;
+  label: string;
+  value: string;
+  trendValue: string;
+  trendLabel: string;
+  trendUp: boolean;
+  iconKey: 'boutique' | 'produit' | 'commande' | 'ca';
+  // ✅ Ajout des propriétés manquantes référencées dans le HTML
+  icon: string;
+  iconClass: string;
+  color: string;
+  bgColor: string;
+  strokeColor: string;
 }
-export interface TopBoutiqueVM {
-  rank: number; nom: string; ca: string; commandes: number; isTop: boolean;
-}
-export interface TopProduitVM {
-  nom: string; boutique: string; ventes: number; barPct: number;
-}
-export interface CommandeVM {
-  id:string;
-  numero: string; date: string; client: string;
-  boutique: string; montant: string;
-  statut: string; statutLabel: string;
-}
+
 export interface NavItem {
-  icon: string; label: string; route: string; active?: boolean; badge?: number;
+  label: string;
+  icon: string;
+  route: string;
+  active?: boolean;
+  badge?: number;
 }
-export interface NavSection { label: string; items: NavItem[]; }
 
+export interface NavSection {
+  label: string;
+  items: NavItem[];
+}
 
+export interface TopBoutiqueVM {
+  rank: number;
+  nom: string;
+  ca: string;
+  commandes: number;
+  isTop: boolean;
+}
+
+export interface TopProduitVM {
+  nom: string;
+  boutique: string;
+  ventes: number;
+  barPct: number;
+}
+
+export interface CommandeVM {
+  id: string;
+  numero: string;
+  date: string;
+  client: string;
+  boutique: string;
+  montant: string;
+  statut: string;
+  statutLabel: string;
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
 
 @Component({
   selector: 'app-admin',
+  standalone: true,
   imports: [CommonModule, RouterModule, DatePipe],
   templateUrl: './admin.component.html',
   styleUrl: './admin.component.scss'
@@ -44,76 +84,82 @@ export interface NavSection { label: string; items: NavItem[]; }
 export class AdminComponent implements OnInit, AfterViewInit, OnDestroy {
 
   @ViewChild('caChart') caChartRef!: ElementRef<HTMLCanvasElement>;
+
   private destroy$ = new Subject<void>();
   private chart: Chart | null = null;
 
   today = new Date();
   activePeriod: '6m' | '12m' = '12m';
-
-  // ─── Sidebar ──────────────────────────────────────────────────────────────
-  sidebarOpen   = false;   // mobile: fermée par défaut
-  isMobile      = false;
   commandeBadge = 0;
+  errorMessage = '';
 
+  // ✅ Ajout de sidebarOpen manquant
+  sidebarOpen = false;
+
+  // ✅ Ajout de navSections manquant
   navSections: NavSection[] = [
-    { label: 'Principal', items: [
-      { icon: '⊞',  label: 'Dashboard',   route: '/admin',             active: true },
-      { icon: '🏪', label: 'Boutiques',   route: '/admin/boutiques'                 },
-      { icon: '📦', label: 'Produits',    route: '/admin/produits'                  },
-      { icon: '📋', label: 'Commandes',   route: '/admin/commandes'                 },
-    ]},
-    { label: 'Gestion', items: [
-      { icon: '👥', label: 'Utilisateurs', route: '/admin/utilisateurs' },
-      { icon: '🎉', label: 'Événements',   route: '/admin/evenements'   },
-      { icon: '🏷️', label: 'Promotions',  route: '/admin/promotions'   },
-    ]},
-    { label: 'Système', items: [
-      { icon: '⚙️', label: 'Paramètres',  route: '/admin/parametres'   },
-      { icon: '📊', label: 'Statistiques',route: '/admin/statistiques'  },
-    ]},
+    {
+      label: 'GÉNÉRAL',
+      items: [
+        { label: 'Tableau de bord', icon: '◉', route: '/admin', active: true },
+      ]
+    },
+    {
+      label: 'GESTION',
+      items: [
+        { label: 'Boutiques', icon: '🏪', route: '/admin/boutiques' },
+        { label: 'Produits', icon: '📦', route: '/admin/produits' },
+        { label: 'Commandes', icon: '🧾', route: '/admin/commandes' },
+        { label: 'Utilisateurs', icon: '👤', route: '/admin/utilisateurs' },
+      ]
+    }
   ];
 
-  // ─── Données ──────────────────────────────────────────────────────────────
-  kpis:          KpiCard[]       = [];
-  topBoutiques:  TopBoutiqueVM[] = [];
-  topProduits:   TopProduitVM[]  = [];
-  recentCommandes: CommandeVM[]  = [];
+  // ─── Data ──────────────────────────────────────────────────────────────────
+  kpis: KpiCard[] = [];
+  topBoutiques: TopBoutiqueVM[] = [];
+  topProduits: TopProduitVM[] = [];
+  recentCommandes: CommandeVM[] = [];
 
-  // ─── États de chargement ──────────────────────────────────────────────────
-  loadingKpis      = false;
-  loadingChart     = false;
+  // ─── Loading flags ─────────────────────────────────────────────────────────
+  loadingKpis = false;
+  loadingChart = false;
   loadingBoutiques = false;
-  loadingProduits  = false;
+  loadingProduits = false;
   loadingCommandes = false;
-  errorMessage     = '';
 
-  private statutLabels: Record<string, string> = {
-    en_attente: 'En attente', validee: 'Validée', preparee: 'En préparation',
-    expediee: 'Expédiée', livree: 'Livrée', annulee: 'Annulée'
+  // ─── Statut labels ─────────────────────────────────────────────────────────
+  private readonly statutLabels: Record<string, string> = {
+    en_attente: 'En attente',
+    validee: 'Validée',
+    preparee: 'En préparation',
+    expediee: 'Expédiée',
+    livree: 'Livrée',
+    annulee: 'Annulée'
+  };
+
+  // ─── KPI colour palette ────────────────────────────────────────────────────
+  private readonly kpiPalette: Record<KpiCard['iconKey'], Pick<KpiCard, 'color' | 'bgColor' | 'strokeColor' | 'icon' | 'iconClass'>> = {
+    boutique: { color: '#10b981', bgColor: '#d1fae5', strokeColor: '#059669', icon: '🏪', iconClass: 'icon-boutique' },
+    produit: { color: '#f59e0b', bgColor: '#fef3c7', strokeColor: '#d97706', icon: '📦', iconClass: 'icon-produit' },
+    commande: { color: '#3b82f6', bgColor: '#dbeafe', strokeColor: '#2563eb', icon: '🧾', iconClass: 'icon-commande' },
+    ca: { color: '#8b5cf6', bgColor: '#f3e8ff', strokeColor: '#7c3aed', icon: '💰', iconClass: 'icon-ca' },
   };
 
   constructor(
-    private dashboardService: AdminService,
+    private adminService: AdminService,
     private router: Router
-  ) {}
+  ) { }
 
-  // ─── Lifecycle ────────────────────────────────────────────────────────────
+  // ─── Lifecycle ─────────────────────────────────────────────────────────────
+
   ngOnInit(): void {
-    this.checkMobile();
     this.loadAll();
     this.loadCommandeBadge();
-
-    // Fermer sidebar au changement de route sur mobile
-    this.router.events.pipe(
-      filter(e => e instanceof NavigationEnd),
-      takeUntil(this.destroy$)
-    ).subscribe(() => {
-      if (this.isMobile) this.sidebarOpen = false;
-    });
   }
 
   ngAfterViewInit(): void {
-    // Le chart est construit après que les données CA sont chargées
+    // Chart is built once CA data arrives via loadCa()
   }
 
   ngOnDestroy(): void {
@@ -122,23 +168,20 @@ export class AdminComponent implements OnInit, AfterViewInit, OnDestroy {
     this.chart?.destroy();
   }
 
-  // ─── Responsive ───────────────────────────────────────────────────────────
-  @HostListener('window:resize')
-  checkMobile(): void {
-    this.isMobile = window.innerWidth < 768;
-    // Sur desktop, la sidebar est toujours visible
-    if (!this.isMobile) this.sidebarOpen = true;
-  }
+  // ─── Sidebar ───────────────────────────────────────────────────────────────
 
+  // ✅ Ajout de toggleSidebar manquant
   toggleSidebar(): void {
     this.sidebarOpen = !this.sidebarOpen;
   }
 
+  // ✅ Ajout de closeOnOverlay manquant
   closeOnOverlay(): void {
-    if (this.isMobile) this.sidebarOpen = false;
+    this.sidebarOpen = false;
   }
 
-  // ─── Chargement données ────────────────────────────────────────────────────
+  // ─── Data loading ──────────────────────────────────────────────────────────
+
   loadAll(): void {
     this.errorMessage = '';
     this.loadKpis();
@@ -150,7 +193,7 @@ export class AdminComponent implements OnInit, AfterViewInit, OnDestroy {
 
   private loadKpis(): void {
     this.loadingKpis = true;
-    this.dashboardService.getKpis().pipe(
+    this.adminService.getKpis().pipe(
       takeUntil(this.destroy$),
       finalize(() => this.loadingKpis = false)
     ).subscribe({
@@ -161,151 +204,165 @@ export class AdminComponent implements OnInit, AfterViewInit, OnDestroy {
 
   private loadCa(): void {
     this.loadingChart = true;
-    this.dashboardService.getCaEvolution(this.activePeriod).pipe(
+    this.adminService.getCaEvolution(this.activePeriod).pipe(
       takeUntil(this.destroy$),
       finalize(() => this.loadingChart = false)
     ).subscribe({
       next: data => this.buildChart(data),
-      error: () => { /* chart reste vide */ }
+      error: () => { }
     });
   }
 
   private loadTopBoutiques(): void {
     this.loadingBoutiques = true;
-    this.dashboardService.getTopBoutiques().pipe(
+    this.adminService.getTopBoutiques().pipe(
       takeUntil(this.destroy$),
       finalize(() => this.loadingBoutiques = false)
     ).subscribe({
       next: data => this.topBoutiques = this.mapTopBoutiques(data),
-      error: () => {}
+      error: () => { }
     });
   }
 
   private loadTopProduits(): void {
     this.loadingProduits = true;
-    this.dashboardService.getTopProduits().pipe(
+    this.adminService.getTopProduits().pipe(
       takeUntil(this.destroy$),
       finalize(() => this.loadingProduits = false)
     ).subscribe({
       next: data => this.topProduits = this.mapTopProduits(data),
-      error: () => {}
+      error: () => { }
     });
   }
 
   private loadCommandes(): void {
     this.loadingCommandes = true;
-    this.dashboardService.getRecentCommandes().pipe(
+    this.adminService.getRecentCommandes().pipe(
       takeUntil(this.destroy$),
       finalize(() => this.loadingCommandes = false)
     ).subscribe({
       next: data => this.recentCommandes = this.mapCommandes(data),
-      error: () => {}
+      error: () => { }
     });
   }
 
   private loadCommandeBadge(): void {
-    this.dashboardService.getCommandesBadge().pipe(
+    this.adminService.getCommandesBadge().pipe(
       takeUntil(this.destroy$)
     ).subscribe({
-      next: badge => {
-        this.commandeBadge = badge.en_attente;
-        // Mettre à jour le badge dans la nav
-        const nav = this.navSections[0].items.find(i => i.label === 'Commandes');
-        if (nav) nav.badge = badge.en_attente;
-      },
-      error: () => {}
+      next: badge => this.commandeBadge = badge.en_attente,
+      error: () => { }
     });
   }
 
-  // ─── Changement de période ─────────────────────────────────────────────────
+  // ─── Period switch ─────────────────────────────────────────────────────────
+
   setPeriod(period: '6m' | '12m'): void {
     if (this.activePeriod === period) return;
     this.activePeriod = period;
     this.loadCa();
   }
 
-  // ─── Mappers API → ViewModel ───────────────────────────────────────────────
+  // ─── API → ViewModel mappers ───────────────────────────────────────────────
+
   private mapKpis(d: DashboardKpis): KpiCard[] {
-    const fmt = (n: number) => n >= 1_000_000
-      ? (n / 1_000_000).toFixed(0) + 'M Ar'
-      : n >= 1_000 ? (n / 1_000).toFixed(0) + 'K' : String(n);
+    const fmt = (n: number): string =>
+      n >= 1_000_000 ? (n / 1_000_000).toFixed(0) + 'M Ar'
+        : n >= 1_000 ? (n / 1_000).toFixed(0) + 'K'
+          : String(n);
+
+    const makeCard = (
+      label: string,
+      value: string,
+      variation: number,
+      periode: string,
+      iconKey: KpiCard['iconKey']
+    ): KpiCard => ({
+      label,
+      value,
+      trendValue: `${variation >= 0 ? '+' : ''}${variation}`,
+      trendLabel: periode,
+      trendUp: variation >= 0,
+      iconKey,
+      ...this.kpiPalette[iconKey]
+    });
 
     return [
-      {
-        label: 'Boutiques actives',
-        value: String(d.boutiques_actives.total),
-        trend: `${d.boutiques_actives.variation >= 0 ? '+' : ''}${d.boutiques_actives.variation} ${d.boutiques_actives.periode}`,
-        trendUp: d.boutiques_actives.variation >= 0,
-        icon: '🏪', iconClass: 'boutiques'
-      },
-      {
-        label: 'Produits référencés',
-        value: d.produits_references.total.toLocaleString('fr-FR'),
-        trend: `${d.produits_references.variation >= 0 ? '+' : ''}${d.produits_references.variation} ${d.produits_references.periode}`,
-        trendUp: d.produits_references.variation >= 0,
-        icon: '📦', iconClass: 'produits'
-      },
-      {
-        label: 'Commandes totales',
-        value: d.commandes_totales.total.toLocaleString('fr-FR'),
-        trend: `${d.commandes_totales.variation >= 0 ? '+' : ''}${d.commandes_totales.variation} ${d.commandes_totales.periode}`,
-        trendUp: d.commandes_totales.variation >= 0,
-        icon: '📋', iconClass: 'commandes'
-      },
+      makeCard(
+        'Boutiques actives',
+        String(d.boutiques_actives.total),
+        d.boutiques_actives.variation,
+        d.boutiques_actives.periode,
+        'boutique'
+      ),
+      makeCard(
+        'Produits référencés',
+        d.produits_references.total.toLocaleString('fr-FR'),
+        d.produits_references.variation,
+        d.produits_references.periode,
+        'produit'
+      ),
+      makeCard(
+        'Commandes totales',
+        d.commandes_totales.total.toLocaleString('fr-FR'),
+        d.commandes_totales.variation,
+        d.commandes_totales.periode,
+        'commande'
+      ),
       {
         label: 'CA total',
         value: fmt(d.ca_total.valeur),
-        trend: `${d.ca_total.variation_pct >= 0 ? '+' : ''}${d.ca_total.variation_pct}% vs mois dern.`,
+        trendValue: `${d.ca_total.variation_pct >= 0 ? '+' : ''}${d.ca_total.variation_pct}%`,
+        trendLabel: 'vs mois dernier',
         trendUp: d.ca_total.variation_pct >= 0,
-        icon: '💰', iconClass: 'ca'
-      },
+        iconKey: 'ca',
+        ...this.kpiPalette['ca']
+      }
     ];
   }
 
   private mapTopBoutiques(data: TopBoutiqueApi[]): TopBoutiqueVM[] {
     return data.map(b => ({
-      rank:      b.rang,
-      nom:       b.boutique.nom,
-      ca:        b.ca >= 1_000_000 ? (b.ca / 1_000_000).toFixed(0) + 'M Ar' : b.ca + ' Ar',
+      rank: b.rang,
+      nom: b.boutique.nom,
+      ca: b.ca >= 1_000_000 ? (b.ca / 1_000_000).toFixed(0) + 'M Ar' : b.ca + ' Ar',
       commandes: b.commandes,
-      isTop:     b.rang <= 3
+      isTop: b.rang <= 3
     }));
   }
 
   private mapTopProduits(data: TopProduitApi[]): TopProduitVM[] {
     const max = data[0]?.ventes ?? 1;
     return data.map(p => ({
-      nom:      p.produit.nom,
+      nom: p.produit.nom,
       boutique: p.boutique.nom,
-      ventes:   p.ventes,
-      barPct:   Math.round((p.ventes / max) * 100)
+      ventes: p.ventes,
+      barPct: Math.round((p.ventes / max) * 100)
     }));
   }
 
   private mapCommandes(data: CommandeRecente[]): CommandeVM[] {
     return data.map(c => ({
       id: c._id,
-      numero:   c.numero,
-      date:     new Date(c.createdAt).toLocaleDateString('fr-FR', {
+      numero: c.numero,
+      date: new Date(c.createdAt).toLocaleDateString('fr-FR', {
         day: '2-digit', month: 'short', hour: '2-digit', minute: '2-digit'
       }),
-      client:   `${c.client.prenom} ${c.client.nom}`,
+      client: `${c.client.prenom} ${c.client.nom}`,
       boutique: c.boutique.nom,
-      montant:  c.montant.toLocaleString('fr-FR') + ' Ar',
-      statut:   c.statut,
+      montant: c.montant.toLocaleString('fr-FR') + ' Ar',
+      statut: c.statut,
       statutLabel: this.statutLabels[c.statut] ?? c.statut
     }));
   }
 
-  // ─── Chart ────────────────────────────────────────────────────────────────
+  // ─── Chart ─────────────────────────────────────────────────────────────────
+
   private buildChart(points: CaPoint[]): void {
     if (!this.caChartRef) return;
     this.chart?.destroy();
 
-    const labels = points.map(p => p.mois);
-    const data   = points.map(p => p.valeur);
-    const ctx    = this.caChartRef.nativeElement.getContext('2d')!;
-
+    const ctx = this.caChartRef.nativeElement.getContext('2d')!;
     const grad = ctx.createLinearGradient(0, 0, 0, 240);
     grad.addColorStop(0, 'rgba(45,74,62,0.18)');
     grad.addColorStop(1, 'rgba(45,74,62,0)');
@@ -313,10 +370,10 @@ export class AdminComponent implements OnInit, AfterViewInit, OnDestroy {
     this.chart = new Chart(ctx, {
       type: 'line',
       data: {
-        labels,
+        labels: points.map(p => p.mois),
         datasets: [{
           label: 'CA (Millions Ar)',
-          data,
+          data: points.map(p => p.valeur),
           borderColor: '#2d4a3e',
           backgroundColor: grad,
           borderWidth: 2.5,
@@ -334,24 +391,37 @@ export class AdminComponent implements OnInit, AfterViewInit, OnDestroy {
         plugins: {
           legend: { display: false },
           tooltip: {
-            backgroundColor: '#1a1a18', padding: 10, cornerRadius: 8,
+            backgroundColor: '#1a1a18',
+            padding: 10,
+            cornerRadius: 8,
             callbacks: { label: c => ` ${c.parsed.y}M Ar` }
           }
         },
         scales: {
-          x: { grid: { display: false }, ticks: { font: { family: 'DM Sans', size: 11 }, color: '#5c5c57' } },
-          y: { grid: { color: '#f0ede8' }, border: { display: false },
-               ticks: { font: { family: 'DM Sans', size: 11 }, color: '#5c5c57', callback: v => `${v}M` } }
+          x: {
+            grid: { display: false },
+            ticks: { font: { family: 'DM Sans', size: 11 }, color: '#5c5c57' }
+          },
+          y: {
+            grid: { color: '#f0ede8' },
+            border: { display: false },
+            ticks: { font: { family: 'DM Sans', size: 11 }, color: '#5c5c57', callback: v => `${v}M` }
+          }
         }
       }
     });
   }
 
-  // ─── Helpers ──────────────────────────────────────────────────────────────
+  // ─── Helpers ───────────────────────────────────────────────────────────────
+
   statutClass(statut: string): string {
     const map: Record<string, string> = {
-      en_attente: 's-attente', validee: 's-payee', preparee: 's-preparee',
-      expediee: 's-prete', livree: 's-livree', annulee: 's-annulee'
+      en_attente: 's-attente',
+      validee: 's-payee',
+      preparee: 's-preparee',
+      expediee: 's-prete',
+      livree: 's-livree',
+      annulee: 's-annulee'
     };
     return map[statut] ?? '';
   }
@@ -360,10 +430,13 @@ export class AdminComponent implements OnInit, AfterViewInit, OnDestroy {
     this.router.navigate(['/admin/commandes', cmd.id]);
   }
 
-  // Skeleton array helper
-  skeletonRows(n: number): number[] { return Array(n).fill(0); }
+  skeletonRows(n: number): number[] {
+    return Array(n).fill(0);
+  }
 
   get isPageLoading(): boolean {
-    return this.loadingKpis || this.loadingChart || this.loadingBoutiques || this.loadingProduits || this.loadingCommandes;
+    return this.loadingKpis || this.loadingChart
+      || this.loadingBoutiques || this.loadingProduits
+      || this.loadingCommandes;
   }
 }

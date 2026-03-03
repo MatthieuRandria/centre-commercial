@@ -47,3 +47,42 @@ exports.updateStatut = async (req, res) => {
     res.status(400).json({ message: error.message });
   }
 };
+
+// ── NOUVELLE ROUTE : commandes par boutique (pour le manager) ─────────────
+exports.getCommandesByBoutique = async (req, res) => {
+  try {
+    const { boutiqueId } = req.params;
+    const page   = Math.max(1, parseInt(req.query.page)  || 1);
+    const limit  = Math.min(50, parseInt(req.query.limit) || 10);
+    const statut = req.query.statut  || null;
+    const search = req.query.search  || null;
+    const order  = req.query.order === 'asc' ? 1 : -1;
+
+    const query = { 'articles.boutique': boutiqueId };
+    if (statut) query.statut = statut;
+
+    // Recherche sur numéro de commande
+    if (search) {
+      query.numeroCommande = { $regex: search, $options: 'i' };
+    }
+
+    const [commandes, total] = await Promise.all([
+      Commande.find(query)
+        .populate('acheteur', 'nom prenom email telephone')
+        .sort({ createdAt: order })
+        .skip((page - 1) * limit)
+        .limit(limit)
+        .lean(),
+      Commande.countDocuments(query)
+    ]);
+
+    res.json({
+      commandes,
+      total,
+      page,
+      totalPages: Math.max(1, Math.ceil(total / limit))
+    });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};

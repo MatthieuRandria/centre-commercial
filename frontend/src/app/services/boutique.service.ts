@@ -56,4 +56,10 @@ export class BoutiqueService {
    getCentres(): Observable<CentreCommercial[]> {
       return this.http.get<CentreCommercial[]>(`${this.base}/centres`);
    }
+
+   getBoutiquesByUser(userId: string): Observable<Boutique[]> {
+      return this.http.get<any>(`${this.base}/boutiques`, {
+         params: new HttpParams().set('userId', userId)
+      }).pipe(map(r => r.data?.boutiques ?? r.data ?? []));
+   }
 }

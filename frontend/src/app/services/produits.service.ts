@@ -1,14 +1,15 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
-import { environment } from '../../environments/environment';
+import { map } from 'rxjs/operators';
 import { Produit } from '../shared/produit.model';
+import { environment } from '../../environments/environment';
 
 @Injectable({ providedIn: 'root' })
 export class ProduitsService {
   private apiUrl = `${environment.apiUrl}/produits`;
 
-  constructor(private http: HttpClient) {}
+  constructor(private http: HttpClient) { }
 
   getProduits(filters: any): Observable<{ total: number; page: number; pages: number; data: Produit[] }> {
     let params = new HttpParams();
@@ -24,15 +25,25 @@ export class ProduitsService {
     return this.http.get<Produit[]>(`${this.apiUrl}/search`, { params: { q: query } });
   }
 
-  getProduitById(id: string): Observable<Produit> {
-    return this.http.get<Produit>(`${this.apiUrl}/${id}`);
+  getProduitById(id: string): Observable<any> {
+    return this.http.get<any>(`${this.apiUrl}/${id}`).pipe(
+      map(r => r.data ?? r)  // unwrap { success, data } → produit directement
+    );
   }
 
-  createProduit(formData: FormData): Observable<Produit> {
-    return this.http.post<Produit>(this.apiUrl, formData);
+  createProduit(formData: FormData): Observable<any> {
+    return this.http.post<any>(this.apiUrl, formData).pipe(
+      map(r => r.data ?? r)
+    );
   }
 
-  updateProduit(id: string, formData: FormData): Observable<Produit> {
-    return this.http.put<Produit>(`${this.apiUrl}/${id}`, formData);
+  updateProduit(id: string, formData: FormData): Observable<any> {
+    return this.http.put<any>(`${this.apiUrl}/${id}`, formData).pipe(
+      map(r => r.data ?? r)
+    );
+  }
+
+  deleteProduit(id: string): Observable<any> {
+    return this.http.delete<any>(`${this.apiUrl}/${id}`);
   }
 }

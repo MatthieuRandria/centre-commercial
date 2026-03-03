@@ -12,5 +12,7 @@ router.get("/:id", auth.auth,
     controller.getCommandeById);
 router.put("/:id/statut", auth.auth, 
     controller.updateStatut);
+router.get("/boutique/:boutiqueId", auth.auth, 
+    controller.getCommandesByBoutique);
 
 module.exports = router;

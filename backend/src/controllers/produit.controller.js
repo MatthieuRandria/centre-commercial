@@ -119,18 +119,38 @@ exports.getProduitById = async (req, res) => {
  */
 exports.createProduit = async (req, res) => {
   try {
-    const images = req.files?.length ? req.files.map(f => f.path) : [];
-    const produitData = {
-      ...req.body,
-      images,
-      variantes:  req.body.variantes  ? JSON.parse(req.body.variantes)  : [],
-      categories: req.body.categories ? JSON.parse(req.body.categories) : []
-    };
-    const produit = await Produit.create(produitData);
-    res.status(201).json({ success: true, data: produit });
-  } catch (err) {
-    res.status(400).json({ success: false, message: err.message });
-  }
+      const body = req.body || {};
+
+      // variantes : tableau si JSON body, string si FormData — on gère les deux
+      let variantes = body.variantes ?? [];
+      if (typeof variantes === 'string') {
+         try { variantes = JSON.parse(variantes); } catch { variantes = []; }
+      }
+
+      // categories : idem
+      let categories = body.categories ?? [];
+      if (typeof categories === 'string') {
+         try { categories = JSON.parse(categories); } catch { categories = []; }
+      }
+
+      let images = [];
+      if (req.files && req.files.length > 0) images = req.files.map(f => f.path);
+
+      const produit = await Produit.create({
+         nom:         body.nom,
+         description: body.description || '',
+         prix:        Number(body.prix),
+         boutique:    body.boutique,
+         actif:       body.actif === 'false' ? false : body.actif !== false,
+         categories,
+         variantes,
+         images
+      });
+
+      res.status(201).json({ success: true, data: produit });
+   } catch (error) {
+      res.status(400).json({ success: false, message: error.message });
+   }
 };
 
 /**

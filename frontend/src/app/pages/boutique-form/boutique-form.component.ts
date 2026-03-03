@@ -8,16 +8,16 @@ import { BoutiqueService } from '../../services/boutique.service';
 import { finalize, forkJoin, Subject, takeUntil } from 'rxjs';
 
 export interface JourHoraire {
-  key:    string;   // 'lundi', 'mardi', …
-  abbr:   string;   // 'Lun'
-  label:  string;   // 'Lundi'
+  key: string;   // 'lundi', 'mardi', …
+  abbr: string;   // 'Lun'
+  label: string;   // 'Lundi'
   weekend: boolean;
 }
 
 @Component({
   selector: 'app-boutique-form',
-  standalone:true,
-  imports: [CommonModule,ReactiveFormsModule,RouterModule],
+  standalone: true,
+  imports: [CommonModule, ReactiveFormsModule, RouterModule],
   templateUrl: './boutique-form.component.html',
   styleUrl: './boutique-form.component.scss'
 })
@@ -26,63 +26,63 @@ export class BoutiqueFormComponent implements OnInit, OnDestroy {
   private destroy$ = new Subject<void>();
 
   // ─── Mode édition ou création ──────────────────────────────────────────────
-  isEditMode  = false;
-  boutiqueId  = '';
-  pageTitle   = 'Nouvelle boutique';
+  isEditMode = false;
+  boutiqueId = '';
+  pageTitle = 'Nouvelle boutique';
 
   // ─── Onglets ───────────────────────────────────────────────────────────────
   activeTab = 0;
   tabs = [
-    { label: 'Informations générales', icon: '📋', number: 1 },
-    { label: 'Informations détaillées', icon: '🖼️', number: 2 },
-    { label: 'Localisation',           icon: '📍', number: 3 },
-    { label: 'Horaires',               icon: '🕐', number: 4 },
+    { label: 'Informations générales', number: 1 },
+    { label: 'Informations détaillées', number: 2 },
+    { label: 'Localisation', number: 3 },
+    { label: 'Horaires', number: 4 },
   ];
 
   // ─── Référentiels ──────────────────────────────────────────────────────────
-  categories: Categorie[]        = [];
-  centres:    CentreCommercial[] = [];
+  categories: Categorie[] = [];
+  centres: CentreCommercial[] = [];
   isLoadingRefs = false;
 
   // ─── Statuts disponibles ───────────────────────────────────────────────────
   statuts = [
-    { value: 'active',                label: 'Active',                dot: 'dot-open'   },
-    { value: 'inactive',              label: 'Inactive',              dot: 'dot-closed' },
-    { value: 'en_travaux',            label: 'En travaux',            dot: 'dot-conge'  },
+    { value: 'active', label: 'Active', dot: 'dot-open' },
+    { value: 'inactive', label: 'Inactive', dot: 'dot-closed' },
+    { value: 'en_travaux', label: 'En travaux', dot: 'dot-conge' },
     { value: 'fermee_definitivement', label: 'Fermée définitivement', dot: 'dot-closed' },
   ];
 
   // ─── Jours de la semaine ───────────────────────────────────────────────────
   jours: JourHoraire[] = [
-    { key: 'Lundi',    abbr: 'Lun', label: 'Lundi',    weekend: false },
-    { key: 'Mardi',    abbr: 'Mar', label: 'Mardi',    weekend: false },
+    { key: 'Lundi', abbr: 'Lun', label: 'Lundi', weekend: false },
+    { key: 'Mardi', abbr: 'Mar', label: 'Mardi', weekend: false },
     { key: 'Mercredi', abbr: 'Mer', label: 'Mercredi', weekend: false },
-    { key: 'Jeudi',    abbr: 'Jeu', label: 'Jeudi',    weekend: false },
+    { key: 'Jeudi', abbr: 'Jeu', label: 'Jeudi', weekend: false },
     { key: 'Vendredi', abbr: 'Ven', label: 'Vendredi', weekend: false },
-    { key: 'Samedi',   abbr: 'Sam', label: 'Samedi',   weekend: true  },
-    { key: 'Dimanche', abbr: 'Dim', label: 'Dimanche', weekend: true  },
+    { key: 'Samedi', abbr: 'Sam', label: 'Samedi', weekend: true },
+    { key: 'Dimanche', abbr: 'Dim', label: 'Dimanche', weekend: true },
   ];
 
   // ─── Previews images ───────────────────────────────────────────────────────
-  logoPreview:   string | null = null;
+  logoPreview: string | null = null;
   bannerPreview: string | null = null;
-  logoFile:   File | null = null;
+  logoFile: File | null = null;
   bannerFile: File | null = null;
 
   // ─── État UI ───────────────────────────────────────────────────────────────
-  isSubmitting  = false;
-  submitSuccess  = false;
-  errorMessage   = '';
+  isSubmitting = false;
+  submitSuccess = false;
+  errorMessage = '';
 
   // ─── Formulaire ───────────────────────────────────────────────────────────
   form!: FormGroup;
 
   constructor(
-    private fb:              FormBuilder,
+    private fb: FormBuilder,
     private boutiqueService: BoutiqueService,
-    private router:          Router,
-    private route:           ActivatedRoute
-  ) {}
+    private router: Router,
+    private route: ActivatedRoute
+  ) { }
 
   // ───────────────────────────────────────────────────────────────────────────
   ngOnInit(): void {
@@ -94,7 +94,7 @@ export class BoutiqueFormComponent implements OnInit, OnDestroy {
     if (id) {
       this.isEditMode = true;
       this.boutiqueId = id;
-      this.pageTitle  = 'Modifier la boutique';
+      this.pageTitle = 'Modifier la boutique';
       this.loadBoutique(id);
     }
   }
@@ -108,32 +108,32 @@ export class BoutiqueFormComponent implements OnInit, OnDestroy {
   private buildForm(): void {
     this.form = this.fb.group({
       // Onglet 1 — Infos générales
-      nom:          ['', [Validators.required, Validators.minLength(2)]],
-      centreId:     ['', Validators.required],
-      categorieId:  ['', Validators.required],
-      statut:       ['active', Validators.required],
+      nom: ['', [Validators.required, Validators.minLength(2)]],
+      centreId: ['', Validators.required],
+      categorieId: ['', Validators.required],
+      statut: ['active', Validators.required],
 
       // Onglet 2 — Infos détaillées
-      description:  [''],
-      telephone:    [''],
-      email:        ['', Validators.email],
-      site_web:     [''],
-      couleur:      ['#2d4a3e'],
-      couleur_hex:  ['#2d4a3e'],
-      superficie:   [null],
+      description: [''],
+      telephone: [''],
+      email: ['', Validators.email],
+      site_web: [''],
+      couleur: ['#2d4a3e'],
+      couleur_hex: ['#2d4a3e'],
+      superficie: [null],
       capacite_accueil: [null],
       // Réseaux sociaux
-      facebook:     [''],
-      instagram:    [''],
-      twitter:      [''],
-      linkedin:     [''],
+      facebook: [''],
+      instagram: [''],
+      twitter: [''],
+      linkedin: [''],
 
       // Onglet 3 — Localisation
-      etage:         [''],
-      numero_local:  [''],
-      zone:          [''],
-      latitude:      [null],
-      longitude:     [null],
+      etage: [''],
+      numero_local: [''],
+      zone: [''],
+      latitude: [null],
+      longitude: [null],
 
       // Onglet 4 — Horaires (FormArray)
       horaires: this.fb.array(this.buildHorairesDefaut()),
@@ -165,13 +165,13 @@ export class BoutiqueFormComponent implements OnInit, OnDestroy {
     ];
     return this.jours.map((j, i) =>
       this.fb.group({
-        jour:       [j.key],
-        ouvert:     [true],
-        ouverture:  [defauts[i].ouverture],
-        fermeture:  [defauts[i].fermeture],
-        pause_actif:  [false],
-        pause_debut:  ['12:00'],
-        pause_fin:    ['13:00'],
+        jour: [j.key],
+        ouvert: [true],
+        ouverture: [defauts[i].ouverture],
+        fermeture: [defauts[i].fermeture],
+        pause_actif: [false],
+        pause_debut: ['12:00'],
+        pause_fin: ['13:00'],
       })
     );
   }
@@ -188,14 +188,14 @@ export class BoutiqueFormComponent implements OnInit, OnDestroy {
   private loadReferentiels(): void {
     this.isLoadingRefs = true;
     forkJoin({
-      centres:    this.boutiqueService.getCentres(),
+      centres: this.boutiqueService.getCentres(),
       categories: this.boutiqueService.getCategories(),
     }).pipe(
       takeUntil(this.destroy$),
       finalize(() => this.isLoadingRefs = false)
     ).subscribe({
       next: ({ centres, categories }) => {
-        this.centres    = this.toArray<CentreCommercial>(centres);
+        this.centres = this.toArray<CentreCommercial>(centres);
         this.categories = this.toArray<Categorie>(categories);
       },
       error: err => console.error('Erreur référentiels', err)
@@ -217,25 +217,25 @@ export class BoutiqueFormComponent implements OnInit, OnDestroy {
 
   private patchForm(b: Boutique): void {
     this.form.patchValue({
-      nom:          b.nom,
-      centreId:     b.centre_commercial._id,
-      categorieId:  b.categorie._id,
-      statut:       b.statut,
-      description:  b.infos.description,
-      telephone:    b.infos.telephone,
-      email:        b.infos.email,
-      site_web:     b.infos.site_web ?? '',
-      couleur:      b.categorie.couleur,
-      couleur_hex:  b.categorie.couleur,
-      superficie:   b.infos.superficie ?? null,
+      nom: b.nom,
+      centreId: b.centre_commercial._id,
+      categorieId: b.categorie._id,
+      statut: b.statut,
+      description: b.infos.description,
+      telephone: b.infos.telephone,
+      email: b.infos.email,
+      site_web: b.infos.site_web ?? '',
+      couleur: b.categorie.couleur,
+      couleur_hex: b.categorie.couleur,
+      superficie: b.infos.superficie ?? null,
       capacite_accueil: b.infos.capacite_accueil ?? null,
-      facebook:     b.infos.reseaux_sociaux?.facebook ?? '',
-      instagram:    b.infos.reseaux_sociaux?.instagram ?? '',
-      twitter:      b.infos.reseaux_sociaux?.twitter ?? '',
-      linkedin:     b.infos.reseaux_sociaux?.linkedin ?? '',
-      etage:        b.localisation.etage,
+      facebook: b.infos.reseaux_sociaux?.facebook ?? '',
+      instagram: b.infos.reseaux_sociaux?.instagram ?? '',
+      twitter: b.infos.reseaux_sociaux?.twitter ?? '',
+      linkedin: b.infos.reseaux_sociaux?.linkedin ?? '',
+      etage: b.localisation.etage,
       numero_local: b.localisation.numero_local,
-      zone:         b.localisation.zone ?? '',
+      zone: b.localisation.zone ?? '',
     });
 
     // Patch horaires
@@ -243,12 +243,12 @@ export class BoutiqueFormComponent implements OnInit, OnDestroy {
       b.horaires.forEach((h, i) => {
         if (i < this.horairesArray.length) {
           this.horaireAt(i).patchValue({
-            ouvert:      h.ouvert,
-            ouverture:   h.heures.ouverture,
-            fermeture:   h.heures.fermeture,
+            ouvert: h.ouvert,
+            ouverture: h.heures.ouverture,
+            fermeture: h.heures.fermeture,
             pause_actif: h.pause_dejeuner.actif,
             pause_debut: h.pause_dejeuner.debut ?? '12:00',
-            pause_fin:   h.pause_dejeuner.fin   ?? '13:00',
+            pause_fin: h.pause_dejeuner.fin ?? '13:00',
           });
         }
       });
@@ -290,40 +290,40 @@ export class BoutiqueFormComponent implements OnInit, OnDestroy {
     const horaires: Horaire[] = this.horairesArray.controls.map((ctrl, i) => {
       const h = ctrl.value;
       return {
-        jour:   this.jours[i].key,
+        jour: this.jours[i].key,
         ouvert: h.ouvert,
         heures: { ouverture: h.ouverture, fermeture: h.fermeture },
         pause_dejeuner: {
-          actif:  h.pause_actif,
-          debut:  h.pause_actif ? h.pause_debut : undefined,
-          fin:    h.pause_actif ? h.pause_fin   : undefined,
+          actif: h.pause_actif,
+          debut: h.pause_actif ? h.pause_debut : undefined,
+          fin: h.pause_actif ? h.pause_fin : undefined,
         }
       };
     });
 
     return {
-      nom:    v.nom,
+      nom: v.nom,
       statut: v.statut,
       // IDs uniquement — le backend résout les objets
       centre_commercial: { _id: v.centreId } as any,
-      categorie:         { _id: v.categorieId, couleur: v.couleur } as any,
+      categorie: { _id: v.categorieId, couleur: v.couleur } as any,
       localisation: {
-        etage:        v.etage,
+        etage: v.etage,
         numero_local: v.numero_local,
-        zone:         v.zone || undefined,
+        zone: v.zone || undefined,
       },
       infos: {
-        description:      v.description,
-        telephone:        v.telephone,
-        email:            v.email,
-        site_web:         v.site_web  || undefined,
-        superficie:       v.superficie       ?? undefined,
+        description: v.description,
+        telephone: v.telephone,
+        email: v.email,
+        site_web: v.site_web || undefined,
+        superficie: v.superficie ?? undefined,
         capacite_accueil: v.capacite_accueil ?? undefined,
         reseaux_sociaux: {
-          facebook:  v.facebook  || undefined,
+          facebook: v.facebook || undefined,
           instagram: v.instagram || undefined,
-          twitter:   v.twitter   || undefined,
-          linkedin:  v.linkedin  || undefined,
+          twitter: v.twitter || undefined,
+          linkedin: v.linkedin || undefined,
         }
       },
       horaires,
@@ -378,9 +378,9 @@ export class BoutiqueFormComponent implements OnInit, OnDestroy {
 
   // ─── Helper ───────────────────────────────────────────────────────────────
   private toArray<T>(res: any): T[] {
-    if (Array.isArray(res))                            return res;
-    if (res?.data  && Array.isArray(res.data))         return res.data;
-    if (res?.items && Array.isArray(res.items))        return res.items;
+    if (Array.isArray(res)) return res;
+    if (res?.data && Array.isArray(res.data)) return res.data;
+    if (res?.items && Array.isArray(res.items)) return res.items;
     return [];
   }
 }
