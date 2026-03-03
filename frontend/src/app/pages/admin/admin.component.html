@@ -122,11 +122,7 @@
                 <td><span class="cmd-count">{{ b.commandes }}</span></td>
               </tr>
               <tr *ngIf="topBoutiques.length === 0">
-<<<<<<< Updated upstream
-                <td colspan="4" class="empty-cell">Aucune donnée disponible</td>
-=======
                 <td colspan="4" class="empty-cell">Aucune donnee disponible</td>
->>>>>>> Stashed changes
               </tr>
             </tbody>
           </table>
@@ -158,11 +154,7 @@
                 </td>
               </tr>
               <tr *ngIf="topProduits.length === 0">
-<<<<<<< Updated upstream
-                <td colspan="3" class="empty-cell">Aucune donnée disponible</td>
-=======
                 <td colspan="3" class="empty-cell">Aucune donnee disponible</td>
->>>>>>> Stashed changes
               </tr>
             </tbody>
           </table>
@@ -170,17 +162,10 @@
 
       </div>
 
-<<<<<<< Updated upstream
-      <!-- ─── DERNIÈRES COMMANDES ─────────────────────────────────────────── -->
-      <div class="recent-orders-card">
-        <div class="tc-head">
-          <h2>Dernières commandes</h2>
-=======
       <!-- DERNIERES COMMANDES -->
       <div class="recent-orders-card">
         <div class="tc-head">
           <h2>Dernieres commandes</h2>
->>>>>>> Stashed changes
           <a class="tc-link" routerLink="/admin/commandes">Voir toutes</a>
         </div>
 
@@ -213,12 +198,6 @@
                     <span class="statut-dot"></span>{{ cmd.statutLabel }}
                   </span>
                 </td>
-<<<<<<< Updated upstream
-                <td><button class="btn-sm" type="button" (click)="viewCommande(cmd)">Voir</button></td>
-              </tr>
-              <tr *ngIf="recentCommandes.length === 0">
-                <td colspan="7" class="empty-cell">Aucune commande récente</td>
-=======
                 <td>
                   <button class="btn-sm" type="button" (click)="viewCommande(cmd)">
                     <!-- eye -->
@@ -235,7 +214,6 @@
               </tr>
               <tr *ngIf="recentCommandes.length === 0">
                 <td colspan="7" class="empty-cell">Aucune commande recente</td>
->>>>>>> Stashed changes
               </tr>
             </tbody>
           </table>
