@@ -83,6 +83,15 @@ export const routes: Routes = [
       import('./pages/manager-boutique/promotion/promotion.component')
         .then(m => m.ManagerPromotionsComponent),
   },
+  {
+    path: 'boutique/commandes/:id',
+    canActivate: [AuthGuard, RoleGuard],
+    data: { role: 'boutique' },
+    loadComponent: () =>
+      import('./pages/manager-boutique/commandes/details/details.component')
+        .then(m => m.ManagerCommandeDetailComponent),
+  },
+
 
   // ───────────── Boutique (Public) ─────────────
 
