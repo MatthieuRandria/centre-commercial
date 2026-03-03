@@ -6,6 +6,7 @@ import { FormsModule } from '@angular/forms';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Subject, takeUntil } from 'rxjs';
 import { AuthService } from '../../../../services/auth.service';
+import { environment } from '../../../../../environments/environment';
 
 interface Article {
    produit: string;
@@ -45,7 +46,7 @@ interface Commande {
 })
 export class ManagerCommandeDetailComponent implements OnInit, OnDestroy {
 
-   private readonly API = 'http://localhost:3000';
+   private readonly API = environment.apiUrl;
    private destroy$ = new Subject<void>();
 
    commande: Commande | null = null;

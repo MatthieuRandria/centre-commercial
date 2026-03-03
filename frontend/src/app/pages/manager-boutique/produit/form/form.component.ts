@@ -16,7 +16,7 @@ import { AuthService } from '../../../../services/auth.service';
 })
 export class ManagerProduitFormComponent implements OnInit {
 
-   private readonly API = 'http://localhost:3000/produits';
+   private readonly API = `${environment.apiUrl}produits`;
 
    form!: FormGroup;
    isLoading = false;

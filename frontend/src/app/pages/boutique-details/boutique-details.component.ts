@@ -4,6 +4,7 @@ import { RouterModule, ActivatedRoute } from '@angular/router';
 import { HttpClient } from '@angular/common/http';
 import { BoutiqueService } from '../../services/boutique.service';
 import { Boutique } from '../../models/boutique.model';
+import { environment } from '../../../environments/environment';
 
 interface Produit {
    _id: string;
@@ -36,7 +37,7 @@ export class BoutiqueDetailComponent implements OnInit {
    private boutiqueService = inject(BoutiqueService);
    private http = inject(HttpClient);
 
-   private apiProduits = 'http://localhost:3000/produits';
+   private apiProduits = `${environment.apiUrl}/produits`;
 
    ngOnInit(): void {
       const slug = this.route.snapshot.paramMap.get('slug');
